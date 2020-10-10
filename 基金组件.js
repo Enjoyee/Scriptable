@@ -96,7 +96,11 @@ function createWidget(fundJson) {
     expectWorth.leftAlignText() //Align,对齐方式(center,left,right)！在同一个stack内的对齐方式不能单独设置，只能调整向左对齐间距大小 
     
     // 净值估算更新日期 
-    let expectWorthDateText = data[index].expectWorthDate.substring(5)
+    let expectWorthDateStr = data[index].expectWorthDate
+    let expectWorthDateText = data[index].netWorthDate
+    if (typeof(expectWorthDateStr) != "undefined") {
+        expectWorthDateText = expectWorthDateStr.substring(5)
+    }
     let expectWorthDate = hStack0.addText(expectWorthDateText + '')
     expectWorthDate.font = new Font('Menlo', fontSize) //font and size,字体与大小
     expectWorthDate.textColor = color //font color,字体颜色
