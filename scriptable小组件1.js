@@ -101,9 +101,9 @@ function sloarToLunar(sy, sm, sd) {
   }
 
   return {
-    lunarYear: `${ly}年`,
-    lunarMonth: `${lm}月`,
-    lunarDay: `${ld}日`,
+    lunarYear: `${ly}`,
+    lunarMonth: `${lm}`,
+    lunarDay: `${ld}`,
   }
 }
 
@@ -390,8 +390,8 @@ const greetingsMorning = '💫 Good morning~';
 const greetingsNoon = '🥳 Good noon~';
 const greetingsAfternoon = '🐡 Good afternoon~';
 const greetingsEvening = '🐳 Good evening~';
-const greetingsNight = '🦉 Time for bed~';
-const greetingsLateNight = '🦍 Fairy mode!!';
+const greetingsNight = '🦉 Time to get laid~';
+const greetingsLateNight = '🦍 Into Fairy mode!!';
 
 var holidaysByDate = {
 	// month,date: greeting
@@ -399,7 +399,7 @@ var holidaysByDate = {
 	"2,14": "👩‍❤️‍💋‍👨情人节快乐!",
 	"3,8": "👩三八妇女节!",
 	"3,12": "🌳植树节!",
-    "10,31": "🎃万圣节快乐!",
+  "10,31": "🎃万圣节快乐!",
 	"12,25": "🎄圣诞快乐!"
 }
 
@@ -426,16 +426,13 @@ function ordinalSuffix(input) {
 	}
 }
 
-// Generate date string
-var datefull = month + "-" + ordinalSuffix(date) + "，" + weekday + "，";
-
 // Support for multiple greetings per time period
 function randomGreeting(greetingArray) {
 	return Math.floor(Math.random() * greetingArray.length);
 }
 
 var greeting = new String("Howdy.")
-if (hour >= 23 && hour <= 1) {
+if (hour >= 23 || hour <= 1) {
 	greeting = greetingsNight
 } else if (hour > 1 && hour <= 5) {
 	greeting = greetingsLateNight
@@ -499,7 +496,7 @@ if (config.runsInWidget) {
  widgetHello.addSpacer(15);
 
  // Greeting label,问候标签
- let hello = widgetHello.addText(greeting);
+ let hello = widgetHello.addText(greeting + '');
  hello.font = Font.boldSystemFont(32); //font and size,字体与大小
  hello.textColor = new Color('e8ffc1'); //font color,字体颜色
  hello.textOpacity = (1); //opacity,不透明度
@@ -613,7 +610,7 @@ hltemptext.leftAlignText(); //Align,对齐方式(center,left,right)！在同一�
 
 
 //define horizontal stack,创建一个stack，使下面组件都在同一个stack中，布局为横向布局（hStack2）
-widgetHello.addSpacer(7);
+widgetHello.addSpacer(6);
 let hStack2 = widgetHello.addStack();
 hStack2.layoutHorizontally();
 
@@ -621,24 +618,25 @@ hStack2.layoutHorizontally();
 hStack2.addSpacer(0)//Left spacing,向左对齐间距
 
 // Date label,日期
+var datefull = "⊱" + month + "-" + ordinalSuffix(date) + "  " + weekday + "  ";
 const datetext = hStack2.addText(datefull);
-datetext.font = Font.boldSystemFont(18); //font and size,字体与大小
+datetext.font = Font.regularSystemFont(20); //font and size,字体与大小
 datetext.textColor = new Color('#ffffff'); //font color,字体颜色
 datetext.textOpacity = (1); //opacity,不透明度
 datetext.centerAlignText(); //Align,对齐方式(center,left,right)！在同一个stack内的对齐方式不能单独设置，只能调整向左对齐间距大小
 
 // 农历
 var lunarDate = sloarToLunar(today.getFullYear(), today.getMonth() + 1, today.getDate())
-const lunarText = lunarDate['lunarMonth']+lunarDate['lunarDay'] + "，"
+const lunarText = lunarDate['lunarMonth'] + '月' + lunarDate['lunarDay'] + "⊰ "
 const lunarDateText = hStack2.addText(lunarText);
-lunarDateText.font = Font.boldSystemFont(18); //font and size,字体与大小
+lunarDateText.font = Font.regularSystemFont(20); //font and size,字体与大小
 lunarDateText.textColor = new Color('#ffffff'); //font color,字体颜色
 lunarDateText.textOpacity = (1); //opacity,不透明度
 lunarDateText.centerAlignText(); //Align,对齐方式(center,left,right)！在同一个stack内的对齐方式不能单独设置，只能调整向左对齐间距大小
 
 //tempeture label in stack
 let temptext = hStack2.addText('\xa0\xa0'+ Math.round(curTemp).toString() + "\u2103" + "  ");
-temptext.font = Font.boldSystemFont(22); //font and size,字体与大小
+temptext.font = Font.boldSystemFont(20); //font and size,字体与大小
 temptext.textColor = new Color('#ffffff'); //font color,字体颜色
 temptext.textOpacity = (1); //opacity,不透明度
 temptext.centerAlignText(); //AlignText,对齐方式(center,left,right)！在同一个stack内的对齐方式不能单独设置，只能调整向左对齐间距大小
@@ -647,7 +645,7 @@ temptext.centerAlignText(); //AlignText,对齐方式(center,left,right)！在同
 var img = Image.fromFile(await fetchimagelocal(iconData + "_ico")); 
 //image in stack 天气图像
 let widgetimg = hStack2.addImage(img); 
-widgetimg.imageSize = new Size(28, 28); //image size,图像大小
+widgetimg.imageSize = new Size(20, 20); //image size,图像大小
 widgetimg.centerAlignImage(); //Align,对齐方式(center,left,right)
 
 // Bottom Spacer
