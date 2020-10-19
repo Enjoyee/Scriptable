@@ -20,7 +20,7 @@ const bgColorStr = "#000000"
 const previewSize = "Medium"
 
 // 彩云天气的apiKey，自己去免费申请：https://caiyunapp.com
-const apiKey = ""
+const apiKey = "TAkhjf8d1nlSlspN"
 
 // 默认的定位信息，定位失败的时候默认读取
 // https://open.caiyunapp.com/File:Adcode-release-2020-06-10.xlsx.zip
@@ -28,37 +28,43 @@ const apiKey = ""
 let locationData = {
   "latitude": undefined,
   "longitude": undefined,
-  "locality": "",
-  "subLocality": ""
+  "locality": undefined,
+  "subLocality": undefined
 }
 // 锁定地区，直接使用上述填写的地址信息不进行定位
 const lockLocation = false
 
 // 是否需要选择图片背景
-const changePicBg = false
+const changePicBg = true
+
+// 日程显示条数
+const maxSchedules = 2
+
+// 提醒事项显示条数
+const maxReminders = 2
 
 // 内容区左右边距
 const padding = {
   top: 0,
-  left: 0,
+  left: 4,
   bottom: 0,
-  right: 0
+  right: 4
 }
 
 // 顶部问候语，英文花样文字：https://beizhedenglong.github.io/weird-fonts/
 const greetingText = {
-  nightGreeting: "🦉 𝔗𝔦𝔪𝔢 𝔱𝔬 𝔤𝔢𝔱 𝔩𝔞𝔦𝔡~",
-  morningGreeting: "💫 𝔊𝔬𝔬𝔡 𝔪𝔬𝔯𝔫𝔦𝔫𝔤~",
-  noonGreeting: "🥳 𝔊𝔬𝔬𝔡 𝔫𝔬𝔬𝔫~",
-  afternoonGreeting: "🐡 𝔊𝔬𝔬𝔡 𝔞𝔣𝔱𝔢𝔯𝔫𝔬𝔬𝔫~",
-  eveningGreeting: "🐳 𝔊𝔬𝔬𝔡 𝔢𝔳𝔢𝔫𝔦𝔫𝔤~"
+  nightGreeting: "🦉 𝑇𝑖𝑚𝑒 𝑡𝑜 𝑔𝑒𝑡 𝑙𝑎𝑖𝑑~",
+  morningGreeting: "💫 𝐺𝑜𝑜𝑑 𝑚𝑜𝑟𝑛𝑖𝑛𝑔~",
+  noonGreeting: "🥳 𝐺𝑜𝑜𝑑 𝑛𝑜𝑜𝑛~",
+  afternoonGreeting: "🐡 𝐺𝑜𝑜𝑑 𝑎𝑓𝑡𝑒𝑟𝑛𝑜𝑜𝑛~",
+  eveningGreeting: "🐳 𝐺𝑜𝑜𝑑 𝑒𝑣𝑒𝑛𝑖𝑛𝑔~"
 }
 
 // 天气对应的icon 
 const weatherIcos = {
   SUNRISE: "sunrise.fill", // 日出
   CLEAR_DAY: "sun.max.fill", // 晴（白天） CLEAR_DAY
-  CLEAR_NIGHT: "sun.min.fill", // 晴（夜间） CLEAR_NIGHT
+  CLEAR_NIGHT: "sun.max.fill", // 晴（夜间） CLEAR_NIGHT
   PARTLY_CLOUDY_DAY: "cloud.sun.fill", // 多云（白天）  PARTLY_CLOUDY_DAY
   PARTLY_CLOUDY_NIGHT: "cloud.sun.fill", // 多云（夜间）  PARTLY_CLOUDY_NIGHT
   CLOUDY: "cloud.fill", // 阴  CLOUDY
@@ -80,11 +86,15 @@ const weatherIcos = {
   SUNSET: "sunset.fill", // 日落
 }
 
-// 电池对应的icon 
-const batteryIcos = {
-  BATTERY_NORMAL: "battery.100",
-  BATTERY_CHARGING: "battery.100.bolt",
-  BATTERY_LOWER: "battery.25",
+// 天气信息控制
+const weatherControl = {
+  HUMIDITY: true, // 是否显示相对湿度
+  COMFORT: true, // 是否显示舒适指数
+  ULTRAVIOLET: true, // 是否显示紫外线指数
+  AQI: true, // 是否显示空气质量指数
+  HEIGHT_LOW: true, // 是否显示温度范围
+  SUNRISE_SUNSET: true, // 是否显示日出日落时间
+  UPDATE_TIME: true, // 是否显示天气更新时间
 }
 
 // 周标题
@@ -123,6 +133,10 @@ const year = currentDate.getFullYear()
 const month = currentDate.getMonth() + 1
 // 日期
 const day = currentDate.getDate()
+// 小时
+const hour = currentDate.getHours()
+// 分钟
+const minute = currentDate.getMinutes()
 
 /*
  ****************************************************************************
@@ -134,7 +148,7 @@ const day = currentDate.getDate()
 /********************************************************************/
 /****************************定义小组件****************************/
 /********************************************************************/
-const filename = Script.name() + ".jpg"
+const filename = `${Script.name()}.jpg`
 const files = FileManager.local()
 const path = files.joinPath(files.documentsDirectory(), filename)
 const widget = new ListWidget()
@@ -148,9 +162,9 @@ const lunarInfo = await getLunar()
 // 今日诗词
 const poetry = await getPoetry()
 // // 日程信息
-// const showSchedules = getSchedules()
-// // 提醒事项
-// const showReminders = getReminders()
+const showSchedules = await getSchedules()
+// 提醒事项
+// const showReminders = await getReminders()
 
 
 //////////////////////////////////////////
@@ -171,121 +185,115 @@ leftStack.layoutVertically()
 
 //////////////////////////////////////////
 // 问候
-let titleStack = leftStack.addStack()
-titleStack.layoutHorizontally()
-titleStack.centerAlignContent()
+let titleStack = horizontallyCenterStack(leftStack)
 // 问候语获取内容
 const greeting = provideGreeting(currentDate)
-textStyle.stack = titleStack
-textStyle.topMargin = 0
-textStyle.text = greeting
-textStyle.font = Font.systemFont(22)
-textStyle.textColor = defaultTextColor
-// 添加显示标题
-addText(textStyle)
+// 添加显示标题  
+addStyleText(titleStack, 0, greeting, 1, Font.systemFont(22), defaultTextColor)
+
 
 //////////////////////////////////////////
-// 年月日样式
-textStyle.stack = leftStack
-textStyle.topMargin = 3
-textStyle.text = getDateStr(currentDate)
-textStyle.font = Font.systemFont(16)
-textStyle.textColor = new Color("#ffcc99")
-// 添加显示日期
-addText(textStyle)
+// 年月日
+const dateStr = getDateStr(currentDate)
+addStyleText(leftStack, 2, dateStr, 1, Font.systemFont(16), new Color("#ffcc99"))
 
 //////////////////////////////////////////
 // 星期几 / 农历日期
+const weekDayColor = new Color("#ffffff", 0.9)
 leftStack.addSpacer(2)
-let dateStack = leftStack.addStack()
-dateStack.layoutHorizontally()
-dateStack.centerAlignContent()
-// 样式
-textStyle.stack = dateStack
-textStyle.topMargin = 0
-textStyle.text = getDayWeekTitle(currentDate)
-textStyle.font = Font.systemFont(16)
-textStyle.textColor = new Color("#ffffff", 0.8)
+let dateStack = horizontallyCenterStack(leftStack)
 // 添加显示星期几
-addText(textStyle)
+const weekDayTitle = getDayWeekTitle(currentDate)
+addStyleText(dateStack, 0, weekDayTitle, 1, Font.systemFont(16), weekDayColor)
 dateStack.addSpacer(4)
+
 // 农历信息
 let infoLunarText = lunarInfo.data.lunar
 infoLunarText = infoLunarText.substring(12, infoLunarText.length)
-// 样式
-textStyle.stack = dateStack
-textStyle.topMargin = 0
-textStyle.text = infoLunarText
-textStyle.font = Font.systemFont(16)
-textStyle.textColor = new Color("#ffffff", 0.8)
 // 添加显示农历
-addText(textStyle)
+addStyleText(dateStack, 0, infoLunarText, 1, Font.systemFont(16), weekDayColor)
+
 // 电池信息
+dateStack.addSpacer(2)
 const batteryLevel = Device.batteryLevel() * 100
 const batteryStr = `〓 ${getBatteryLevel()} 〓`
-// 电池具体信息 / 样式
-textStyle.stack = dateStack
-textStyle.topMargin = 0
-textStyle.text = batteryStr
-textStyle.font = Font.systemFont(14)
-textStyle.textColor = new Color("#ffffff", 0.8)
 // 添加显示电池具体信息
-addText(textStyle)
+addStyleText(dateStack, 0, batteryStr, 1, Font.systemFont(15), weekDayColor)
 
 
 //////////////////////////////////////////
-// 添加天气预告信息
+// 天气预警、预告信息
 const weatherAlertInfo = weatherInfo.alertWeatherTitle 
 let weatherDesc = weatherInfo.weatherDesc
 if (weatherAlertInfo != undefined) {
   weatherDesc = weatherAlertInfo
 }
-// 样式
-textStyle.stack = leftStack
-textStyle.topMargin = 4
-textStyle.text = weatherDesc
-textStyle.lineLimit = 1
-textStyle.font = Font.systemFont(12)
-textStyle.textColor = new Color("#ffffff", 0.8)
-// 添加天气预告信息
-addText(textStyle)
+// 添加显示天气预告信息
+addStyleText(leftStack, 3, weatherDesc, 1, Font.systemFont(12), defaultTextColor)
 
 //////////////////////////////////////////
-// 添加今日诗词
-leftStack.addSpacer(3)
-const poetryStack = leftStack.addStack()
-poetryStack.backgroundColor = new Color("#666", 0.5)
-poetryStack.cornerRadius = 4
-poetryStack.layoutVertically()
-poetryStack.addSpacer(2)
-const poetryInfo = poetry.data
-// 样式
-textStyle.stack = poetryStack
-textStyle.topMargin = 0
-textStyle.text = `“${poetryInfo.content.substring(0, poetryInfo.content.length - 1)}”`
-textStyle.lineLimit = 1
-textStyle.font = Font.systemFont(12)
-textStyle.textColor = new Color("#ffffff", 0.7)
-// 添加显示诗词
-addText(textStyle)
-// 重置行数控制
-textStyle.lineLimit = 0
-// 添加作者
-const authStack = poetryStack.addStack()
-authStack.layoutHorizontally()
-authStack.addSpacer()
-// 作者样式
-textStyle.stack = authStack
-textStyle.topMargin = 0
-textStyle.text = `⊱${poetryInfo.origin.dynasty}·${poetryInfo.origin.author}⊰`
-textStyle.lineLimit = 1
-textStyle.font = Font.systemFont(11)
-textStyle.textColor = new Color("#ffffff", 0.7)
-// 显示作者
-addText(textStyle)
-authStack.addSpacer(20)
-poetryStack.addSpacer(2)
+// 日程、诗词
+const schedulePoetryColor = new Color("#ffffff", 0.7)
+const scheduleSize = showSchedules.length
+if (scheduleSize > 0) {
+  addStyleText(leftStack, 1, "----------------------------------", 1, Font.systemFont(10), schedulePoetryColor)
+  // 添加日程
+  let scheduleIndex = 0
+  for (let schedule of showSchedules) {
+    // 索引值
+    scheduleIndex++
+    if (scheduleIndex > maxSchedules) {
+      return
+    }
+
+    const scheduleStack = horizontallyCenterStack(leftStack)
+    // 图片
+    const img = getSFIco("megaphone")
+    // 展示ico
+    addStyleImg(scheduleStack, 0, img, 12, 12, schedulePoetryColor)
+    scheduleStack.addSpacer(4)
+
+    // 日程标题
+    addStyleText(scheduleStack, 0, schedule.title, 1, Font.systemFont(11), schedulePoetryColor)
+
+    // 开始时间
+    const scheduleTimeStack = leftStack.addStack()
+    scheduleTimeStack.layoutHorizontally()
+    scheduleTimeStack.addSpacer(17)
+    // 展示时间
+    addStyleText(scheduleTimeStack, 0, schedule.timeText, 1, Font.systemFont(11), schedulePoetryColor)
+  }
+} else {
+  // 添加今日诗词
+  leftStack.addSpacer(4)
+  const poetryStack = leftStack.addStack()
+  // 诗词背景
+  poetryStack.backgroundColor = new Color("#666", 0.5)
+  poetryStack.cornerRadius = 4
+  poetryStack.layoutVertically()
+  poetryStack.addSpacer(2)
+  //
+  const poetryInfoStack = poetryStack.addStack()
+  poetryInfoStack.layoutHorizontally()
+  poetryInfoStack.addSpacer(2)
+  const poetryInfo = poetry.data
+  // 添加显示诗词
+  const potryContent = `"${poetryInfo.content.substring(0, poetryInfo.content.length - 1)}"`
+  addStyleText(poetryInfoStack, 0, potryContent, 1, Font.systemFont(11), schedulePoetryColor)
+
+  // 添加作者
+  const authStack = poetryStack.addStack()
+  authStack.layoutHorizontally()
+  authStack.addSpacer()
+  // 显示作者
+  const authorText = `⊱${poetryInfo.origin.dynasty}·${poetryInfo.origin.author}⊰`
+  addStyleText(authStack, 0, authorText, 1, Font.systemFont(11), schedulePoetryColor)
+  authStack.addSpacer(20)
+  poetryStack.addSpacer(2)
+}
+
 ////////////////////////////////////////////////////////////////////////////////////
+
 
 
 
@@ -303,144 +311,97 @@ rightStack.layoutVertically()
 // 天气Icon
 const weatherStack = alignRightStack(rightStack)
 weatherStack.bottomAlignContent()
-let weatherImg = getWeatherIco(weatherInfo.weatherIco)
-// 样式
-imgStyle.stack = weatherStack
-imgStyle.topMargin = 0
-imgStyle.img = weatherImg
-imgStyle.width = 32
-imgStyle.length = 32
+let weatherImg = getSFIco(weatherInfo.weatherIco)
 // 显示天气
-addImg(imgStyle)
+addStyleImg(weatherStack, 0, weatherImg, 32, 32)
 // 体感温度
 weatherStack.addSpacer(4)
 const bodyFeelingTemperature = weatherInfo.bodyFeelingTemperature
-textStyle.stack = weatherStack
-textStyle.topMargin = 0
-textStyle.text = `${bodyFeelingTemperature}°C`
-textStyle.font = Font.boldMonospacedSystemFont(20)
-textStyle.textColor = defaultTextColor
-addText(textStyle)
+addStyleText(weatherStack, 0, `${bodyFeelingTemperature}°C`, 1, Font.boldMonospacedSystemFont(22), defaultTextColor)
 //////////////////////////////////////////
 
 // 相对湿度
-rightStack.addSpacer(4)
-const humidityStack = alignRightStack(rightStack)
-textStyle.stack = humidityStack
-textStyle.topMargin = 0
-textStyle.text = `相对湿度：${weatherInfo.humidity}`
-textStyle.font = Font.systemFont(11)
-textStyle.textColor = defaultTextColor
-addText(textStyle)
+if (weatherControl.HUMIDITY) {
+  rightStack.addSpacer(4)
+  const humidityStack = alignRightStack(rightStack)
+  addStyleText(humidityStack, 0, `相对湿度：${weatherInfo.humidity}`, 1, Font.systemFont(11), defaultTextColor)  
+}
 
 //////////////////////////////////////////
 // 舒适指数
-rightStack.addSpacer(1)
-const comfortStack = alignRightStack(rightStack)
-textStyle.stack = comfortStack
-textStyle.topMargin = 0
-textStyle.text = `舒适指数：${weatherInfo.comfort}`
-textStyle.font = Font.systemFont(11)
-textStyle.textColor = defaultTextColor
-addText(textStyle)
+if (weatherControl.COMFORT) {
+  rightStack.addSpacer(1)
+  const comfortStack = alignRightStack(rightStack)
+  addStyleText(comfortStack, 0, `舒适指数：${weatherInfo.comfort}`, 1, Font.systemFont(11), defaultTextColor)
+}
 
 //////////////////////////////////////////
 // 紫外线指数
-rightStack.addSpacer(1)
-const ultravioletStack = alignRightStack(rightStack)
-textStyle.stack = ultravioletStack
-textStyle.topMargin = 0
-textStyle.text = `紫外线：${weatherInfo.ultraviolet}`
-textStyle.font = Font.systemFont(11)
-textStyle.textColor = defaultTextColor
-addText(textStyle)
+if (weatherControl.ULTRAVIOLET) {
+  rightStack.addSpacer(1)
+  const ultravioletStack = alignRightStack(rightStack)
+  addStyleText(ultravioletStack, 0, `紫外线：${weatherInfo.ultraviolet}`, 1, Font.systemFont(11), defaultTextColor)
+}
 
 //////////////////////////////////////////
 // 空气质量
-rightStack.addSpacer(1)
-const aqiInfoStack = alignRightStack(rightStack)
-textStyle.stack = aqiInfoStack
-textStyle.topMargin = 8
-textStyle.text = `空气质量：${weatherInfo.aqiInfo}`
-textStyle.font = Font.systemFont(11)
-textStyle.textColor = defaultTextColor
-addText(textStyle)
-
+if (weatherControl.AQI) {
+  rightStack.addSpacer(1)
+  const aqiInfoStack = alignRightStack(rightStack)
+  addStyleText(aqiInfoStack, 8, `空气质量：${weatherInfo.aqiInfo}`, 1, Font.systemFont(11), defaultTextColor)
+}
 
 //////////////////////////////////////////
 // 高低温
-const minTemperature = weatherInfo.minTemperature
-const maxTemperature = weatherInfo.maxTemperature
-// 右对齐
-rightStack.addSpacer(3)
-const tempStack = alignRightStack(rightStack)
-// 高温
-textStyle.stack = tempStack
-textStyle.topMargin = 0
-textStyle.text = `↑`
-textStyle.font = Font.systemFont(10)
-textStyle.textColor = new Color("#ff0000")
-addText(textStyle)
-textStyle.text = `${weatherInfo.maxTemperature}°`
-textStyle.textColor = defaultTextColor
-addText(textStyle)
-// 低温
-tempStack.addSpacer(6)
-textStyle.stack = tempStack
-textStyle.topMargin = 0
-textStyle.text = `↓`
-textStyle.font = Font.systemFont(10)
-textStyle.textColor = new Color("#2bae85")
-addText(textStyle)
-textStyle.text = `${weatherInfo.minTemperature}°`
-textStyle.textColor = defaultTextColor
-addText(textStyle)
-
+if (weatherControl.HEIGHT_LOW) {
+  const minTemperature = weatherInfo.minTemperature
+  const maxTemperature = weatherInfo.maxTemperature
+  // 右对齐
+  rightStack.addSpacer(3)
+  const tempStack = alignRightStack(rightStack)
+  // 高温
+  addStyleText(tempStack, 0, `↑`, 1, Font.systemFont(10), new Color("#ff0000"))
+  addStyleText(tempStack, 0, `${weatherInfo.maxTemperature}°`, 1, Font.systemFont(10), defaultTextColor)
+  // 低温
+  tempStack.addSpacer(6)
+  addStyleText(tempStack, 0, `↓`, 1, Font.systemFont(10), new Color("#2bae85"))
+  addStyleText(tempStack, 0, `${weatherInfo.minTemperature}°`, 1, Font.systemFont(10), defaultTextColor)
+}
 
 //////////////////////////////////////////
 // 日出
-rightStack.addSpacer(2)
-let symbolStack = rightStack.addStack()
-symbolStack.layoutHorizontally()
-symbolStack.addSpacer()
-symbolStack.bottomAlignContent()
-// 添加日出icon
-let sunriseImg = getWeatherIco(weatherIcos.SUNRISE)
-// 样式
-imgStyle.stack = symbolStack
-imgStyle.topMargin = 0
-imgStyle.img = sunriseImg
-imgStyle.width = 15
-imgStyle.length = 15
-addImg(imgStyle)
-symbolStack.addSpacer(4)
-// 日出时间 / 样式
-textStyle.stack = symbolStack
-textStyle.topMargin = 0
-textStyle.text = weatherInfo.sunrise
-textStyle.font = Font.systemFont(10)
-textStyle.textColor = defaultTextColor
-addText(textStyle)
-//***********************//
-// 日落
-symbolStack.addSpacer(4)
-// 添加日落icon
-let sunsetImg = getWeatherIco(weatherIcos.SUNSET)
-// 样式
-imgStyle.stack = symbolStack
-imgStyle.topMargin = 0
-imgStyle.img = sunsetImg
-imgStyle.width = 15
-imgStyle.length = 15
-addImg(imgStyle)
-symbolStack.addSpacer(4)
-// 日落时间 / 样式
-textStyle.stack = symbolStack
-textStyle.topMargin = 0
-textStyle.text = weatherInfo.sunset
-textStyle.font = Font.systemFont(10)
-textStyle.textColor = defaultTextColor
-addText(textStyle)
+if (weatherControl.SUNRISE_SUNSET) {
+  rightStack.addSpacer(2)
+  let symbolStack = rightStack.addStack()
+  symbolStack.layoutHorizontally()
+  symbolStack.addSpacer()
+  symbolStack.bottomAlignContent()
+  // 添加日出icon
+  let sunriseImg = getSFIco(weatherIcos.SUNRISE)
+  addStyleImg(symbolStack, 0, sunriseImg, 15, 15)
+  symbolStack.addSpacer(4)
+  // 日出时间 / 样式
+  addStyleText(symbolStack, 0, weatherInfo.sunrise, 1, Font.systemFont(10), defaultTextColor)
+  //***********************//
+  // 日落
+  symbolStack.addSpacer(4)
+  // 添加日落icon
+  let sunsetImg = getSFIco(weatherIcos.SUNSET)
+  addStyleImg(symbolStack, 0, sunsetImg, 15, 15)
+  symbolStack.addSpacer(4)
+  // 日落时间 / 样式
+  addStyleText(symbolStack, 0, weatherInfo.sunset, 1, Font.systemFont(10), defaultTextColor)
+}
+
+//////////////////////////////////////////
+// 天气更新时间
+if (weatherControl.UPDATE_TIME) {
+  // 更新时间
+  rightStack.addSpacer(2)
+  const updateTimeStack = alignRightStack(rightStack)
+  addStyleText(updateTimeStack, 0, `上次更新 → ${hour}:${minute}`, 1, Font.systemFont(8), new Color("#ffffff", 0.8))  
+}
+
 /*****************************小组件内容ENd*****************************/
 
 if (!colorMode && !config.runsInWidget && changePicBg) {
@@ -664,6 +625,17 @@ function phoneSizes() {
  * 添加一行文本数据显示
  **************************************
  */
+function addStyleText(stack, topMargin, text, lineLimit, font, textColor, width = 0) {
+  textStyle.stack = stack
+  textStyle.topMargin = topMargin
+  textStyle.text = text
+  textStyle.lineLimit = lineLimit
+  textStyle.font = font
+  textStyle.textColor = textColor
+  addText(textStyle)
+  textStyle.lineLimit = 0
+}
+
 function addText(style, width = 0) {
   style.stack.size = new Size(width, 0)
   style.stack.addSpacer(style.topMargin)
@@ -679,6 +651,16 @@ function addText(style, width = 0) {
  * 添加图片显示
  **************************************
  */
+function addStyleImg(stack, topMargin, img, width, length, tintColor) {
+  imgStyle.stack = stack
+  imgStyle.topMargin = topMargin
+  imgStyle.img = img
+  imgStyle.width = width
+  imgStyle.length = length
+  imgStyle.tintColor = tintColor
+  addImg(imgStyle)
+}
+
 function addImg(style) {
   const stack = style.stack
   stack.addSpacer(style.topMargin)
@@ -713,7 +695,7 @@ function provideGreeting(date) {
   if (hour    < 5)  { return greetingText.nightGreeting }
   if (hour    < 11) { return greetingText.morningGreeting }
   if (hour    > 11 && hour-12 < 1)  { return greetingText.noonGreeting }
-  if (hour-12 < 6)  { return greetingText.afternoonGreeting }
+  if (hour-12 < 7)  { return greetingText.afternoonGreeting }
   if (hour-12 < 10) { return greetingText.eveningGreeting }
   return greetingText.nightGreeting
 }
@@ -764,8 +746,8 @@ async function getWeather() {
     weatherInfo.weatherDesc = weatherDesc
 
     // 相对湿度
-    const humidity = (weatherJsonData.result.realtime.humidity * 100) + "%"
-    log("相对湿度==>" + humidity)
+    const humidity = (Math.round(weatherJsonData.result.realtime.humidity * 100)) + "%"
+    log("相对湿度==>" + weatherJsonData.result.realtime.humidity)
     weatherInfo.humidity = humidity
 
     // 舒适指数
@@ -854,36 +836,38 @@ async function getSchedules() {
   let showSchedules = []
   const todaySchedules = await CalendarEvent.today([])
   for (const schedule of todaySchedules) {
-  if (shouldShowSchedule(schedule)) {
-    // 日程
-    let scheduleObj = {}
-    // 开始时间
-    const startDate = schedule.startDate
-      // 开始小时
-    const startHour = ("0" + startDate.getHours()).slice(-2)
-    // 开始分钟
-    const startMinute = ("0" + startDate.getMinutes()).slice(-2)
-    
-    // 结束时间
-    const endDate = schedule.endDate
-    // 结束小时
-    const endHour = ("0" + endDate.getHours()).slice(-2)
-    // 结束分钟
-    const endMinute = ("0" + endDate.getMinutes()).slice(-2)
-    
-    // 时间安排展示
-    let timeText = startHour + ":" + startMinute + " → " + endHour + ":" + endMinute
-    if (schedule.isAllDay) {
-      timeText = "全天"
-    }
+    if (shouldShowSchedule(schedule)) {
+      // 日程
+      let scheduleObj = {}
+      // 开始时间
+      const startDate = schedule.startDate
+        // 开始小时
+      const startHour = ("0" + startDate.getHours()).slice(-2)
+      // 开始分钟
+      const startMinute = ("0" + startDate.getMinutes()).slice(-2)
+      
+      // 结束时间
+      const endDate = schedule.endDate
+      // 结束小时
+      const endHour = ("0" + endDate.getHours()).slice(-2)
+      // 结束分钟
+      const endMinute = ("0" + endDate.getMinutes()).slice(-2)
+      
+      // 时间安排展示
+      let timeText = startHour + ":" + startMinute + "→" + endHour + ":" + endMinute
+      if (schedule.isAllDay) {
+        timeText = "全天"
+      }
 
-    // 构造格式后的日程
-    scheduleObj.title = schedule.title
-    scheduleObj.timeText = schedule.timeText 
-    log(">>日程：" + scheduleObj.title + "==>" + scheduleObj.timeText)
-    showSchedules.push(scheduleObj)
+      // 构造格式后的日程
+      scheduleObj.title = schedule.title
+      scheduleObj.timeText = timeText 
+      log(">>日程：" + scheduleObj.title + "==>" + timeText)
+      showSchedules.push(scheduleObj)
+    }
   }
-  }
+
+  return showSchedules
 }
 
 
@@ -905,6 +889,8 @@ async function getReminders() {
       showReminders.push(reminder)
     }
   }
+
+  return showReminders
 }
 
 
@@ -932,21 +918,11 @@ async function getJson(url) {
 
 /*
  **************************************
- * 获取电池对应的icon
+ * 获取icon
  **************************************
  */
-function getBatteryIco(batteryKey) {
+function getSFIco(batteryKey) {
   return SFSymbol.named(batteryKey).image
-}
-
-
-/*
- **************************************
- * 获取天气对应的icon
- **************************************
- */
-function getWeatherIco(weatherKey) {
-  return SFSymbol.named(weatherKey).image
 }
 
 
@@ -1046,5 +1022,31 @@ function alignRightStack(alignmentStack) {
   let returnStack = alignmentStack.addStack()
   returnStack.layoutHorizontally()
   returnStack.addSpacer()
+  return returnStack
+}
+
+
+/*
+ **************************************
+ * 水平居中
+ **************************************
+ */
+function horizontallyCenterStack(alignmentStack) {
+  let returnStack = alignmentStack.addStack()
+  returnStack.layoutHorizontally()
+  returnStack.centerAlignContent()
+  return returnStack
+}
+
+
+/*
+ **************************************
+ * 垂直居中
+ **************************************
+ */
+function verticallyCenterStack(alignmentStack) {
+  let returnStack = alignmentStack.addStack()
+  returnStack.layoutVertically()
+  returnStack.centerAlignContent()
   return returnStack
 }
