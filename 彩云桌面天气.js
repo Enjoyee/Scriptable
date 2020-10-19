@@ -399,7 +399,7 @@ if (weatherControl.UPDATE_TIME) {
   // 更新时间
   rightStack.addSpacer(2)
   const updateTimeStack = alignRightStack(rightStack)
-  addStyleText(updateTimeStack, 0, `上次更新 → ${hour}:${minute}`, 1, Font.systemFont(8), new Color("#ffffff", 0.8))  
+  addStyleText(updateTimeStack, 0, `上次更新 → ${num2Str(hour)}:${num2Str(minute)}`, 1, Font.systemFont(8), new Color("#ffffff", 0.8))  
 }
 
 /*****************************小组件内容ENd*****************************/
@@ -1049,4 +1049,18 @@ function verticallyCenterStack(alignmentStack) {
   returnStack.layoutVertically()
   returnStack.centerAlignContent()
   return returnStack
+}
+
+
+/*
+ **************************************
+ * 数字加0
+ **************************************
+ */
+function num2Str(num) {
+  if (num < 10) {
+    return `0${num}`
+  } else {
+    return `${num}` 
+  }
 }
