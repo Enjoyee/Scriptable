@@ -3,13 +3,6 @@
  * https://github.com/Enjoyee/Scriptable
  */
 
-
-/*
- ****************************************************************************
- ****************************************************************************
- ****************************************************************************
- */
-
 // 内容区左右边距
 const padding = {
   top: 0,
@@ -112,12 +105,6 @@ let imgStyle = {
     tintColor: undefined, // 图片渲染颜色
 }
 
-/*
- ****************************************************************************
- ****************************************************************************
- ****************************************************************************
- */
-
 
 //////////////////////////////////////
 // 组件Start
@@ -155,11 +142,12 @@ contentStack.addSpacer(16)
 const weatherIcoStack = contentStack.addStack()
 weatherIcoStack.layoutHorizontally()
 weatherIcoStack.addSpacer()
+weatherIcoStack.setPadding(0, 0, -8, 0)
 imgStyle.stack = weatherIcoStack
 const weatherImg = await getImage(weatherIco)
 imgStyle.img = weatherImg
-imgStyle.width = 80
-imgStyle.height = 80
+imgStyle.width = 60
+imgStyle.height = 60
 addStyleImg()
 
 // otherInfo
@@ -170,34 +158,31 @@ let dateString = formatter.string(currentDate)
 
 const otherStack = contentStack.addStack()
 otherStack.layoutVertically()
-
 // 日期
 let infoLunarText = lunarInfo.data.lunar
 infoLunarText = infoLunarText.substring(12, infoLunarText.length)
 textStyle.stack = otherStack
 textStyle.text = `${dateString}  ${infoLunarText}`
-textStyle.font = Font.systemFont(15)
+textStyle.font = Font.systemFont(14)
 textStyle.textColor = new Color("ffffff", 0.8)
 addStyleText()
 // 温度 
 textStyle.stack = otherStack
-textStyle.marginStart = 4
 textStyle.text = `${weatherInfo.temperature}°C`
-textStyle.font = Font.systemFont(40)
+textStyle.font = Font.systemFont(32)
 textStyle.textColor = new Color("ffffff", 0.9)
 addStyleText()
 // 体感温度 
 textStyle.stack = otherStack
-textStyle.marginStart = 2
 textStyle.text = `Feels like ${weatherInfo.bodyFeelingTemperature}°C, ${weatherInfo.weather}`
-textStyle.font = Font.systemFont(15)
+textStyle.font = Font.systemFont(14)
 textStyle.textColor = new Color("ffffff", 0.8)
 addStyleText()
 // 地区 
 textStyle.stack = otherStack
 textStyle.marginStart = 2
 textStyle.text = `${locationData.locality} の ${locationData.subLocality}`
-textStyle.font = Font.systemFont(12)
+textStyle.font = Font.systemFont(11)
 textStyle.textColor = new Color("ffffff", 0.8)
 addStyleText()
 // 
