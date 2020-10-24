@@ -33,7 +33,7 @@ const imgObjs = [
 const key = parseInt(Math.random() * Object.keys(imgObjs).length).toString()
 let imgUrl = imgObjs[key]
 if(imgUrl == undefined) {
-    imgUrl = imgObjs['0']
+    imgUrl = imgObjs[0]
 }
 log(`图片链接：${imgUrl}`)
 let img = await env.getImage(imgUrl)
