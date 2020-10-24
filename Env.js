@@ -60,7 +60,7 @@ exports.run = async function (scriptName, widget) {
     let fileImgName = `${scriptName}-${appearance}.jpg`
     path = fm.joinPath(fm.documentsDirectory(), fileImgName)
 
-    if (!exports.configs.changePicBg || exports.configs.colorMode) {
+    if (!exports.configs.changePicBg || exports.configs.colorMode || config.runsInWidget) {
         // 结束并且进行预览
         completeWidget(widget)
         return
