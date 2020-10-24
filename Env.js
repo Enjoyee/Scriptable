@@ -17,7 +17,8 @@ let configs = {
     topPadding: 0, // 内容区边距
     leftPadding: 0, // 内容区边距
     bottomPadding: 0, // 内容区边距
-    rightPadding: 0 // 内容区边距
+    rightPadding: 0, // 内容区边距
+    refreshInterval: 0 // 刷新间隔，单位分钟，非精准，会有3-5分钟差距
 }
 exports.configs = configs
 //------------------------------------------------
@@ -151,6 +152,12 @@ exports.run = async function (scriptName, widget) {
 }
 //------------------------------------------------
 function completeWidget(widget) {
+    // 刷新间隔
+    const refreshInterval = exports.configs.refreshInterval
+    if (refreshInterval > 0) {
+        widget.refreshAfterDate = new Date(new Date() + 1000*60*refreshInterval)
+    }
+    // 背景
     if (exports.configs.colorMode) {
         widget.backgroundColor = exports.configs.bgColor
     } else {
