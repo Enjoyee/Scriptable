@@ -469,6 +469,38 @@ exports.addStyleText = function () {
     resetTextStyle()
 }
 //------------------------------------------------
+exports.getLocation = async function() {
+    const locationData = {
+        "latitude": undefined,
+        "longitude": undefined,
+        "locality": undefined,
+        "subLocality": "LSP"
+    }
+    try {
+        const location = await Location.current()
+        const geocode = await Location.reverseGeocode(location.latitude, location.longitude, "zh_cn")
+        locationData.latitude = location.latitude
+        locationData.longitude = location.longitude
+        const geo = geocode[0]
+        // 市
+        if (locationData.locality == undefined) {
+          locationData.locality = geo.locality
+        }
+        // 区
+        if (locationData.subLocality == undefined) {
+          locationData.subLocality = geo.subLocality
+        }
+        // 街道
+        locationData.street = geo.thoroughfare
+        log("定位信息：latitude=" + location.latitude + "，longitude=" + location.longitude + "，locality="
+            + locationData.locality + "，subLocality=" + locationData.subLocality + "，street=" + locationData.street)
+    } catch (e) {
+        log("定位出错了，" + e.toString())
+    }
+
+    return locationData
+}
+//------------------------------------------------
 function resetImgStyle() {
     exports.imgStyle.stack = undefined // 加入到哪个内容栈显示
     exports.textStyle.marginStart = 0
