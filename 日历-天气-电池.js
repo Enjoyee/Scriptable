@@ -10,7 +10,7 @@ env.configs.topPadding = 0 // 内容区边距
 env.configs.leftPadding = 0 // 内容区边距
 env.configs.bottomPadding = 0 // 内容区边距
 env.configs.rightPadding = 0 // 内容区边距
-env.configs.refreshInterval = 1 // 刷新间隔，单位分钟，非精准，会有3-5分钟差距
+env.configs.refreshInterval = 0 // 刷新间隔，单位分钟，非精准，会有3-5分钟差距
 //
 const imgStyle = env.imgStyle
 const textStyle = env.textStyle
