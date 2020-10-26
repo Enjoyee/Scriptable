@@ -53,12 +53,16 @@ exports.imgStyle = textStyle
 
 
 //------------------------------------------------
-exports.run = async function (scriptName, widget) {
+exports.run = async function (scriptName, widget, autoDak = false) {
     let appearance = (await exports.isUsingDarkAppearance()) ? 'dark' : 'light'
     let appearanceStr = appearance == 'dark' ? '暗黑模式' : '白天模式'
+    let fileImgName = `${scriptName}.jpg`
+    if (autoDak) {
+        fileImgName = `${scriptName}-${appearance}.jpg`
+    } else {
+        appearanceStr = ""
+    }
 
-
-    let fileImgName = `${scriptName}-${appearance}.jpg`
     path = fm.joinPath(fm.documentsDirectory(), fileImgName)
 
     if (!exports.configs.changePicBg || exports.configs.colorMode || config.runsInWidget) {
