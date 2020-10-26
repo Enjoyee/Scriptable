@@ -47,28 +47,29 @@ const greetingText = {
 }
 
 // 天气对应的icon 
+// 天气对应的icon 
 const weatherIcos = {
-    CLEAR_DAY: "https://s1.ax1x.com/2020/10/24/BZSMJe.png", // 晴（白天） CLEAR_DAY
-    CLEAR_NIGHT: "https://s1.ax1x.com/2020/10/24/BZS8sI.png", // 晴（夜间） CLEAR_NIGHT
-    PARTLY_CLOUDY_DAY: "https://s1.ax1x.com/2020/10/24/BZSKiD.png", // 多云（白天）  PARTLY_CLOUDY_DAY
-    PARTLY_CLOUDY_NIGHT: "https://s1.ax1x.com/2020/10/24/BZSKiD.png", // 多云（夜间）  PARTLY_CLOUDY_NIGHT
-    CLOUDY: "https://s1.ax1x.com/2020/10/24/BZSnIO.png", // 阴（白天）  CLOUDY
-    CLOUDY_NIGHT:"https://s1.ax1x.com/2020/10/24/BZS3QA.png", // 阴（夜间）  CLOUDY
-    LIGHT_HAZE: "https://s1.ax1x.com/2020/10/24/BZ8Rrn.png", // 轻度雾霾   LIGHT_HAZE
-    MODERATE_HAZE: "https://s1.ax1x.com/2020/10/24/BZ3whF.png", // 中度雾霾  MODERATE_HAZE
-    HEAVY_HAZE: "https://s1.ax1x.com/2020/10/24/BZ3akT.png", // 重度雾霾   HEAVY_HAZE
-    LIGHT_RAIN: "https://s1.ax1x.com/2020/10/24/BZSdJg.png", // 小雨 LIGHT_RAIN
-    MODERATE_RAIN: "https://s1.ax1x.com/2020/10/24/BZSwWQ.png", // 中雨 MODERATE_RAIN
-    HEAVY_RAIN: "https://s1.ax1x.com/2020/10/24/BZS0zj.png", // 大雨  HEAVY_RAIN
-    STORM_RAIN: "https://s1.ax1x.com/2020/10/24/BZSsLq.png", // 暴雨 STORM_RAIN
-    FOG: "https://s1.ax1x.com/2020/10/24/BZ82Ks.png", // 雾 FOG
-    LIGHT_SNOW: "https://s1.ax1x.com/2020/10/24/BZSbTK.png", // 小雪  LIGHT_SNOW
-    MODERATE_SNOW: "https://s1.ax1x.com/2020/10/24/BZSLFO.png", // 中雪 MODERATE_SNOW
-    HEAVY_SNOW: "https://s1.ax1x.com/2020/10/24/BZSOYD.png", // 大雪  HEAVY_SNOW
-    STORM_SNOW: "https://s1.ax1x.com/2020/10/24/BZ8A4U.png", // 暴雪 STORM_SNOW
-    DUST: "https://s1.ax1x.com/2020/10/24/BZ8hV0.png", // 浮尘  DUST
-    SAND: "https://s1.ax1x.com/2020/10/24/BZ84aV.png", // 沙尘  SAND
-    WIND: "https://s1.ax1x.com/2020/10/24/BZ8TGF.png", // 大风  WIND
+    CLEAR_DAY: "https://s1.ax1x.com/2020/10/26/Bukd4s.png", // 晴（白天） CLEAR_DAY
+    CLEAR_NIGHT: "https://s1.ax1x.com/2020/10/26/BukPhR.png", // 晴（夜间） CLEAR_NIGHT
+    PARTLY_CLOUDY_DAY: "https://s1.ax1x.com/2020/10/26/BuQHN6.png", // 多云（白天）  PARTLY_CLOUDY_DAY
+    PARTLY_CLOUDY_NIGHT: "https://s1.ax1x.com/2020/10/26/BukcbF.png", // 多云（夜间）  PARTLY_CLOUDY_NIGHT
+    CLOUDY: "https://s1.ax1x.com/2020/10/26/BuAbQ0.png", // 阴（白天）  CLOUDY
+    CLOUDY_NIGHT:"https://s1.ax1x.com/2020/10/26/BuEmYd.png", // 阴（夜间）  CLOUDY
+    LIGHT_HAZE: "https://s1.ax1x.com/2020/10/26/BuKk34.png", // 轻度雾霾   LIGHT_HAZE
+    MODERATE_HAZE: "https://s1.ax1x.com/2020/10/26/BuKk34.png", // 中度雾霾  MODERATE_HAZE
+    HEAVY_HAZE: "https://s1.ax1x.com/2020/10/26/BuKk34.png", // 重度雾霾   HEAVY_HAZE
+    LIGHT_RAIN: "https://s1.ax1x.com/2020/10/26/BuZTWd.png", // 小雨 LIGHT_RAIN
+    MODERATE_RAIN: "https://s1.ax1x.com/2020/10/26/BunhwV.png", // 中雨 MODERATE_RAIN
+    HEAVY_RAIN: "https://s1.ax1x.com/2020/10/26/BueSYQ.png", // 大雨  HEAVY_RAIN
+    STORM_RAIN: "https://s1.ax1x.com/2020/10/26/BueSYQ.png", // 暴雨 STORM_RAIN
+    FOG: "https://s1.ax1x.com/2020/10/26/BueAmV.png", // 雾 FOG
+    LIGHT_SNOW: "https://s1.ax1x.com/2020/10/26/BueW1s.png", // 小雪  LIGHT_SNOW
+    MODERATE_SNOW: "https://s1.ax1x.com/2020/10/26/BueW1s.png", // 中雪 MODERATE_SNOW
+    HEAVY_SNOW: "https://s1.ax1x.com/2020/10/26/BueXcR.png", // 大雪  HEAVY_SNOW
+    STORM_SNOW: "https://s1.ax1x.com/2020/10/26/BumM4g.png", // 暴雪 STORM_SNOW
+    DUST: "https://s1.ax1x.com/2020/10/26/BumW5D.png", // 浮尘  DUST
+    SAND: "https://s1.ax1x.com/2020/10/26/Bunez9.png", // 沙尘  SAND
+    WIND: "https://s1.ax1x.com/2020/10/26/BunEiF.png", // 大风  WIND
 }
 
 // 天气信息控制
