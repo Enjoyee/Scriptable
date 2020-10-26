@@ -13,8 +13,10 @@
 - 新增模板js，可以通过封装函数进行积木一般的搭建进行搭建自己的小组件https://www.yuque.com/docs/share/9fa2aed5-b670-4d28-bd5e-9b622041eddd?# 《Scriptable简单教程》
 - 新增热搜榜单自动轮播，自行按照下方格式进行添加删除，榜单ID来源于摸鱼网站的分类，ID在点击分类后网站链接那里
 > // 热搜ID跟对应的标题，数据来源于 https://mo.fish/ 
+```JavaScript
 const hotIdObjs = [
 	{"1": "知乎の热搜"},
 	{"58": "微博の热搜"},
 	{"59": "V2EXの热搜"}
 ]
+```
