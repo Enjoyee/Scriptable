@@ -7,7 +7,7 @@ env.configs.changePicBg = true // 是否需要更换背景
 env.configs.colorMode = false // 是否是纯色背景
 env.configs.bgColor = new Color("000000") // 小组件背景色
 env.configs.topPadding = 4 // 内容区边距
-env.configs.leftPadding = 0 // 内容区边距
+env.configs.leftPadding = 4 // 内容区边距
 env.configs.bottomPadding = 0 // 内容区边距
 env.configs.rightPadding = 4 // 内容区边距
 env.configs.refreshInterval = 20 // 刷新间隔，单位分钟，非精准，会有3-5分钟差距
@@ -209,7 +209,7 @@ textStyle.stack = leftStack
 textStyle.marginStart = 3
 textStyle.text = weatherDesc
 textStyle.lineLimit = 1
-textStyle.font = Font.systemFont(13)
+textStyle.font = Font.systemFont(12)
 textStyle.textColor = defaultTextColor
 env.addStyleText()
 
