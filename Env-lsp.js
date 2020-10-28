@@ -51,7 +51,6 @@ exports.imgStyle = textStyle
 
 
 
-
 //------------------------------------------------
 exports.run = async function (scriptName, widget, autoDak = false) {
     let appearance = (await exports.isUsingDarkAppearance()) ? 'dark' : 'light'
@@ -71,7 +70,11 @@ exports.run = async function (scriptName, widget, autoDak = false) {
         return
     }
 
-    const okTips = `您的小部件在${appearanceStr}下的背景已准备就绪，请退到桌面查看即可。`
+    let subTips = ""
+    if (appearanceStr.length > 0) {
+        subTips = `在${appearanceStr}下的`
+    }
+    const okTips = `您的小部件${subTips}背景已准备就绪，请退到桌面查看即可。`
     let message = "图片模式支持相册照片&背景透明"
     let options = ["图片选择", "透明背景"]
     let isTransparentMode = await generateAlert(message, options)
@@ -156,11 +159,6 @@ exports.run = async function (scriptName, widget, autoDak = false) {
 }
 //------------------------------------------------
 function completeWidget(widget) {
-    // 刷新间隔
-    const refreshInterval = exports.configs.refreshInterval
-    if (refreshInterval > 0) {
-        widget.refreshAfterDate = new Date(new Date() + 1000*60*refreshInterval)
-    }
     // 背景
     if (exports.configs.colorMode) {
         widget.backgroundColor = exports.configs.bgColor
@@ -538,7 +536,31 @@ function resetTextStyle() {
     exports.textStyle.font = undefined // 字体
     exports.textStyle.textColor = undefined // 文字颜色
 }
+//------------------------------------------------
+// 是否使用缓存
+exports.useCache = function(cachePath) {
+  let use = false
+  const cacheExists = fm.fileExists(cachePath)
+  const cacheDate = cacheExists ? fm.modificationDate(cachePath) : 0
+  log(`缓存时间：${exports.getDateStr(new Date(cacheDate), "MM月dd日HH:mm")}`)
+  const refreshInterval = configs.refreshInterval * (60 * 1000)
+  log(`缓存过期：${configs.refreshInterval}min`)
+  if (cacheExists && ((new Date()).getTime() - cacheDate.getTime()) < refreshInterval) {
+    use = true
+  }
 
+  log(`是否使用缓存：${use}`)
+
+  return use
+}
+//------------------------------------------------
+// 格式化时间
+exports.getDateStr = function(date, formatter = "yyyy年MM月d日 EEE", locale = "zh_cn") {
+  let df = new DateFormatter()
+  df.locale = locale
+  df.dateFormat = formatter
+  return df.string(date)
+}
 //------------------------------------------------
 module.exports = exports
 //------------------------------------------------
