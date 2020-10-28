@@ -10,7 +10,9 @@ env.configs.topPadding = 0 // 内容区边距
 env.configs.leftPadding = 0 // 内容区边距
 env.configs.bottomPadding = 0 // 内容区边距
 env.configs.rightPadding = 0 // 内容区边距
-env.configs.refreshInterval = 20 // 刷新间隔，单位分钟，非精准，会有3-5分钟差距
+env.configs.refreshInterval = 30 // 刷新间隔，单位分钟，非精准，会有3-5分钟差距
+// 文件
+const fm = FileManager.local()
 //
 const imgStyle = env.imgStyle
 const textStyle = env.textStyle
@@ -507,8 +509,21 @@ let imgUrl = imgObjs[key]
 if(imgUrl == undefined) {
     imgUrl = imgObjs[0]
 }
+// 缓存目录
+const cachePath = fm.joinPath(fm.documentsDirectory(), "lsp-lovely-cache")
 
-let img = await env.getImage(imgUrl)
+let img = undefined
+if (env.useCache(cachePath)) {
+  img = fm.readImage(cachePath)
+} else {
+  try {
+    img = await env.getImage(imgUrl)
+    fm.writeImage(cachePath, img)
+  } catch(e) {
+    img = fm.readImage(cachePath)
+  }
+}
+
 imgStyle.stack = contentStack
 imgStyle.width = 170
 imgStyle.height = 170
