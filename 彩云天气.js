@@ -6,11 +6,11 @@ env.configs.previewSize = "Medium" // 预览大小【小：Small，中：Medium�
 env.configs.changePicBg = true // 是否需要更换背景
 env.configs.colorMode = false // 是否是纯色背景
 env.configs.bgColor = new Color("000000") // 小组件背景色
-env.configs.topPadding = 4 // 内容区边距
-env.configs.leftPadding = 4 // 内容区边距
-env.configs.bottomPadding = 0 // 内容区边距
-env.configs.rightPadding = 4 // 内容区边距
-//env.configs.refreshInterval = 20 // 刷新间隔，单位分钟，非精准，会有3-5分钟差距
+env.configs.topPadding = 3 // 内容区边距
+env.configs.leftPadding = 3 // 内容区边距
+env.configs.bottomPadding = 3 // 内容区边距
+env.configs.rightPadding = 3 // 内容区边距
+env.configs.refreshInterval = 30 // 刷新间隔，单位分钟，非精准，会有3-5分钟差距
 //////////////////////////////////
 const imgStyle = env.imgStyle
 const textStyle = env.textStyle
@@ -33,6 +33,8 @@ let locationData = {
 }
 // 锁定地区，直接使用上述填写的地址信息不进行定位
 const lockLocation = false
+// 天气是否使用了上次的缓存
+let isUsedLastCache = true
 
 // 日程显示条数
 const maxSchedules = 1
@@ -46,7 +48,6 @@ const greetingText = {
   eveningGreeting: "🐳 𝐺𝑜𝑜𝑑 𝑒𝑣𝑒𝑛𝑖𝑛𝑔~"
 }
 
-// 天气对应的icon 
 // 天气对应的icon 
 const weatherIcos = {
     CLEAR_DAY: "https://s1.ax1x.com/2020/10/26/Bukd4s.png", // 晴（白天） CLEAR_DAY
@@ -150,7 +151,7 @@ env.addStyleText()
 
 //////////////////////////////////////////
 // 年月日周
-const dateStr = getDateStr(currentDate)
+const dateStr = env.getDateStr(currentDate)
 // 显示
 textStyle.stack = leftStack
 textStyle.marginStart = 2
@@ -338,7 +339,7 @@ weatherStack.bottomAlignContent()
 const weatherImgCachePath = fm.joinPath(fm.documentsDirectory(), "env-lsp-weatherImg-cache")
 let weatherImg = undefined
 try {
-  weatherImg = await env.getImage(weatherInfo.weatherIco)
+  weatherImg = await env.getImage(weatherInfo.weatherIco) 
   fm.writeImage(weatherImgCachePath, weatherImg)
   log(`天气icon写入缓存`)
 } catch(e) {
@@ -348,8 +349,8 @@ try {
 
 // 显示天气
 imgStyle.stack = weatherStack
-imgStyle.width = 35
-imgStyle.height = 35
+imgStyle.width = 33
+imgStyle.height = 33
 imgStyle.img = weatherImg
 env.addStyleImg()
 // 体感温度
@@ -357,7 +358,7 @@ weatherStack.addSpacer(4)
 const bodyFeelingTemperature = weatherInfo.bodyFeelingTemperature
 // 显示体感温度
 textStyle.stack = weatherStack
-textStyle.text = `${bodyFeelingTemperature}°C`
+textStyle.text = `${bodyFeelingTemperature}°`
 textStyle.lineLimit = 1
 textStyle.font = Font.boldMonospacedSystemFont(23)
 textStyle.textColor = defaultTextColor
@@ -506,11 +507,20 @@ if (weatherControl.SUNRISE_SUNSET) {
 //////////////////////////////////////////
 // 天气更新时间
 if (weatherControl.UPDATE_TIME) {
+  // 缓存目录
+  const cachePath = fm.joinPath(fm.documentsDirectory(), "lsp-weather-uptime-cache")
+  // 更新时间
+  let updateTime = env.getDateStr(new Date(), "HH:mm")
+  if (isUsedLastCache) {
+    updateTime = fm.readString(cachePath)
+  }
+  // 写入缓存
+  fm.writeString(cachePath, updateTime)
   // 更新时间
   rightStack.addSpacer(3)
   const updateTimeStack = env.alignRightStack(rightStack)
   textStyle.stack = updateTimeStack
-  textStyle.text = `上次更新 → ${getDateStr(new Date(), "HH:mm")}`
+  textStyle.text = `上次更新 → ${updateTime}`
   textStyle.lineLimit = 1
   textStyle.font = Font.systemFont(8)
   textStyle.textColor = new Color("ffffff", 0.8)
@@ -536,20 +546,27 @@ async function getWeather() {
   // 彩云天气域名
   const DOMAIN = `https://api.caiyunapp.com/v2.5/${apiKey}/${location.longitude},${location.latitude}/weather.json?alert=true`
   let weatherJsonData = undefined
-  try {
-    weatherJsonData = await env.getJson(DOMAIN)
-  } catch (e) {
+
+  isUsedLastCache = env.useCache(cachePath)
+  if (isUsedLastCache) {
     const cache = fm.readString(cachePath)
-    log(`读取彩云天气缓存数据：${cache}`)
+    log(`刷新间隔触发，读取彩云天气缓存数据`)
     weatherJsonData = JSON.parse(cache)
+  } else {
+    try {
+      weatherJsonData = await env.getJson(DOMAIN)
+      // 写入缓存
+      fm.writeString(cachePath, JSON.stringify(weatherJsonData))
+    } catch (e) {
+      const cache = fm.readString(cachePath)
+      log(`读取彩云天气缓存数据`)
+      weatherJsonData = JSON.parse(cache)
+    }
   }
 
   if (weatherJsonData.status == "ok") {
     log("天气数据请求成功，进行缓存")
     
-    // 写入缓存
-    fm.writeString(cachePath, JSON.stringify(weatherJsonData))
-
     // 天气突发预警
     const alertWeatherTitle = weatherJsonData.result.alert.content.title
     log("突发的天气预警==>" + alertWeatherTitle)
@@ -739,19 +756,25 @@ async function getLunar() {
   // 缓存目录
   const cachePath = fm.joinPath(fm.documentsDirectory(), "env-lsp-lunar-cache")
 
-  let dateString = getDateStr(new Date(), "yyyy-MM-dd")
+  let dateString = env.getDateStr(new Date(), "yyyy-MM-dd")
   const url = `http://calendar.netcore.show/api/day/days?day=${dateString}`
   let data = undefined
 
-  try {
-    data = await env.getJson(url)
-    // 缓存数据
-    fm.writeString(cachePath, JSON.stringify(data))
-    log(`农历信息请求成功，数据缓存`)
-  } catch (e) {
-    const cache = fm.readString(cachePath)
-    log(`读取农历缓存数据：${cache}`)
-    data = JSON.parse(cache)
+  if (env.useCache(cachePath)) {
+      const cache = fm.readString(cachePath)
+      log(`刷新间隔触发，读取农历缓存数据`)
+      data = JSON.parse(cache)
+  } else {
+    try {
+      data = await env.getJson(url)
+      // 缓存数据
+      fm.writeString(cachePath, JSON.stringify(data))
+      log(`农历信息请求成功，数据缓存`)
+    } catch (e) {
+      const cache = fm.readString(cachePath)
+      log(`读取农历缓存数据`)
+      data = JSON.parse(cache)
+    }
   }
   
   return data
@@ -767,33 +790,26 @@ async function getPoetry() {
   const cachePath = fm.joinPath(fm.documentsDirectory(), "env-lsp-poetry-cache")
   let data = undefined
 
-  try {
-    data = await env.getJson("https://v2.jinrishici.com/sentence")
-    // 缓存数据
-    fm.writeString(cachePath, JSON.stringify(data))
-    log(`今日诗词：${data.status}，数据缓存`)
-  } catch (e) {
+  if (env.useCache(cachePath)) {
     const cache = fm.readString(cachePath)
-    log(`读取今日诗词缓存数据：${cache}`)
+    log(`刷新间隔触发，读取今日诗词缓存数据`)
     data = JSON.parse(cache)
+  } else {
+    try {
+      data = await env.getJson("https://v2.jinrishici.com/sentence")
+      // 缓存数据
+      fm.writeString(cachePath, JSON.stringify(data))
+      log(`今日诗词：${data.status}，数据缓存`)
+    } catch (e) {
+      const cache = fm.readString(cachePath)
+      log(`读取今日诗词缓存数据`)
+      data = JSON.parse(cache)
+    }
   }
-
   
   return data
 }
 
-
-/*
- **************************************
- * 格式化时间
- **************************************
- */
-function getDateStr(date, formatter = "yyyy年MM月d日 EEE") {
-  let df = new DateFormatter()
-  df.locale = locale
-  df.dateFormat = formatter
-  return df.string(date)
-}
 
 /*
  **************************************
