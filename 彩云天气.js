@@ -153,7 +153,7 @@ const greeting = provideGreeting(currentDate)
 // 添加显示标题  
 textStyle.stack = titleStack
 textStyle.text = greeting
-textStyle.font = Font.systemFont(20)
+textStyle.font = Font.systemFont(23)
 textStyle.textColor = defaultTextColor
 textStyle.lineLimit = 1
 env.addStyleText()
