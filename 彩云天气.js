@@ -2,7 +2,7 @@ const env = importModule('Env-lsp.js')
 //------------------------------------------------
 // 配置区
 env.configs.previewSize = "Medium" // 预览大小【小：Small，中：Medium，大：Large】
-env.configs.changePicBg = true // 是否需要更换背景
+env.configs.changePicBg = false // 是否需要更换背景
 env.configs.colorMode = false // 是否是纯色背景
 env.configs.bgColor = new Color("000000") // 小组件背景色
 env.configs.topPadding = 3 // 内容区边距
@@ -336,7 +336,7 @@ if (scheduleSize > 0) {
 contentStack.addSpacer()
 let rightStack = contentStack.addStack()
 // 写死右侧宽度
-rightStack.size = new Size(110, 0)
+rightStack.size = new Size(112, 0)
 rightStack.layoutVertically()
 //////////////////////////////////////////
 
@@ -370,7 +370,7 @@ const bodyFeelingTemperature = weatherInfo.bodyFeelingTemperature
 textStyle.stack = weatherStack
 textStyle.text = `${bodyFeelingTemperature}°`
 textStyle.lineLimit = 1
-textStyle.font = Font.boldMonospacedSystemFont(23)
+textStyle.font = Font.boldMonospacedSystemFont(25)
 textStyle.textColor = defaultTextColor
 env.addStyleText()
 //////////////////////////////////////////
@@ -383,7 +383,7 @@ if (weatherControl.HUMIDITY) {
   textStyle.stack = humidityStack
   textStyle.text = `相对湿度：${weatherInfo.humidity}`
   textStyle.lineLimit = 1
-  textStyle.font = Font.systemFont(10)
+  textStyle.font = Font.systemFont(11)
   textStyle.textColor = defaultTextColor
   env.addStyleText()
 }
@@ -397,7 +397,7 @@ if (weatherControl.COMFORT) {
   textStyle.stack = comfortStack
   textStyle.text = `舒适指数：${weatherInfo.comfort}`
   textStyle.lineLimit = 1
-  textStyle.font = Font.systemFont(10)
+  textStyle.font = Font.systemFont(11)
   textStyle.textColor = defaultTextColor
   env.addStyleText()
 }
@@ -411,7 +411,7 @@ if (weatherControl.ULTRAVIOLET) {
   textStyle.stack = ultravioletStack
   textStyle.text = `紫外线：${weatherInfo.ultraviolet}`
   textStyle.lineLimit = 1
-  textStyle.font = Font.systemFont(10)
+  textStyle.font = Font.systemFont(11)
   textStyle.textColor = defaultTextColor
   env.addStyleText()
 }
@@ -426,7 +426,7 @@ if (weatherControl.AQI) {
   textStyle.marginStart = 8
   textStyle.text = `空气质量：${weatherInfo.aqiInfo}`
   textStyle.lineLimit = 1
-  textStyle.font = Font.systemFont(10)
+  textStyle.font = Font.systemFont(11)
   textStyle.textColor = defaultTextColor
   env.addStyleText()
 }
@@ -443,7 +443,7 @@ if (weatherControl.HEIGHT_LOW) {
   textStyle.stack = tempStack
   textStyle.text = `↑`
   textStyle.lineLimit = 1
-  textStyle.font = Font.systemFont(9)
+  textStyle.font = Font.systemFont(10)
   textStyle.textColor = new Color("ff0000")
   env.addStyleText()
   // 高温温度
@@ -451,7 +451,7 @@ if (weatherControl.HEIGHT_LOW) {
   textStyle.stack = tempStack
   textStyle.text = `${weatherInfo.maxTemperature}°`
   textStyle.lineLimit = 1
-  textStyle.font = Font.systemFont(9)
+  textStyle.font = Font.systemFont(10)
   textStyle.textColor = defaultTextColor
   env.addStyleText()
   // 低温箭头
@@ -459,7 +459,7 @@ if (weatherControl.HEIGHT_LOW) {
   textStyle.stack = tempStack
   textStyle.text = `↓`
   textStyle.lineLimit = 1
-  textStyle.font = Font.systemFont(9)
+  textStyle.font = Font.systemFont(10)
   textStyle.textColor = new Color("2bae85")
   env.addStyleText()
   // 低温温度
@@ -467,7 +467,7 @@ if (weatherControl.HEIGHT_LOW) {
   textStyle.stack = tempStack
   textStyle.text = `${weatherInfo.minTemperature}°`
   textStyle.lineLimit = 1
-  textStyle.font = Font.systemFont(9)
+  textStyle.font = Font.systemFont(10)
   textStyle.textColor = defaultTextColor
   env.addStyleText()
 }
@@ -483,8 +483,8 @@ if (weatherControl.SUNRISE_SUNSET) {
   // 添加日出icon
   let sunriseImg = SFSymbol.named("sunrise.fill").image
   imgStyle.stack = symbolStack
-  imgStyle.width = 13
-  imgStyle.height = 13
+  imgStyle.width = 15
+  imgStyle.height = 15
   imgStyle.img = sunriseImg
   env.addStyleImg()
   symbolStack.addSpacer(4)
@@ -492,7 +492,7 @@ if (weatherControl.SUNRISE_SUNSET) {
   textStyle.stack = symbolStack
   textStyle.text = weatherInfo.sunrise
   textStyle.lineLimit = 1
-  textStyle.font = Font.systemFont(9)
+  textStyle.font = Font.systemFont(10)
   textStyle.textColor = defaultTextColor
   env.addStyleText()
   //***********************//
@@ -501,8 +501,8 @@ if (weatherControl.SUNRISE_SUNSET) {
   // 添加日落icon
   let sunsetImg = SFSymbol.named("sunset.fill").image
   imgStyle.stack = symbolStack
-  imgStyle.width = 13
-  imgStyle.height = 13
+  imgStyle.width = 15
+  imgStyle.height = 15
   imgStyle.img = sunsetImg
   env.addStyleImg()
   symbolStack.addSpacer(4)
@@ -510,7 +510,7 @@ if (weatherControl.SUNRISE_SUNSET) {
   textStyle.stack = symbolStack
   textStyle.text = weatherInfo.sunset
   textStyle.lineLimit = 1
-  textStyle.font = Font.systemFont(9)
+  textStyle.font = Font.systemFont(10)
   textStyle.textColor = defaultTextColor
   env.addStyleText()
 }
