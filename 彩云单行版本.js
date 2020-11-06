@@ -2,7 +2,7 @@ const env = importModule('Env-lsp.js')
 //------------------------------------------------
 // 配置区
 env.configs.previewSize = "Medium" // 预览大小【小：Small，中：Medium，大：Large】
-env.configs.changePicBg = false // 是否需要更换背景
+env.configs.changePicBg = true // 是否需要更换背景
 env.configs.colorMode = false // 是否是纯色背景
 env.configs.bgColor = new Color("000000") // 小组件背景色
 env.configs.topPadding = 2 // 内容区边距
