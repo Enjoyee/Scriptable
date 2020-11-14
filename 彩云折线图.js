@@ -459,11 +459,13 @@ if (!graphMode) {
     const foldArea = 50 // 温度曲线所占高度
 
     // 温度差
-    const maxTemperature = weatherInfo.maxTemperature
-    const minTemperature = weatherInfo.minTemperature
+    let subWeatherArr = weatherInfo.hourly.slice(0, 8)
+    subWeatherArr = subWeatherArr.sort(function (a, b) { return a.temperature - b.temperature })
+    const maxTemperature = subWeatherArr[subWeatherArr.length - 1].temperature
+    const minTemperature = subWeatherArr[0].temperature
     const temperatureDifference = maxTemperature - minTemperature
     // 每一度所占高度
-    const perTemperatureSize = foldArea / temperatureDifference
+    const perTemperatureSize = (foldArea - 10) / temperatureDifference
     const foldY = 132 // 垂直开始位置
     const areaSize = 15
 
