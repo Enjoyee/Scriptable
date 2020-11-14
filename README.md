@@ -1,5 +1,8 @@
 #### **scriptable App 脚本分享**
 
+- 彩云曲线版本
+![image](https://i.loli.net/2020/11/14/AWrZmgNEjoS5zDU.png)
+
 - **main分支** 下的脚本已经适配 **12系列** 透明背景，**old分支** 还是之前的旧版本
 
 - 使用该 **main分支** 下的任何脚本都要先加上 **Env-lsp.js** 这个脚本
