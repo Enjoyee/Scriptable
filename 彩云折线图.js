@@ -943,5 +943,5 @@ function provideGreeting(date) {
 // 运行脚本、预览
 widget.backgroundImage = drawContext.getImage()
 // 设置组件
-env.finish(widget)
+env.finish(widget, false)
 //------------------------------------------------
