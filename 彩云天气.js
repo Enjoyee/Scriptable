@@ -2,7 +2,7 @@ const env = importModule('Env-lsp.js')
 //------------------------------------------------
 // 配置区
 env.configs.previewSize = "Medium" // 预览大小【小：Small，中：Medium，大：Large】
-env.configs.changePicBg = false // 是否需要更换背景
+env.configs.changePicBg = true // 是否需要更换背景
 env.configs.colorMode = false // 是否是纯色背景
 env.configs.bgColor = new Color("000000") // 小组件背景色
 env.configs.topPadding = 3 // 内容区边距
@@ -19,7 +19,7 @@ const textStyle = env.textStyle
 const locale = "zh_cn"
 
 // 彩云天气的apiKey，自己去免费申请：https://caiyunapp.com
-const apiKey = ""
+const apiKey = "ovH0dJfU5sO6SouB"
 
 // 默认的定位信息，定位失败的时候默认读取
 // https://open.caiyunapp.com/File:Adcode-release-2020-06-10.xlsx.zip
@@ -125,7 +125,7 @@ const fm = FileManager.local()
 // 彩云天气信息
 const weatherInfo = await getWeather()
 // 农历信息
-const lunarInfo = await getLunar()
+const lunarInfo = await getLunar(day - 1)
 // 日程信息
 const showSchedules = await getSchedules()
 
@@ -165,9 +165,7 @@ leftStack.addSpacer(4)
 let dateStack = env.alignHorizontallyCenterStack(leftStack)
 const dateStr = env.getDateStr(currentDate, "MM月dd日 EEE")
 // 农历信息
-const lunarData = lunarInfo.data[0]
-let infoLunarText = lunarData.lunarText
-infoLunarText = infoLunarText.substring(5, infoLunarText.length)
+const infoLunarText = lunarInfo.infoLunarText
 // 显示
 textStyle.stack = dateStack
 textStyle.text = `${dateStr} ${infoLunarText}`
@@ -178,27 +176,23 @@ env.addStyleText()
 
 
 //////////////////////////////////////////
-// 农历日期
-const lunarDayColor = new Color("ffffff", 0.8)
-leftStack.addSpacer(5)
-let lunarDayStack = env.alignHorizontallyCenterStack(leftStack)
-
 // 节假期信息
-const lunarHoliday = lunarData.calendarDay.lunarHoliday.key
-const solarHoliday = lunarData.calendarDay.solarHoliday.key
-// 农历节气
-const solarTerm = lunarData.calendarDay.solarTerm
-// 下一个节气的时间间隔
-let solarTermDays = lunarData.calendarDay.solarTermDays
-const holidayText = `${lunarHoliday ? lunarHoliday + "◇" : ""}${solarHoliday ? solarHoliday + "◇" : ""}${solarTermDays}`
+const holidayText = `${lunarInfo.holidayText}`
 log(`节假日信息：${holidayText}`)
-// 添加显示农历
-textStyle.stack = lunarDayStack
-textStyle.text = `☉ ${holidayText}`
-textStyle.font = Font.systemFont(12)
-textStyle.textColor = lunarDayColor
-textStyle.lineLimit = 1
-env.addStyleText()
+if(holidayText.length != 0) {
+    // 农历日期
+    const lunarDayColor = new Color("ffffff", 0.8)
+    leftStack.addSpacer(5)
+    let lunarDayStack = env.alignHorizontallyCenterStack(leftStack)
+    
+    // 添加显示农历
+    textStyle.stack = lunarDayStack
+    textStyle.text = `☉ ${holidayText}`
+    textStyle.font = Font.systemFont(12)
+    textStyle.textColor = lunarDayColor
+    textStyle.lineLimit = 1
+    env.addStyleText()
+}
 
 //////////////////////////////////////////
 // 天气预警、预告信息
@@ -760,32 +754,50 @@ function getBatteryLevel() {
 * 在线获取农历信息
 **************************************
 */
-async function getLunar() {
-  // 缓存目录
-  const cachePath = fm.joinPath(fm.documentsDirectory(), "lsp-lunar-cache")
-
-  let dateString = env.getDateStr(new Date(), "yyyy-MM-dd")
-  const url = `http://calendar.netcore.show/api/day/days?day=${dateString}`
-  let data = undefined
-
-  if (env.useCache(cachePath)) {
-    const cache = fm.readString(cachePath)
-    log(`刷新间隔触发，读取农历缓存数据`)
-    data = JSON.parse(cache)
-  } else {
+async function getLunar(day) {
+    // 缓存key
+    const cacheKey = "lsp-lunar-cache"
+    // 万年历数据
+    let response = undefined
     try {
-      data = await env.getJson(url)
-      // 缓存数据
-      fm.writeString(cachePath, JSON.stringify(data))
-      log(`农历信息请求成功，数据缓存`)
+        const request = new Request("https://wannianrili.51240.com/")
+        const defaultHeaders = {
+            "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.67 Safari/537.36"
+        }
+        request.method = 'GET'
+        request.headers = defaultHeaders
+        const html = await request.loadString()
+        let webview = new WebView()
+        await webview.loadHTML(html)
+        var getData = `
+            function getData() {
+                try {
+                    infoLunarText = document.querySelector('div#wnrl_k_you_id_${day}.wnrl_k_you .wnrl_k_you_id_wnrl_nongli').innerText
+                    holidayText = document.querySelectorAll('div.wnrl_k_zuo div.wnrl_riqi')[${day}].querySelector('.wnrl_td_bzl').innerText
+                    if(infoLunarText.search(holidayText) != -1) {
+                        holidayText = ''
+                    }
+                } catch {
+                    holidayText = ''
+                }
+                return {infoLunarText: infoLunarText, holidayText: holidayText}
+            }
+            
+            getData()
+            `
+        // 节日数据  
+        response = await webview.evaluateJavaScript(getData, false)
+        Keychain.set(cacheKey, JSON.stringify(response))
+        console.log(`农历输出：${JSON.stringify(response)}`);
     } catch (e) {
-      const cache = fm.readString(cachePath)
-      log(`读取农历缓存数据`)
-      data = JSON.parse(cache)
+        console.error(`农历请求出错：${e}`)
+        if (Keychain.contains(cacheKey)) {
+            const cache = Keychain.get(cacheKey)
+            response = JSON.parse(cache)
+        }
     }
-  }
 
-  return data
+    return response
 }
 
 /*
