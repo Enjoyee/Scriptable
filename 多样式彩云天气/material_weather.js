@@ -700,7 +700,7 @@ getData()
         let message = ''
         try {
             let downloadURL = "https://mashangkaifa.coding.net/p/coding-code-guide/d/Scriptable/git/raw/master/material_weather.js"
-            if(widgetConfigs.useGithub) {
+            if (widgetConfigs.useGithub) {
                 downloadURL = "https://raw.githubusercontent.com/Enjoyee/Scriptable/new/%E5%A4%9A%E6%A0%B7%E5%BC%8F%E5%BD%A9%E4%BA%91%E5%A4%A9%E6%B0%94/material_weather.js"
             }
             const req = new Request(downloadURL)
@@ -784,9 +784,10 @@ getData()
         temStack.addSpacer(10)
         // 定位图标
         let dividerDesc = ''
+        const locationStack = temStack.addStack()
+        let textWidget = undefined
         if (widgetConfigs.showLocation) {
             // 天气
-            const locationStack = temStack.addStack()
             locationStack.centerAlignContent()
             locationStack.addSpacer(3)
             const locationImg = await this.getImageByUrl("https://s3.ax1x.com/2021/01/24/sH8Hk6.png")
@@ -794,22 +795,24 @@ getData()
             locationImgSpan.imageSize = new Size(10, 10)
             // 定位
             locationStack.addSpacer(7)
-            let textWidget = locationStack.addText(`${widgetConfigs.location.subLocality}`)
+            textWidget = locationStack.addText(`${widgetConfigs.location.subLocality}`)
             textWidget.textColor = Color.white()
             textWidget.font = stackTopFont
+
+            dividerDesc = ' • '
         }
         // 天气文字
-        dividerDesc = ''
         if (widgetConfigs.showWeatherDesc) {
-            dividerDesc = ' • '
             textWidget = locationStack.addText(`${dividerDesc}${widgetConfigs.weatherDesc[weatherInfo.weatherIco]}`)
             textWidget.textColor = Color.white()
             textWidget.font = stackTopFont
+
+            if (dividerDesc.length == 0) {
+                dividerDesc = ' • '
+            }
         }
         // 农历
-        dividerDesc = ''
         if (widgetConfigs.showLunar) {
-            dividerDesc = ' • '
             const lunarInfo = await this.getLunar()
             // 农历信息
             const infoLunarText = lunarInfo.infoLunarText
@@ -821,15 +824,21 @@ getData()
             textWidget = locationStack.addText(`${dividerDesc}${dateFullText}`)
             textWidget.textColor = Color.white()
             textWidget.font = stackTopFont
-        }
-        dividerDesc = ''
+
+            if (dividerDesc.length == 0) {
+                dividerDesc = ' • '
+            }
+        } 
         if (widgetConfigs.showUpdateTime) {
-            dividerDesc = ' • '
             // 更新时间
             const updateText = `${this.getDateStr(new Date(), "HH:mm")} ⊹`
             textWidget = locationStack.addText(`${dividerDesc}${updateText}`)
             textWidget.textColor = Color.white()
             textWidget.font = stackTopFont
+            
+            if (dividerDesc.length == 0) {
+                dividerDesc = ' • '
+            }
         }
         locationStack.addSpacer()
         // 
