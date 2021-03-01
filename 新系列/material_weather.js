@@ -36,6 +36,8 @@ const widgetConfigs = {
     showLunar: true,
     // 是否显示更新时间
     showUpdateTime: true,
+    // 备用仓库地址
+    useGithub: false,
 
     selectPicBg: false, // 透明背景图片
     colorBgMode: false,  // 纯色背景模式
@@ -697,7 +699,11 @@ getData()
         files = iCloudInUse ? FileManager.iCloud() : files
         let message = ''
         try {
-            const req = new Request("https://gitee.com/enjoyee/scriptable/raw/master/%E6%96%B0%E7%B3%BB%E5%88%97/%E5%A4%9A%E6%A0%B7%E5%BC%8F%E5%A4%A9%E6%B0%94.js")
+            let downloadURL = "https://mashangkaifa.coding.net/p/coding-code-guide/d/Scriptable/git/raw/master/material_weather.js"
+            if(widgetConfigs.useGithub) {
+                downloadURL = "https://raw.githubusercontent.com/Enjoyee/Scriptable/main/%E6%96%B0%E7%B3%BB%E5%88%97/material_weather.js"
+            }
+            const req = new Request(downloadURL)
             const codeString = await req.loadString()
             files.writeString(module.filename, codeString)
             message = "天气脚本已更新，请退出脚本重新进入运行生效。"
