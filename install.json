@@ -31,9 +31,9 @@
         "<li>支持透明背景</li>",
         "<li>具体天气、农历、定位、更新时间可配置是否显示</li>",
         "<br/>",
-        "<h3 align=\"center\">使用说明</h3>"
+        "<h3 align=\"center\">使用说明</h3>",
         "<li>自行申请彩云apikey填入</li>",
-        "<li>依赖lsp环境</li>",
+        "<li>依赖lsp环境</li>"
       ],
       "images": [
         "https://github.com/Enjoyee/Scriptable/blob/new/%E5%A4%9A%E6%A0%B7%E5%BC%8F%E5%BD%A9%E4%BA%91%E5%A4%A9%E6%B0%94/WechatIMG491.jpeg"
