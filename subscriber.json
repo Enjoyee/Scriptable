@@ -14,7 +14,7 @@
       "title": "material_weather",
       "depend": [
         {
-          "name": "lsp环境",
+          "name": "lsp",
           "scriptURL": "https://raw.githubusercontent.com/Enjoyee/Scriptable/new/lsp%E7%8E%AF%E5%A2%83.js"
         }
       ],
@@ -36,7 +36,7 @@
         "<li>依赖lsp环境</li>"
       ],
       "images": [
-        "https://github.com/Enjoyee/Scriptable/blob/new/%E5%A4%9A%E6%A0%B7%E5%BC%8F%E5%BD%A9%E4%BA%91%E5%A4%A9%E6%B0%94/WechatIMG491.jpeg"
+        "https://raw.githubusercontent.com/Enjoyee/Scriptable/new/%E5%A4%9A%E6%A0%B7%E5%BC%8F%E5%BD%A9%E4%BA%91%E5%A4%A9%E6%B0%94/WechatIMG491.jpeg"
       ]
     }
   ]
