@@ -14,7 +14,7 @@
       "title": "彩云多样式天气",
       "depend": [
         {
-          "name": "lsp",
+          "name": "lsp环境",
           "scriptURL": "https://raw.githubusercontent.com/Enjoyee/Scriptable/new/lsp%E7%8E%AF%E5%A2%83.js"
         }
       ],
