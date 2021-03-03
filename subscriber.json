@@ -10,7 +10,7 @@
       "description": "多样式彩云天气",
       "scriptURL": "https://raw.githubusercontent.com/Enjoyee/Scriptable/new/%E5%A4%9A%E6%A0%B7%E5%BC%8F%E5%BD%A9%E4%BA%91%E5%A4%A9%E6%B0%94/material_weather.js",
       "thumb": "https://s3.ax1x.com/2021/03/03/6AP4YV.png",
-      "name": "material_weather",
+      "name": "彩云多样式天气",
       "title": "彩云多样式天气",
       "depend": [
         {
