@@ -31,8 +31,8 @@ const widgetConfigs = {
     // 农历字体
     lunarFont: Font.regularRoundedSystemFont(15),
 
-    // 日程颜色
-    scheduleColor: new Color("#FFFFFF", 0.7),
+    // 日程字体颜色透明度
+    scheduleAlpha: 0.8,
     // 日程字体
     scheduleFont: Font.systemFont(11),
 
@@ -157,6 +157,8 @@ class Widget extends Base {
                     scheduleObj.text = `${schedule.title} ${timeText}`
                 }
 
+                // 日程颜色
+                scheduleObj.color = schedule.calendar.color
                 log(`>>日程：${scheduleObj.text}`)
                 showSchedules.push(scheduleObj)
             }
@@ -190,6 +192,8 @@ class Widget extends Base {
                     scheduleObj.text = `${schedule.title} ${timeText}`
                 }
 
+                // 日程颜色
+                scheduleObj.color = schedule.calendar.color
                 log(`>>日程：${scheduleObj.text}`)
                 showSchedules.push(scheduleObj)
             }
@@ -231,6 +235,8 @@ class Widget extends Base {
                     scheduleObj.text = `${schedule.title} ${timeText}`
                 }
 
+                // 日程颜色
+                scheduleObj.color = schedule.calendar.color
                 log(`>>日程：${scheduleObj.text}`)
                 showSchedules.push(scheduleObj)
             }
@@ -307,7 +313,8 @@ class Widget extends Base {
                 stack = widget.addStack()
                 widget.addSpacer(5)
                 widgetText = stack.addText(`▌${schedule.text}`)
-                widgetText.textColor = widgetConfigs.scheduleColor
+                widgetText.textColor = schedule.color
+                widgetText.textOpacity = widgetConfigs.scheduleAlpha
                 widgetText.font = widgetConfigs.scheduleFont
                 widgetText.lineLimit = 1
             }
