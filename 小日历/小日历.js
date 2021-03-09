@@ -201,7 +201,7 @@ class Widget extends Base {
 
         // 获取本周日程
         let startDate = new Date()
-        startDate.setTime(startDate.getTime() + 2 * 24 * 60 * 60 * 1000)
+        startDate.setTime(startDate.getTime() + 1 * 24 * 60 * 60 * 1000)
         let endDate = new Date()
         endDate.setTime(endDate.getTime() + 5 * 24 * 60 * 60 * 1000)
         const thisWeekSchedules = await CalendarEvent.between(startDate, endDate, [])
