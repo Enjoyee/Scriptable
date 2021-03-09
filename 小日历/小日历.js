@@ -203,7 +203,7 @@ class Widget extends Base {
         let startDate = new Date()
         startDate.setTime(startDate.getTime() + 1 * 24 * 60 * 60 * 1000)
         let endDate = new Date()
-        endDate.setTime(endDate.getTime() + 5 * 24 * 60 * 60 * 1000)
+        endDate.setTime(endDate.getTime() + 7 * 24 * 60 * 60 * 1000)
         const thisWeekSchedules = await CalendarEvent.between(startDate, endDate, [])
         for (const schedule of thisWeekSchedules) {
             if (this.shouldShowSchedule(schedule)) {
