@@ -34,6 +34,39 @@
         "<h3 align=\"center\">使用说明</h3>",
         "<li>自行申请彩云apikey填入</li>",
         "<li>依赖lsp环境</li>"
+        "<li>欢迎关注公众号：杂货万事屋</li>"
+      ],
+      "images": [
+        "https://raw.githubusercontent.com/Enjoyee/Scriptable/new/%E5%A4%9A%E6%A0%B7%E5%BC%8F%E5%BD%A9%E4%BA%91%E5%A4%A9%E6%B0%94/WechatIMG491.jpeg"
+      ]
+    },
+    {
+      "version": "1.0.0",
+      "author": "LSP",
+      "description": "小日历",
+      "scriptURL": "https://raw.githubusercontent.com/Enjoyee/Scriptable/new/%E5%B0%8F%E6%97%A5%E5%8E%86/%E5%B0%8F%E6%97%A5%E5%8E%86.js",
+      "thumb": "https://s3.ax1x.com/2021/03/09/63E6bQ.jpg",
+      "name": "小日历",
+      "title": "小日历",
+      "depend": [
+        {
+          "name": "lsp环境",
+          "scriptURL": "https://raw.githubusercontent.com/Enjoyee/Scriptable/new/lsp%E7%8E%AF%E5%A2%83.js"
+        }
+      ],
+      "html": [
+        "作者：<a href=\"https://github.com/Enjoyee/Scriptable\">@Enjoyee</a>",
+        "<br/>",
+        "<br/>",
+        "<h4 align=\"center\">脚本说明</h4>",
+        "v1.0.0",
+        "<li>实时时间</li>",
+        "<li>只做了小型组件支持</li>",
+        "<li>未来一周日程前三条展示</li>",
+        "<li>支持透明背景</li>",
+        "<li>农历展示</li>",
+        "<br/>",
+        "<li>欢迎关注公众号：杂货万事屋</li>"
       ],
       "images": [
         "https://raw.githubusercontent.com/Enjoyee/Scriptable/new/%E5%A4%9A%E6%A0%B7%E5%BC%8F%E5%BD%A9%E4%BA%91%E5%A4%A9%E6%B0%94/WechatIMG491.jpeg"
