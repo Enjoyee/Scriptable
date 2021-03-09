@@ -41,7 +41,7 @@
       ]
     },
     {
-      "version": "1.0.0",
+      "version": "1.0.1",
       "author": "LSP",
       "description": "小日历",
       "scriptURL": "https://raw.githubusercontent.com/Enjoyee/Scriptable/new/%E5%B0%8F%E6%97%A5%E5%8E%86/%E5%B0%8F%E6%97%A5%E5%8E%86.js",
@@ -59,7 +59,8 @@
         "<br/>",
         "<br/>",
         "<h4 align=\"center\">脚本说明</h4>",
-        "v1.0.0",
+        "v1.0.1",
+        "<li>日程文字颜色同步系统日程颜色</li>",
         "<li>实时时间</li>",
         "<li>只做了小型组件支持</li>",
         "<li>未来一周日程前三条展示</li>",
