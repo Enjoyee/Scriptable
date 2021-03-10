@@ -3,7 +3,7 @@
 // icon-color: blue; icon-glyph: user-astronaut;
 /**
 * Author:LSP
-* Date:2021-03-09
+* Date:2021-03-10
 * 公众号：杂货万事屋
 */
 // @导入引用开发环境
@@ -18,26 +18,28 @@ const widgetConfigs = {
     timeFont: Font.mediumRoundedSystemFont(18),
 
     // 周颜色
-    weekColor: new Color("#FFFFFF", 0.8),
+    weekColor: new Color("#1A94BC", 1),
     // 周字体
-    weekFont: Font.regularRoundedSystemFont(15),
+    weekFont: Font.mediumRoundedSystemFont(16),
 
     // 年月日颜色
-    fullYearColor: new Color("#FFFFFF", 0.9),
+    fullYearColor: new Color("#CDD1D3", 0.9),
     fullYearFont: Font.regularRoundedSystemFont(14),
 
     // 农历颜色
-    lunarColor: new Color("#FFFFFF", 0.9),
+    lunarColor: new Color("#F9F4DC", 1),
     // 农历字体
     lunarFont: Font.regularRoundedSystemFont(15),
 
-    // 日程字体颜色透明度
-    scheduleAlpha: 0.8,
     // 日程字体
     scheduleFont: Font.systemFont(11),
 
+    // 打开更新，直接同步脚本
+    openDownload: true,
+    // 是否使用GitHub仓库地址同步
+    useGithub: false,
     // 缓存刷新时间--估算(单位：分钟)
-    refreshInterval: 10,
+    refreshInterval: 30,
 
     // 透明背景图片
     selectPicBg: false,
@@ -167,6 +169,7 @@ class Widget extends Base {
         // 明日行程
         const tomorrowSchedules = await CalendarEvent.tomorrow([])
         for (const schedule of tomorrowSchedules) {
+            log("@" + tomorrowSchedules.size)
             if (this.shouldShowSchedule(schedule)) {
                 // 日程
                 let scheduleObj = {}
@@ -272,7 +275,7 @@ class Widget extends Base {
         const weekStack = stack.addStack()
         weekStack.layoutVertically()
         weekStack.bottomAlignContent()
-        const week = this.getDateStr(currentDate, 'EEEE')
+        const week = this.getDateStr(currentDate, 'EEE', "en")
         console.log(`week:${week}`)
         let widgetText = stack.addText(week)
         widgetText.textColor = widgetConfigs.weekColor
@@ -314,7 +317,7 @@ class Widget extends Base {
                 widget.addSpacer(5)
                 widgetText = stack.addText(`▌${schedule.text}`)
                 widgetText.textColor = schedule.color
-                widgetText.textOpacity = widgetConfigs.scheduleAlpha
+                widgetText.textOpacity = 0.8
                 widgetText.font = widgetConfigs.scheduleFont
                 widgetText.lineLimit = 1
             }
@@ -328,10 +331,48 @@ class Widget extends Base {
 
     //-------------------------------------
     /**
+    * 下载更新
+    */
+     async downloadUpdate() {
+        let files = FileManager.local()
+        const iCloudInUse = files.isFileStoredIniCloud(module.filename)
+        files = iCloudInUse ? FileManager.iCloud() : files
+        let message = ''
+        try {
+            let downloadURL = "https://mashangkaifa.coding.net/p/coding-code-guide/d/Scriptable/git/raw/master/material_weather.js"
+            if (widgetConfigs.useGithub) {
+                downloadURL = "https://raw.githubusercontent.com/Enjoyee/Scriptable/new/%E5%B0%8F%E6%97%A5%E5%8E%86/%E5%B0%8F%E6%97%A5%E5%8E%86.js"
+            }
+            const req = new Request(downloadURL)
+            const codeString = await req.loadString()
+            files.writeString(module.filename, codeString)
+            message = "脚本已更新，请退出脚本重新进入运行生效。"
+        } catch {
+            message = "更新失败，请稍后再试。"
+        }
+        const options = ["好的"]
+        await this.generateAlert(message, options)
+        Script.complete()
+    }
+
+    //-------------------------------------
+    /**
      * @渲染小组件
      */
     async render() {
-        return await this.renderUI()
+        // 下载更新
+        if (widgetConfigs.openDownload && config.runsInApp) {
+            const message = "同步远程脚本？"
+            const options = ["运行脚本", "下载脚本"]
+            let typeIndex = await this.generateAlert(message, options)
+            if (typeIndex == 1) {
+                await this.downloadUpdate()
+            } else {
+                return await this.renderUI()
+            }
+        } else {
+            return await this.renderUI()
+        }
     }
 }
 
