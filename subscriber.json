@@ -5,7 +5,7 @@
   "repo": "https://github.com/Enjoyee/Scriptable",
   "apps": [
     {
-      "version": "1.0.0",
+      "version": "1.0.1",
       "author": "LSP",
       "description": "多样式彩云天气",
       "scriptURL": "https://raw.githubusercontent.com/Enjoyee/Scriptable/new/%E5%A4%9A%E6%A0%B7%E5%BC%8F%E5%BD%A9%E4%BA%91%E5%A4%A9%E6%B0%94/material_weather.js",
@@ -30,6 +30,7 @@
         "<li>天气背景图会跟随对应天气改变</li>",
         "<li>支持透明背景</li>",
         "<li>具体天气、农历、定位、更新时间可配置是否显示</li>",
+        "<li>对彩云key进行了缓存，再对下下次的同步更新无需重新填入key</li>",
         "<br/>",
         "<h3 align=\"center\">使用说明</h3>",
         "<li>自行申请彩云apikey填入</li>",
