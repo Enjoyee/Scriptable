@@ -706,7 +706,7 @@ getData()
         files = iCloudInUse ? FileManager.iCloud() : files
         let message = ''
         try {
-            let downloadURL = "https://mashangkaifa.coding.net/p/coding-code-guide/d/Scriptable/git/raw/master/material_weather.js"
+            let downloadURL = "https://gitee.com/enjoyee/scriptable/raw/master/%E6%96%B0%E7%B3%BB%E5%88%97/material_weather.js"
             if (widgetConfigs.useGithub) {
                 downloadURL = "https://raw.githubusercontent.com/Enjoyee/Scriptable/new/%E5%A4%9A%E6%A0%B7%E5%BC%8F%E5%BD%A9%E4%BA%91%E5%A4%A9%E6%B0%94/material_weather.js"
             }
