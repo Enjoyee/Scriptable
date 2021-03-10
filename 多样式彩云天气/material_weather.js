@@ -458,7 +458,7 @@ class Widget extends Base {
         if(apiKey.length == 0) {
             apiKey = this.loadStringCache(apiCacheKeyName)
         } else {
-            this.saveStringCache(apiCacheKeyName)
+            this.saveStringCache(apiCacheKeyName, apiKey)
         }
         // 彩云天气域名
         const url = `https://api.caiyunapp.com/v2.5/${apiKey}/${location.longitude},${location.latitude}/weather.json?alert=true&dailysteps=${dailysteps}`
@@ -615,21 +615,21 @@ class Widget extends Base {
         let webview = new WebView()
         await webview.loadHTML(html)
         var getData = `
-function getData() {
-try {
-infoLunarText = document.querySelector('div#wnrl_k_you_id_${day}.wnrl_k_you .wnrl_k_you_id_wnrl_nongli').innerText
-holidayText = document.querySelectorAll('div.wnrl_k_zuo div.wnrl_riqi')[${day}].querySelector('.wnrl_td_bzl').innerText
-if(infoLunarText.search(holidayText) != -1) {
-holidayText = ''
-}
-} catch {
-holidayText = ''
-}
-return {infoLunarText: infoLunarText, holidayText: holidayText}
-}
-
-getData()
-`
+            function getData() {
+                try {
+                    infoLunarText = document.querySelector('div#wnrl_k_you_id_${day}.wnrl_k_you .wnrl_k_you_id_wnrl_nongli').innerText
+                    holidayText = document.querySelectorAll('div.wnrl_k_zuo div.wnrl_riqi')[${ day }].querySelector('.wnrl_td_bzl').innerText
+                    if (infoLunarText.search(holidayText) != -1) {
+                        holidayText = ''
+                    }
+                } catch {
+                    holidayText = ''
+                }
+                return { infoLunarText: infoLunarText, holidayText: holidayText }
+            }
+            
+            getData()
+        `
 
         // 节日数据  
         const response = await webview.evaluateJavaScript(getData, false)
