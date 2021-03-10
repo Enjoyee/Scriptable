@@ -1,6 +1,6 @@
 /**
 * Author:LSP
-* Date:2021-03-01
+* Date:2021-03-010
 */
 // @导入引用开发环境
 if (typeof require === 'undefined') require = importModule
@@ -450,8 +450,15 @@ class Widget extends Base {
         // 小时
         const hour = new Date().getHours()
 
+        const apiCacheKeyName = 'CaiYunKey'
+        let apiKey = widgetConfigs.apiKey
+        if(apiKey.length == 0) {
+            apiKey = this.loadStringCache(apiCacheKeyName)
+        } else {
+            this.saveStringCache(apiCacheKeyName)
+        }
         // 彩云天气域名
-        const url = `https://api.caiyunapp.com/v2.5/${widgetConfigs.apiKey}/${location.longitude},${location.latitude}/weather.json?alert=true&dailysteps=${dailysteps}`
+        const url = `https://api.caiyunapp.com/v2.5/${apiKey}/${location.longitude},${location.latitude}/weather.json?alert=true&dailysteps=${dailysteps}`
         const weatherJsonData = await this.httpGet(url, true, null, 'weatherMultiInfo')
 
         // 天气数据
