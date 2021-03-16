@@ -73,6 +73,37 @@
       "images": [
         "https://s3.ax1x.com/2021/03/10/6GHT8s.jpg"
       ]
+    },
+    {
+      "version": "1.0.0",
+      "author": "LSP",
+      "description": "网络图片轮播",
+      "scriptURL": "https://raw.githubusercontent.com/Enjoyee/Scriptable/new/%E5%9B%BE%E7%89%87%E8%BD%AE%E6%92%AD/%E7%BD%91%E7%BB%9C%E5%9B%BE%E7%89%87%E8%BD%AE%E6%92%AD.js",
+      "thumb": "https://s3.ax1x.com/2021/03/16/6sP5Px.jpg",
+      "name": "网络图片轮播",
+      "title": "网络图片轮播",
+      "depend": [
+        {
+          "name": "lsp环境",
+          "scriptURL": "https://raw.githubusercontent.com/Enjoyee/Scriptable/new/lsp%E7%8E%AF%E5%A2%83.js"
+        }
+      ],
+      "html": [
+        "作者：<a href=\"https://github.com/Enjoyee/Scriptable\">@Enjoyee</a>",
+        "<br/>",
+        "<br/>",
+        "<h4 align=\"center\">脚本说明</h4>",
+        "v1.0.0",
+        "<li>网络图片链接轮播</li>",
+        "<li>脚本里内置了line的一些表情的轮播</li>",
+        "<li>鬼灭、哆啦A梦、可妮布朗熊、进击的巨人</li>",
+        "<br/>",
+        "<li>欢迎关注公众号：杂货万事屋</li>"
+      ],
+      "images": [
+        "https://s3.ax1x.com/2021/03/16/6sPIG6.jpg",
+        "https://s3.ax1x.com/2021/03/16/6sP5Px.jpg"
+      ]
     }
   ]
 }
