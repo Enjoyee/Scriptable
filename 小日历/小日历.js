@@ -3,7 +3,7 @@
 // icon-color: blue; icon-glyph: user-astronaut;
 /**
 * Author:LSP
-* Date:2021-03-10
+* Date:2021-03-16
 * 公众号：杂货万事屋
 */
 // @导入引用开发环境
@@ -33,6 +33,10 @@ const widgetConfigs = {
 
     // 日程字体
     scheduleFont: Font.systemFont(11),
+    // 日程指示条圆角
+    schedulesIndicatorRadius: 0,
+    // 日程指示条尺寸
+    schedulesIndicatorSize: new Size(5, 13),
 
     // 打开更新，直接同步脚本
     openDownload: true,
@@ -315,7 +319,15 @@ class Widget extends Base {
             if (index < 3) {
                 stack = widget.addStack()
                 widget.addSpacer(5)
-                widgetText = stack.addText(`▌${schedule.text}`)
+                
+                // 指示条
+                let vStack = stack.addStack()
+                vStack.cornerRadius = widgetConfigs.schedulesIndicatorRadius
+                vStack.borderColor = schedule.color
+                vStack.size = widgetConfigs.schedulesIndicatorSize
+
+                // 日程文本
+                widgetText = stack.addText(`${schedule.text}`)
                 widgetText.textColor = schedule.color
                 widgetText.textOpacity = 0.8
                 widgetText.font = widgetConfigs.scheduleFont
