@@ -323,8 +323,9 @@ class Widget extends Base {
                 // 指示条
                 let vStack = stack.addStack()
                 vStack.cornerRadius = widgetConfigs.schedulesIndicatorRadius
-                vStack.borderColor = schedule.color
+                vStack.backgroundColor = schedule.color
                 vStack.size = widgetConfigs.schedulesIndicatorSize
+                stack.addSpacer(5)
 
                 // 日程文本
                 widgetText = stack.addText(`${schedule.text}`)
