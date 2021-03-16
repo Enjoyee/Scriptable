@@ -105,9 +105,9 @@ class Widget extends Base {
         files = iCloudInUse ? FileManager.iCloud() : files
         let message = ''
         try {
-            let downloadURL = "https://gitee.com/enjoyee/scriptable/raw/master/%E6%96%B0%E7%B3%BB%E5%88%97/%E5%B0%8F%E6%97%A5%E5%8E%86.js"
+            let downloadURL = "https://gitee.com/enjoyee/scriptable/raw/master/%E6%96%B0%E7%B3%BB%E5%88%97/%E7%BD%91%E7%BB%9C%E5%9B%BE%E7%89%87%E8%BD%AE%E6%92%AD.js"
             if (widgetConfigs.useGithub) {
-                downloadURL = "https://raw.githubusercontent.com/Enjoyee/Scriptable/new/%E5%B0%8F%E6%97%A5%E5%8E%86/%E5%B0%8F%E6%97%A5%E5%8E%86.js"
+                downloadURL = "https://raw.githubusercontent.com/Enjoyee/Scriptable/new/%E5%9B%BE%E7%89%87%E8%BD%AE%E6%92%AD/%E7%BD%91%E7%BB%9C%E5%9B%BE%E7%89%87%E8%BD%AE%E6%92%AD.js"
             }
             const req = new Request(downloadURL)
             const codeString = await req.loadString()
