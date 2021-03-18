@@ -13,6 +13,8 @@ const { Base } = require("./lsp环境")
 const widgetConfigs = {
     // 打开更新，直接同步远程彩云脚本
     openDownload: true,
+    // 备用仓库地址
+    useGithub: false,
 
     apiKey: "", // 彩云key
 
@@ -405,7 +407,7 @@ class Widget extends Base {
         try {
             let downloadURL = "https://gitee.com/enjoyee/scriptable/raw/master/%E6%96%B0%E7%B3%BB%E5%88%97/%E5%BD%A9%E4%BA%91%E6%8A%98%E7%BA%BF.js"
             if (widgetConfigs.useGithub) {
-                downloadURL = "https://raw.githubusercontent.com/Enjoyee/Scriptable/new/%E5%A4%9A%E6%A0%B7%E5%BC%8F%E5%BD%A9%E4%BA%91%E5%A4%A9%E6%B0%94/material_weather.js"
+                downloadURL = "https://raw.githubusercontent.com/Enjoyee/Scriptable/new/%E5%BD%A9%E4%BA%91%E6%8A%98%E7%BA%BF/%E5%BD%A9%E4%BA%91%E6%8A%98%E7%BA%BF.js"
             }
             const req = new Request(downloadURL)
             const codeString = await req.loadString()
