@@ -105,5 +105,38 @@
         "https://s3.ax1x.com/2021/03/16/6sP5Px.jpg"
       ]
     }
+    ,
+    {
+      "version": "1.0.0",
+      "author": "LSP",
+      "description": "彩云折线",
+      "scriptURL": "https://raw.githubusercontent.com/Enjoyee/Scriptable/new/%E5%BD%A9%E4%BA%91%E6%8A%98%E7%BA%BF/%E5%BD%A9%E4%BA%91%E6%8A%98%E7%BA%BF.js",
+      "thumb": "https://github.com/Enjoyee/Scriptable/raw/new/%E5%BD%A9%E4%BA%91%E6%8A%98%E7%BA%BF/WechatIMG1.jpeg",
+      "name": "彩云折线",
+      "title": "彩云折线",
+      "depend": [
+        {
+          "name": "lsp环境",
+          "scriptURL": "https://raw.githubusercontent.com/Enjoyee/Scriptable/new/lsp%E7%8E%AF%E5%A2%83.js"
+        }
+      ],
+      "html": [
+        "作者：<a href=\"https://github.com/Enjoyee/Scriptable\">@Enjoyee</a>",
+        "<br/>",
+        "<br/>",
+        "<h4 align=\"center\">脚本说明</h4>",
+        "v1.0.0",
+        "<li>显示温度折线</li>",
+        "<li>两种模式，日小时温度模式，每天温度模式</li>",
+        "<li>长按小组件编辑，在Parameter栏输入1就是每天的温度模式，2就是日小时温度模式</li>",
+        "<li>照旧背景模式</li>",
+        "<li>欢迎关注公众号：杂货万事屋</li>"
+      ],
+      "images": [
+        "https://github.com/Enjoyee/Scriptable/raw/new/%E5%BD%A9%E4%BA%91%E6%8A%98%E7%BA%BF/WechatIMG1.jpeg",
+        "https://github.com/Enjoyee/Scriptable/raw/new/%E5%BD%A9%E4%BA%91%E6%8A%98%E7%BA%BF/WechatIMG2.jpeg",
+        "https://github.com/Enjoyee/Scriptable/raw/new/%E5%BD%A9%E4%BA%91%E6%8A%98%E7%BA%BF/WechatIMG3.jpeg"
+      ]
+    }
   ]
 }
