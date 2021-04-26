@@ -502,7 +502,7 @@ class Widget extends Base {
         try {
             let downloadURL = "https://gitee.com/enjoyee/scriptable/raw/master/%E5%90%88%E9%9B%86%E6%95%B4%E7%90%86/%E5%B0%8F%E9%9D%92%E8%9B%99%E5%BD%A9%E4%BA%91%E5%A4%A9%E6%B0%94.js"
             if (widgetConfigs.useGithub) {
-                downloadURL = "https://raw.githubusercontent.com/Enjoyee/Scriptable/new/%E5%A4%9A%E6%A0%B7%E5%BC%8F%E5%BD%A9%E4%BA%91%E5%A4%A9%E6%B0%94/material_weather.js"
+                downloadURL = "https://raw.githubusercontent.com/Enjoyee/Scriptable/new/%E5%B0%8F%E9%9D%92%E8%9B%99%E5%BD%A9%E4%BA%91%E5%A4%A9%E6%B0%94/%E5%B0%8F%E9%9D%92%E8%9B%99%E5%BD%A9%E4%BA%91%E5%A4%A9%E6%B0%94.js"
             }
             const req = new Request(downloadURL)
             const codeString = await req.loadString()
