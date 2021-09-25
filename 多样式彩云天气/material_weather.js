@@ -3,7 +3,7 @@
 // icon-color: blue; icon-glyph: user-astronaut;
 /**
 * Author:LSP
-* Date:2021-03-10
+* Date:2021-09-25
 */
 // @导入引用开发环境
 if (typeof require === 'undefined') require = importModule
@@ -16,6 +16,10 @@ const widgetConfigs = {
 
     // 彩云key
     apiKey: "",
+    
+    // 农历api，https://www.mxnzp.com/doc/detail?id=1
+    lunarAppid: "jdtjpaqlvaxmpsfi", // 农历相关apikey
+    lunarAppSecret: "NDM2dDFHcml6V21QcEhZSUxBZldQQT09", // 农历相关apikey
 
     // 是否是iPhone12mini
     isIphone12Mini: false,
@@ -605,37 +609,24 @@ class Widget extends Base {
     * 获取农历信息
     */
     async getLunar() {
-        const day = new Date().getDate() - 1
-        // 万年历数据
-        const url = "https://wannianrili.51240.com/"
-        const defaultHeaders = {
-            "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.67 Safari/537.36"
+        // 日期
+        const currentDate = new Date()
+        const dateStr = this.getDateStr(currentDate, 'yyyyMMdd', widgetConfigs.locale)
+        // 日历
+        const lunarUrl = `https://www.mxnzp.com/api/holiday/single/${dateStr}?app_id=${widgetConfigs.lunarAppid}&app_secret=${widgetConfigs.lunarAppSecret}`
+        const lunarJsonData = await this.httpGet(lunarUrl, true, null, 'lunar')
+        const data = lunarJsonData.data
+        return {
+            yearTips: data.yearTips,
+            infoLunarText: data.lunarCalendar,
+            holidayText: data.solarTerms,
+            typeDes: data.typeDes,
+            chineseZodiac: data.chineseZodiac,
+            avoid: data.avoid,
+            suit: data.suit,
+            weekOfYear: data.dayOfYear,
+            weekOfYear: data.weekOfYear,
         }
-        const html = await this.httpGet(url, false, defaultHeaders)
-        let webview = new WebView()
-        await webview.loadHTML(html)
-        var getData = `
-            function getData() {
-                try {
-                    infoLunarText = document.querySelector('div#wnrl_k_you_id_${day}.wnrl_k_you .wnrl_k_you_id_wnrl_nongli').innerText
-                    holidayText = document.querySelectorAll('div.wnrl_k_zuo div.wnrl_riqi')[${ day }].querySelector('.wnrl_td_bzl').innerText
-                    if (infoLunarText.search(holidayText) != -1) {
-                        holidayText = ''
-                    }
-                } catch {
-                    holidayText = ''
-                }
-                return { infoLunarText: infoLunarText, holidayText: holidayText }
-            }
-            
-            getData()
-        `
-
-        // 节日数据  
-        const response = await webview.evaluateJavaScript(getData, false)
-        console.log(`农历输出：${JSON.stringify(response)}`);
-
-        return response
     }
 
     /**
