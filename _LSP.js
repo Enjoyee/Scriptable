@@ -8,13 +8,13 @@
 */
 
 // 当前环境版本号
-const VERSION = 20230324
+const VERSION = 20230420
 // 组件配置文件名
 const settingConfigName = 'settings.json';
 // 分支
-const branch = 'master';
+const branch = 'v2';
 // 仓库根目录
-const remoteRoot = `https://gitcode.net/enoyee/scriptable/-/raw/${branch}`;
+const remoteRoot = `https://raw.githubusercontent.com/Enjoyee/Scriptable/${branch}`;
 
 // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@

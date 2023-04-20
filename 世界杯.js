@@ -3,14 +3,18 @@
 // icon-color: red; icon-glyph: user-astronaut;
 /**
 * Author:LSP
-* Date:2022-12-13
+* Date:2023-04-20
 */
 // -------------------------------------------------------
 // 是否是开发环境，配合手机端调试使用，正式发布设置为false
 const isDev = false;
-console.log(`开发环境 👉👉👉👉👉 ${isDev ? 'DEV' : 'RELEASE'}`);
+const dependencyLSP = '20230420';
+console.log(`当前环境 👉👉👉👉👉 ${isDev ? 'DEV' : 'RELEASE'}`);
 console.log(`----------------------------------------`);
-const remoteRoot = 'https://gitcode.net/enoyee/scriptable/-/raw/master/';
+// 分支
+const branch = 'v2';
+// 仓库根目录
+const remoteRoot = `https://raw.githubusercontent.com/Enjoyee/Scriptable/${branch}`;
 // 依赖包目录
 const fm = FileManager.local();
 const rootDir = fm.documentsDirectory();
