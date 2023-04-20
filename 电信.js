@@ -1,0 +1,577 @@
+// Variables used by Scriptable.
+// These must be at the very top of the file. Do not edit.
+// icon-color: blue; icon-glyph: mobile-alt;
+/**
+* Author:LSP
+* Date:2023-03-02
+*/
+// -------------------------------------------------------
+// 是否是开发环境，配合手机端调试使用，正式发布设置为false
+const isDev = false;
+const dependencyLSP = '20230228';
+console.log(`开发环境 👉👉👉👉👉 ${isDev ? 'DEV' : 'RELEASE'}`);
+console.log(`----------------------------------------`);
+// 分支
+const branch = 'master';
+// 仓库根目录
+const remoteRoot = `https://gitcode.net/enoyee/scriptable/-/raw/${branch}`;
+// 依赖包目录
+const fm = FileManager.local();
+const rootDir = fm.documentsDirectory();
+const cacheDir = fm.joinPath(rootDir, 'LSP');
+const dependencyFileName = isDev ? "_LSP.js" : `${cacheDir}/_LSP.js`;
+// 下载依赖包
+await downloadLSPDependency();
+// -------------------------------------------------------
+if (typeof require === 'undefined') require = importModule
+// 引入相关方法
+const { BaseWidget } = require(dependencyFileName);
+
+// @定义小组件
+class Widget extends BaseWidget {
+
+  defaultPreference = {
+    cache_key_detail: 'detail',
+    cache_key_balance: 'balance',
+    fetchUrl: {
+      home: 'https://e.189.cn/store/wap/partner/stylehead/189Bill.do',
+      detail: 'https://e.189.cn/store/user/package_detail.do?t=189Bill',
+      balance: 'https://e.189.cn/store/user/balance_new.do',
+    },
+    titleDayColor: '#000000',
+    titleNightColor: '#000000',
+    descDayColor: '#000000',
+    descNightColor: '#000000',
+    refreshTimeDayColor: '#000000',
+    refreshTimeNightColor: '#000000',
+  };
+
+  fee = {
+    title: '📱 剩余话费：',
+    balance: 0,
+    unit: '元',
+  };
+
+  voice = {
+    title: '⏳ 剩余语音：',
+    balance: 0,
+    percent: 0,
+    unit: '分钟',
+  };
+
+  flow = {
+    title: '⛽️ 剩余流量：',
+    balance: 0,
+    percent: 0,
+    unit: 'MB',
+  };
+
+  getValueByKey = (key) => this.readWidgetSetting()[key] ?? '';
+
+  titleDayColor = () => this.getValueByKey('titleDayColor');
+  titleNightColor = () => this.getValueByKey('titleNightColor');
+
+  descDayColor = () => this.getValueByKey('descDayColor');
+  descNightColor = () => this.getValueByKey('descNightColor');
+
+  refreshTimeDayColor = () => this.getValueByKey('refreshTimeDayColor');
+  refreshTimeNightColor = () => this.getValueByKey('refreshTimeNightColor');
+
+  constructor(scriptName) {
+    super(scriptName);
+    this.reset = false;
+    this.defaultConfig.bgType = '3';
+    this.backgroundColor = '#FEFCF3,#0A2647';
+    this.cookie = this.getValueByKey('cookie');
+  }
+
+  async getAppViewOptions() {
+    return {
+      widgetProvider: {
+        small: true, // 是否提供小号组件
+        medium: false, // 是否提供中号组件
+        large: false, // 是否提供大号组件
+      },
+      // 预览界面的组件设置item
+      settingItems: [
+        {
+          name: 'chinaTelecomCK',
+          label: '天翼信息',
+          type: 'cell',
+          icon: `${remoteRoot}/img/icon_10000.png`,
+          needLoading: true,
+          desc: this.getValueByKey('cookie')?.length > 0 ? '已登录' : '未登录'
+        },
+        {
+          name: 'filterOrientateFlow',
+          label: '过滤定向流量',
+          type: 'switch',
+          icon: { name: 'bag.fill', color: '#F14A16', },
+          needLoading: false,
+          default: false
+        },
+        {
+          name: 'otherSetting',
+          label: '其他设置',
+          type: 'cell',
+          icon: `${remoteRoot}/img/setting.gif`,
+          needLoading: true,
+          childItems: [
+            {
+              items: [
+                {
+                  name: 'titleDayColor',
+                  label: '标题浅色颜色',
+                  type: 'color',
+                  icon: { name: 'pencil.and.outline', color: '#3a86ff', },
+                  needLoading: false,
+                  default: this.titleDayColor(),
+                },
+                {
+                  name: 'titleNightColor',
+                  label: '标题深色颜色',
+                  type: 'color',
+                  icon: { name: 'square.and.pencil', color: '#3a0ca3', },
+                  needLoading: false,
+                  default: this.titleNightColor(),
+                },
+              ],
+            },
+            {
+              items: [
+                {
+                  name: 'descDayColor',
+                  label: '内容浅色颜色',
+                  type: 'color',
+                  icon: { name: 'pencil.and.outline', color: '#3a86ff', },
+                  needLoading: false,
+                  default: this.descDayColor(),
+                },
+                {
+                  name: 'descNightColor',
+                  label: '内容深色颜色',
+                  type: 'color',
+                  icon: { name: 'square.and.pencil', color: '#3a0ca3', },
+                  needLoading: false,
+                  default: this.descNightColor(),
+                },
+              ],
+            },
+            {
+              items: [
+                {
+                  name: 'refreshTimeDayColor',
+                  label: '刷新时间浅色颜色',
+                  type: 'color',
+                  icon: { name: 'pencil.and.outline', color: '#3a86ff', },
+                  needLoading: false,
+                  default: this.refreshTimeDayColor(),
+                },
+                {
+                  name: 'refreshTimeNightColor',
+                  label: '刷新时间深色颜色',
+                  type: 'color',
+                  icon: { name: 'square.and.pencil', color: '#3a0ca3', },
+                  needLoading: false,
+                  default: this.refreshTimeNightColor(),
+                },
+              ],
+            },
+          ]
+        },
+      ],
+      // cell类型的item点击回调
+      onItemClick: async (item) => {
+        let insertDesc;
+        const widgetSetting = this.readWidgetSetting();
+        switch (item.name) {
+          case 'chinaTelecomCK':
+            let ck;
+            let selectIndex = await this.generateAlert('登录信息', '1.网页登录\n2.自己抓取填入ck', ['网页登录', '直接填入']);
+            if (selectIndex == 0) {
+              const webview = new WebView();
+              await webview.loadURL(this.defaultPreference.fetchUrl.home);
+              await webview.present();
+              const request = new Request(this.defaultPreference.fetchUrl.balance);
+              request.method = 'POST';
+              const response = await request.loadJSON();
+              console.log(
+                JSON.stringify(response, null, 2)
+              );
+              if (response?.result == 0) {
+                const cookies = request.response.cookies;
+                let cookie = [];
+                cookie = cookies.map((item) => item.name + '=' + item.value);
+                ck = cookie.join('; ');
+                // 保存配置
+                widgetSetting['cookie'] = ck;
+              }
+            } else {
+              Pasteboard.copy(this.defaultPreference.fetchUrl.home);
+              await this.generateInputAlert({
+                title: '登录信息填写',
+                message: '填入抓取天翼的cookie\n👉登录地址已复制到粘贴板了👈',
+                options: [
+                  { hint: '请输入cookie', value: widgetSetting?.cookie ?? '' },
+                ]
+              }, async (inputArr) => {
+                this.reset = true;
+                ck = inputArr[0].value;
+                // 保存配置
+                widgetSetting['cookie'] = ck;
+              });
+            }
+            this.cookie = widgetSetting.cookie;
+            insertDesc = ck?.length > 0 ? '已填写' : '未填写';
+            this.writeWidgetSetting({ ...widgetSetting });
+            break;
+        }
+        return {
+          desc: { value: insertDesc },
+        };
+      },
+    };
+  }
+
+  async render({ widgetSetting }) {
+    return await this.provideSmallWidget(widgetSetting);
+  }
+
+  async provideSmallWidget(widgetSetting) {
+    // ========================================
+    await this.loadMoneyBalance();
+    await this.loadDetailInfo(widgetSetting.filterOrientateFlow);
+    const voiceBalance = this.voice.balance;
+    // ========================================
+    const widget = new ListWidget();
+    widget.setPadding(0, 0, 0, 0);
+    // ========================================
+    const widgetSize = this.getWidgetSize('小号');
+    let stack = widget.addStack();
+    let image = await this.getImageByUrl(`${remoteRoot}/img/bg_doraemon_1.png`);
+    stack.setPadding(4, 12, 0, 12);
+    stack.backgroundImage = image;
+    stack.size = new Size(widgetSize.width, widgetSize.height);
+    stack.layoutVertically();
+    stack.addSpacer();
+    // ========================================
+    const titleFont = Font.lightSystemFont(13);
+    const infoFont = Font.mediumSystemFont(16);
+    const titleTextColor = Color.dynamic(new Color(this.titleDayColor()), new Color(this.titleNightColor()));
+    const descTextColor = Color.dynamic(new Color(this.descDayColor()), new Color(this.descNightColor()));
+    const refreshTimeTextColor = Color.dynamic(new Color(this.refreshTimeDayColor()), new Color(this.refreshTimeNightColor()));
+    const descSpacer = 3;
+    const lineSpacer = 4;
+    const descLeftSpacer = 22;
+    // ========================================
+    let textSpan = stack.addText(`${this.fee.title}`);
+    textSpan.textColor = titleTextColor;
+    textSpan.font = titleFont;
+    // 
+    stack.addSpacer(descSpacer);
+    let displayStack = stack.addStack();
+    displayStack.centerAlignContent();
+    displayStack.addSpacer(descLeftSpacer);
+    textSpan = displayStack.addText(`${this.fee.balance}${this.fee.unit}`);
+    textSpan.textColor = descTextColor;
+    textSpan.font = infoFont;
+    displayStack.addSpacer();
+    // ========================================
+    stack.addSpacer(lineSpacer);
+    textSpan = stack.addText(`${this.voice.title} `);
+    textSpan.textColor = titleTextColor;
+    textSpan.font = titleFont;
+    // 
+    stack.addSpacer(descSpacer);
+    displayStack = stack.addStack();
+    displayStack.centerAlignContent();
+    displayStack.addSpacer(descLeftSpacer);
+    textSpan = displayStack.addText(`${voiceBalance}${this.voice.unit}`);
+    textSpan.textColor = descTextColor;
+    textSpan.font = infoFont;
+    displayStack.addSpacer();
+    // ========================================
+    stack.addSpacer(lineSpacer);
+    textSpan = stack.addText(`${this.flow.title} `);
+    textSpan.textColor = titleTextColor;
+    textSpan.font = titleFont;
+    // 
+    stack.addSpacer(descSpacer);
+    displayStack = stack.addStack();
+    displayStack.centerAlignContent();
+    displayStack.addSpacer(descLeftSpacer);
+    textSpan = displayStack.addText(`${this.flow.balance}${this.flow.unit}`);
+    textSpan.textColor = descTextColor;
+    textSpan.font = infoFont;
+    displayStack.addSpacer();
+    // ========================================
+
+    // ========================================
+    stack.addSpacer(6);
+    let btStack = stack.addStack();
+    btStack.centerAlignContent();
+    btStack.addSpacer(6);
+    image = this.getSFSymbol('goforward');
+    let imgSpan = btStack.addImage(image);
+    imgSpan.imageSize = new Size(9, 9);
+    imgSpan.tintColor = refreshTimeTextColor;
+    btStack.addSpacer(4);
+    if (this.success) {
+      this.lastUpdate = this.getDateStr(new Date(), 'HH:mm');
+    }
+    textSpan = btStack.addText(`${this.getDateStr(new Date(), 'HH:mm')} `);
+    textSpan.textColor = refreshTimeTextColor;
+    textSpan.font = Font.lightSystemFont(10);
+    btStack.addSpacer();
+    image = await this.getImageByUrl(`${remoteRoot}/img/ic_logo_10000.jpg`);
+    imgSpan = btStack.addImage(image);
+    imgSpan.imageSize = new Size(14, 14);
+    stack.addSpacer();
+    //=================================
+    return widget;
+  }
+
+  // --------------------------NET START--------------------------
+  bodyText2Response = async (webview, cacheKey) => {
+    const widgetSetting = this.readWidgetSetting();
+    const text = await webview.evaluateJavaScript("document.body.innerText");
+    const ck = await webview.evaluateJavaScript("document.cookie");
+    console.log(`CK:${ck} `);
+    let RES;
+    try {
+      this.success = true;
+      RES = JSON.parse(text);
+      widgetSetting['loginRes'] = 'login';
+      this.useFileManager().writeJSONCache(cacheKey, RES);
+    } catch (error) {
+      this.success = false;
+      widgetSetting['loginRes'] = '';
+      console.error(`加载出错：${text} `);
+    }
+    this.writeWidgetSetting(widgetSetting);
+    return RES;
+  }
+
+  /**
+   * 加载账户余额
+   */
+  loadMoneyBalance = async () => {
+    const response = await this.httpGet(
+      this.defaultPreference.fetchUrl.balance,
+      {
+        useCache: this.reset ?? false,
+        dataSuccess: (res) => res.serviceResultCode == '0',
+        headers: {
+          'cookie': this.cookie
+        }
+      }
+    );
+    this.fee.balance = response == undefined || response['serviceResultCode'] == 0 ? parseFloat(parseInt(response?.totalBalanceAvailable || 0) / 100).toFixed(2) : 'NAN';
+  }
+
+  /**
+   * 流量格式化
+   * @param {*} flow 
+   * @returns 
+   */
+  formatFlow = (flow) => {
+    const remain = flow / 1024;
+    if (remain < 1024) {
+      return { amount: remain.toFixed(2), unit: 'MB' };
+    }
+    return { amount: (remain / 1024).toFixed(2), unit: 'GB' };
+  }
+
+  /**
+   * 加载明细
+   * @returns 
+   */
+  loadDetailInfo = async (filterOrientateFlow) => {
+    const response = await this.httpGet(
+      this.defaultPreference.fetchUrl.detail,
+      {
+        useCache: this.reset ?? false,
+        dataSuccess: (res) => res.paraFieldResult == 'SUCCESS',
+        headers: {
+          'cookie': this.cookie
+        }
+      }
+    );
+    // 总流量
+    let totalFlowAmount = 0;
+    // 剩余流量
+    let totalBalanceFlowAmount = 0;
+    // 总语音
+    let totalVoiceAmount = 0;
+    // 剩余语音
+    let totalBalanceVoiceAmount = 0;
+    // 语音
+    if (response.voiceAmount && response.voiceBalance) {
+      totalVoiceAmount = response.voiceAmount;
+      totalBalanceVoiceAmount = response.voiceBalance;
+    }
+    // 流量&语音
+    response.items?.forEach((data) => {
+      if (data.offerType !== 19) {
+        data.items?.forEach((item) => {
+          if (item.unitTypeId == 3) {
+            if (!(item.usageAmount == 0 && item.balanceAmount == 0)) {
+              let ratableResourcename = item.ratableResourcename;
+              let ratableAmount = item.ratableAmount;
+              let balanceAmount = item.balanceAmount;
+              console.log(`套餐名称：«${ratableResourcename}»`);
+              console.log(`套餐总流量：${ratableAmount} MB`);
+              console.log(`套餐剩余流量：${balanceAmount} MB`);
+              console.log(`================================= `);
+              if (filterOrientateFlow && ratableResourcename.search('定向') != -1 || balanceAmount == '999999999999') {
+                ratableAmount = 0;
+                balanceAmount = 0;
+              }
+              totalFlowAmount += parseFloat(ratableAmount);
+              totalBalanceFlowAmount += parseFloat(balanceAmount);
+            }
+            if (data.offerType == 21 && item.ratableAmount == '0') {
+              // 无限流量用户
+              const usageAmountObj = this.formatFlow(item.usageAmount);
+              this.flow.title = '⛽️ 流量已用：';
+              this.flow.balance = usageAmountObj.amount;
+              this.flow.unit = usageAmountObj.unit;
+            }
+          } else if (!response.voiceBalance && item.unitTypeId == 1) {
+            totalVoiceAmount += parseInt(item.ratableAmount);
+            totalBalanceVoiceAmount += parseInt(item.balanceAmount);
+          }
+        });
+      }
+    });
+    const totalFlowObj = this.formatFlow(totalFlowAmount);
+    const totalBalanceFlowObj = this.formatFlow(totalBalanceFlowAmount);
+    console.log(`总流量：${totalFlowObj.amount}${totalFlowObj.unit} `);
+    console.log(`剩余流量：${totalBalanceFlowObj.amount}${totalBalanceFlowObj.unit} `);
+    console.log(`总语音：${totalVoiceAmount}${this.voice.unit} `);
+    console.log(`剩余语音：${totalBalanceVoiceAmount}${this.voice.unit} `);
+    console.log(`================================= `);
+    // 设置流量
+    this.flow.percent = ((totalBalanceFlowAmount / (totalFlowAmount || 1)) * 100).toFixed(2);
+    this.flow.balance = totalBalanceFlowObj.amount;
+    this.flow.unit = totalBalanceFlowObj.unit;
+    // 设置语音
+    this.voice.percent = ((totalBalanceVoiceAmount / (totalVoiceAmount || 1)) * 100).toFixed(2);
+    this.voice.balance = totalBalanceVoiceAmount;
+  }
+
+  // --------------------------NET END--------------------------
+}
+
+await new Widget(Script.name()).run();
+
+
+// =================================================================================
+// =================================================================================
+async function downloadLSPDependency() {
+  let fm = FileManager.local();
+  const dependencyURL = `${remoteRoot}/_LSP.js`;
+  const update = needUpdateDependency();
+  if (isDev) {
+    const iCloudPath = FileManager.iCloud().documentsDirectory();
+    const localIcloudDependencyExit = fm.isFileStoredIniCloud(`${iCloudPath}/_LSP.js`);
+    const localDependencyExit = fm.fileExists(`${rootDir}/_LSP.js`);
+    const fileExist = localIcloudDependencyExit || localDependencyExit;
+    console.log(`🚀 DEV开发依赖文件${fileExist ? '已存在 ✅' : '不存在 🚫'}`);
+    if (!fileExist || update) {
+      console.log(`🤖 DEV 开始${update ? '更新' + dependencyLSP : '下载'}依赖~`);
+      keySave('VERSION', dependencyLSP);
+      await downloadFile2Scriptable('_LSP', dependencyURL);
+    }
+    return
+  }
+
+  //////////////////////////////////////////////////////////
+  console.log(`----------------------------------------`);
+  const remoteDependencyExit = fm.fileExists(`${cacheDir}/_LSP.js`);
+  console.log(`🚀 RELEASE依赖文件${remoteDependencyExit ? '已存在 ✅' : '不存在 🚫'}`);
+  // ------------------------------
+  if (!remoteDependencyExit || update) { // 下载依赖
+    // 创建根目录
+    if (!fm.fileExists(cacheDir)) {
+      fm.createDirectory(cacheDir, true);
+    }
+    // 下载
+    console.log(`🤖 RELEASE开始${update ? '更新' : '下载'}依赖~`);
+    console.log(`----------------------------------------`);
+    const req = new Request(dependencyURL);
+    const moduleJs = await req.load();
+    if (moduleJs) {
+      fm.write(fm.joinPath(cacheDir, '/_LSP.js'), moduleJs);
+      keySave('VERSION', dependencyLSP);
+      console.log('✅ LSP远程依赖环境下载成功！');
+      console.log(`----------------------------------------`);
+    } else {
+      console.error('🚫 获取依赖环境脚本失败，请重试！');
+      console.log(`----------------------------------------`);
+    }
+  }
+}
+
+/**
+ * 获取保存的文件名
+ * @param {*} fileName 
+ * @returns 
+ */
+function getSaveFileName(fileName) {
+  const hasSuffix = fileName.lastIndexOf(".") + 1;
+  return !hasSuffix ? `${fileName}.js` : fileName;
+};
+
+/**
+ * 保存文件到Scriptable软件目录，app可看到
+ * @param {*} fileName 
+ * @param {*} content 
+ * @returns 
+ */
+function saveFile2Scriptable(fileName, content) {
+  try {
+    const fm = FileManager.iCloud();
+    let fileSimpleName = getSaveFileName(fileName);
+    const filePath = fm.joinPath(fm.documentsDirectory(), fileSimpleName);
+    fm.writeString(filePath, content);
+    return true;
+  } catch (error) {
+    return false;
+  }
+};
+
+/**
+ * 下载js文件到Scriptable软件目录
+ * @param {*} moduleName 名称 
+ * @param {*} url 在线地址 
+ * @returns 
+ */
+async function downloadFile2Scriptable(moduleName, url) {
+  const req = new Request(url);
+  const content = await req.loadString();
+  return saveFile2Scriptable(`${moduleName}`, content);
+};
+
+/**
+ * 是否需要更新依赖版本
+ */
+function needUpdateDependency() {
+  return dependencyLSP != keyGet('VERSION');
+};
+
+function keySave(cacheKey, cache) {
+  if (cache) {
+    Keychain.set(Script.name() + cacheKey, cache);
+  }
+}
+
+function keyGet(cacheKey, defaultValue = '') {
+  if (Keychain.contains(Script.name() + cacheKey)) {
+    return Keychain.get(Script.name() + cacheKey);
+  } else {
+    return defaultValue;
+  }
+}
+// =================================================================================
+// =================================================================================
