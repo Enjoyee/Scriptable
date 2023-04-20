@@ -1,6 +1,6 @@
 Script.Installer = async () => {
   let continueRun = true;
-  const INSTALL_NAME = '桌面启动';
+  const INSTALL_NAME = '';
   console.log(`👉公众号«杂货万事屋»`);
   console.log(`🚀安装«${INSTALL_NAME}»小组件`);
   const fileManager = FileManager[module.filename.includes('Documents/iCloud~') ? 'iCloud' : 'local']();
