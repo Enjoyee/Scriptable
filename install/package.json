@@ -2,91 +2,91 @@
   "author": "LSP-杂货万事屋",
   "scriptable": true,
   "icon": "https://s3.uuu.ovh/imgs/2022/12/09/4c8c4d09b6542713.png",
-  "repo": "https://gitcode.net/enoyee/scriptable",
+  "repo": "https://github.com/Enjoyee/Scriptable",
   "dependency": {
     "name": "_LSP",
-    "version": "20221203",
-    "scriptURL": "https://gitcode.net/enoyee/scriptable/-/raw/master/_LSP.js"
+    "version": "20230420",
+    "scriptURL": "https://raw.githubusercontent.com/Enjoyee/Scriptable/v2/_LSP.js"
   },
   "apps": [
     {
       "title": "桌面启动",
-      "thumb": "https://gitcode.net/enoyee/scriptable/-/raw/master/preview/s1.jpeg",
+      "thumb": "https://raw.githubusercontent.com/Enjoyee/Scriptable/v2/preview/s1.jpeg",
       "version": "1.0.0",
       "description": "快捷启动 & 彩云天气数据 & 节假日倒计时",
-      "scriptURL": "https://gitcode.net/enoyee/scriptable/-/raw/master/%E6%A1%8C%E9%9D%A2%E5%90%AF%E5%8A%A8.js",
+      "scriptURL": "https://raw.githubusercontent.com/Enjoyee/Scriptable/v2/%E6%A1%8C%E9%9D%A2%E5%90%AF%E5%8A%A8.js",
       "name": "桌面启动"
     },
     {
       "title": "写真随机",
-      "thumb": "https://gitcode.net/enoyee/scriptable/-/raw/master/preview/s3.jpeg",
+      "thumb": "https://raw.githubusercontent.com/Enjoyee/Scriptable/v2/preview/s3.jpeg",
       "version": "1.0.0",
       "description": "写真随机，dounimei&dopaminegirl图源",
-      "scriptURL": "https://gitcode.net/enoyee/scriptable/-/raw/master/%E5%86%99%E7%9C%9F%E9%9A%8F%E6%9C%BA.js",
+      "scriptURL": "https://raw.githubusercontent.com/Enjoyee/Scriptable/v2/%E5%86%99%E7%9C%9F%E9%9A%8F%E6%9C%BA.js",
       "name": "写真随机"
     },
     {
       "title": "TopHub榜单",
-      "thumb": "https://gitcode.net/enoyee/scriptable/-/raw/master/preview/s4.jpeg",
+      "thumb": "https://raw.githubusercontent.com/Enjoyee/Scriptable/v2/preview/s4.jpeg",
       "version": "1.0.0",
       "description": "数据来源于今日热榜，几乎包罗全网热点，搜索热点添加",
-      "scriptURL": "https://gitcode.net/enoyee/scriptable/-/raw/master/TopHub%E6%A6%9C%E5%8D%95.js",
+      "scriptURL": "https://raw.githubusercontent.com/Enjoyee/Scriptable/v2/TopHub%E6%A6%9C%E5%8D%95.js",
       "name": "TopHub榜单"
     },
     {
       "title": "青蛙天气",
-      "thumb": "https://gitcode.net/enoyee/scriptable/-/raw/master/preview/s2.jpeg",
+      "thumb": "https://raw.githubusercontent.com/Enjoyee/Scriptable/v2/preview/s2.jpeg",
       "version": "1.0.0",
       "description": "谷歌青蛙天气背景 & 彩云天气数据",
-      "scriptURL": "https://gitcode.net/enoyee/scriptable/-/raw/master/%E9%9D%92%E8%9B%99%E5%A4%A9%E6%B0%94.js",
+      "scriptURL": "https://raw.githubusercontent.com/Enjoyee/Scriptable/v2/%E9%9D%92%E8%9B%99%E5%A4%A9%E6%B0%94.js",
       "name": "青蛙天气"
     },
     {
       "title": "今日事项",
-      "thumb": "https://gitcode.net/enoyee/scriptable/-/raw/master/preview/s6.jpeg",
+      "thumb": "https://raw.githubusercontent.com/Enjoyee/Scriptable/v2/preview/s6.jpeg",
       "version": "1.0.0",
       "description": "配合系统提现事项使用，事项优先级背景色区分，全部完成会有烟花庆祝背景",
-      "scriptURL": "https://gitcode.net/enoyee/scriptable/-/raw/master/%E4%BB%8A%E6%97%A5%E4%BA%8B%E9%A1%B9.js",
+      "scriptURL": "https://raw.githubusercontent.com/Enjoyee/Scriptable/v2/%E4%BB%8A%E6%97%A5%E4%BA%8B%E9%A1%B9.js",
       "name": "今日事项"
     },
     {
       "title": "倒计日",
-      "thumb": "https://gitcode.net/enoyee/scriptable/-/raw/master/preview/s7.jpeg",
+      "thumb": "https://raw.githubusercontent.com/Enjoyee/Scriptable/v2/preview/s7.jpeg",
       "version": "1.0.0",
       "description": "选择一个日期进行倒计时，动态颜色背景，根据系统深色模式切换，倒计、正计、纪念日、岁数",
-      "scriptURL": "https://gitcode.net/enoyee/scriptable/-/raw/master/%E5%80%92%E8%AE%A1%E6%97%A5.js",
+      "scriptURL": "https://raw.githubusercontent.com/Enjoyee/Scriptable/v2/%E5%80%92%E8%AE%A1%E6%97%A5.js",
       "name": "倒计日"
     },
     {
       "title": "电影日历",
-      "thumb": "https://gitcode.net/enoyee/scriptable/-/raw/master/preview/s8.jpeg",
+      "thumb": "https://raw.githubusercontent.com/Enjoyee/Scriptable/v2/preview/s8.jpeg",
       "version": "1.0.0",
       "description": "每日电影推荐，点击右侧日历跳到所有列表，其他则到今日详情，网站提供在线&下载地址",
-      "scriptURL": "https://gitcode.net/enoyee/scriptable/-/raw/master/%E7%94%B5%E5%BD%B1%E6%97%A5%E5%8E%86.js",
+      "scriptURL": "https://raw.githubusercontent.com/Enjoyee/Scriptable/v2/%E7%94%B5%E5%BD%B1%E6%97%A5%E5%8E%86.js",
       "name": "电影日历"
     },
     {
       "title": "JD",
-      "thumb": "https://gitcode.net/enoyee/scriptable/-/raw/master/preview/s9.jpeg",
+      "thumb": "https://raw.githubusercontent.com/Enjoyee/Scriptable/v2/preview/s9.jpeg",
       "version": "1.0.0",
       "description": "京豆、物流、东东农场、白条还款、红包等信息展示",
-      "scriptURL": "https://gitcode.net/enoyee/scriptable/-/raw/master/JD.js",
+      "scriptURL": "https://raw.githubusercontent.com/Enjoyee/Scriptable/v2/JD.js",
       "name": "JD"
     },
     {
       "title": "电信",
-      "thumb": "https://gitcode.net/enoyee/scriptable/-/raw/master/preview/s10.jpeg",
+      "thumb": "https://raw.githubusercontent.com/Enjoyee/Scriptable/v2/preview/s10.jpeg",
       "version": "1.0.0",
       "description": "电信流量、话费、语音展示",
-      "scriptURL": "https://gitcode.net/enoyee/scriptable/-/raw/master/%E7%94%B5%E4%BF%A1.js",
+      "scriptURL": "https://raw.githubusercontent.com/Enjoyee/Scriptable/v2/%E7%94%B5%E4%BF%A1.js",
       "name": "电信"
     },
     {
       "title": "联通",
-      "thumb": "https://gitcode.net/enoyee/scriptable/-/raw/master/preview/s11.jpeg",
+      "thumb": "https://raw.githubusercontent.com/Enjoyee/Scriptable/v2/preview/s11.jpeg",
       "version": "1.0.0",
       "description": "联通流量、话费、语音展示",
-      "scriptURL": "https://gitcode.net/enoyee/scriptable/-/raw/master/%E8%81%94%E9%80%9A.js",
+      "scriptURL": "https://raw.githubusercontent.com/Enjoyee/Scriptable/v2/%E8%81%94%E9%80%9A.js",
       "name": "联通"
     }
   ]

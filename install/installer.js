@@ -1,13 +1,13 @@
 Script.Installer = async () => {
   let continueRun = true;
-  const INSTALL_NAME = '';
+  const INSTALL_NAME = '桌面启动';
   console.log(`👉公众号«杂货万事屋»`);
   console.log(`🚀安装«${INSTALL_NAME}»小组件`);
   const fileManager = FileManager[module.filename.includes('Documents/iCloud~') ? 'iCloud' : 'local']();
   await Promise.all([`${INSTALL_NAME}.js`].map(async widgetFullName => {
     const widgetName = widgetFullName.replace('.js', '');
     console.log("👉下载小组件«" + widgetName + "»");
-    let url = `https://gitcode.net/enoyee/scriptable/-/raw/master/${encodeURIComponent(widgetName)}.js`;
+    let url = `https://raw.githubusercontent.com/Enjoyee/Scriptable/v2/${encodeURIComponent(widgetName)}.js`;
     console.log('👉脚本地址：' + url);
     const req = new Request(url);
     const res = await req.load();
