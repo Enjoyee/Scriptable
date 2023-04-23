@@ -38,7 +38,7 @@
 
 ### `S8，电影日历`：
 
-![](https://raw.githubusercontent.com/Enjoyee/Scriptable/v2/preview/s8.jpeg)
+![](https://raw.githubusercontent.com/Enjoyee/Scriptable/v2/preview/s8.jpeg){width=50%, height=50%}
 
 ### `S9，京东`：
 
