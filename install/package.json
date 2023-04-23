@@ -10,6 +10,14 @@
   },
   "apps": [
     {
+      "title": "彩云折线",
+      "thumb": "https://raw.githubusercontent.com/Enjoyee/Scriptable/v2/preview/s12.jpeg",
+      "version": "1.0.0",
+      "description": "彩云天气折线数据",
+      "scriptURL": "https://raw.githubusercontent.com/Enjoyee/Scriptable/v2/%E5%BD%A9%E4%BA%91%E6%8A%98%E7%BA%BF.js",
+      "name": "彩云折线"
+    },
+    {
       "title": "桌面启动",
       "thumb": "https://raw.githubusercontent.com/Enjoyee/Scriptable/v2/preview/s1.jpeg",
       "version": "1.0.0",

@@ -1,9 +1,9 @@
 // Variables used by Scriptable.
 // These must be at the very top of the file. Do not edit.
-// icon-color: red; icon-glyph: user-astronaut;
+// icon-color: deep-blue; icon-glyph: bolt;
 /**
 * Author:LSP
-* Date:2023-04-21
+* Date:2023-04-23
 */
 // -------------------------------------------------------
 // 是否是开发环境，配合手机端调试使用，正式发布设置为false
