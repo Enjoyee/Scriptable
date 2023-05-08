@@ -10,6 +10,14 @@
   },
   "apps": [
     {
+      "title": "万年历",
+      "thumb": "https://raw.githubusercontent.com/Enjoyee/Scriptable/v2/preview/s13.jpeg",
+      "version": "1.0.0",
+      "description": "万年历日历，显示调休节假日农历等信息",
+      "scriptURL": "https://raw.githubusercontent.com/Enjoyee/Scriptable/v2/%E4%B8%87%E5%B9%B4%E5%8E%86.js",
+      "name": "万年历"
+    },
+    {
       "title": "彩云折线",
       "thumb": "https://raw.githubusercontent.com/Enjoyee/Scriptable/v2/preview/s12.jpeg",
       "version": "1.0.0",
