@@ -29,6 +29,7 @@ const { BaseWidget } = require(dependencyFileName);
 
 // @定义小组件
 class Widget extends BaseWidget {
+  weekTitleArr = ['一', '二', '三', '四', '五', '六', '日'];
 
   defaultPreference = {
     weekdayTitleDayColor: '#333333',
@@ -86,7 +87,7 @@ class Widget extends BaseWidget {
     return {
       widgetProvider: {
         small: false, // 是否提供小号组件
-        medium: false, // 是否提供中号组件
+        medium: true, // 是否提供中号组件
         large: true, // 是否提供大号组件
       },
       // 预览界面的组件设置item
@@ -266,20 +267,29 @@ class Widget extends BaseWidget {
     };
   }
 
-  async render({ widgetSetting }) {
-    return await this.provideWidget(widgetSetting);
+  async render({ widgetSetting, family }) {
+    if (family == 'medium') {
+      return await this.provideWidget({ widgetSetting, isLarge: false });
+    }
+    return await this.provideWidget({ widgetSetting, isLarge: true });
   }
 
-  async provideWidget(widgetSetting) {
+  async provideWidget({ widgetSetting, isLarge }) {
     // ========================================
-    const widgetSize = this.getWidgetSize('大号');
+    const currDate = new Date();
+    let widgetSize = this.getWidgetSize('中号');
+    let rowCount = 2;
+    if (isLarge) {
+      rowCount = 6;
+      widgetSize = this.getWidgetSize('大号');
+    }
     const width = widgetSize.width;
     const height = widgetSize.height;
     const hCellWidth = width / 7;
     const topPadding = 8;
     const bottomPadding = 8;
     const weekCellHeight = 16;
-    const dateCellHeight = (height - weekCellHeight - 2 * topPadding - bottomPadding) / 6;
+    const dateCellHeight = (height - weekCellHeight - 2 * topPadding - bottomPadding) / rowCount;
     const canvasHeight = height - 2 * topPadding;
     // ========================================
     const widget = new ListWidget();
@@ -296,25 +306,41 @@ class Widget extends BaseWidget {
     //
     drawContext.setFont(Font.regularSystemFont(15));
     drawContext.setTextAlignedCenter();
-    const weekTitleArr = ['一', '二', '三', '四', '五', '六', '日'];
     for (let index = 0; index < 7; index++) {
       if (index >= 5) {
         drawContext.setTextColor(Color.dynamic(new Color(this.weekendTitleDayColor()), new Color(this.weekendTitleNightColor())));
       } else {
         drawContext.setTextColor(Color.dynamic(new Color(this.weekdayTitleDayColor()), new Color(this.weekdayTitleNightColor())));
       }
-      drawContext.drawTextInRect(weekTitleArr[index], new Rect(index * hCellWidth, 0, hCellWidth, weekCellHeight));
+      let rect = new Rect(index * hCellWidth, 0, hCellWidth, weekCellHeight);
+      drawContext.drawTextInRect(this.weekTitleArr[index], rect);
     }
 
     // =================================
     const calendarArr = await this.loadCalendarData();
+    const matchCalendar = calendarArr.filter(item => item.year == currDate.getFullYear() && item.month == (currDate.getMonth() + 1) && item.day == currDate.getDate())[0];
+    const index = calendarArr.indexOf(matchCalendar);
+    const calendarRow = Math.floor(index / 7 + 1);
+    let range = [0, 42];
+    if (calendarRow <= 2) {
+      range = [0, 14];
+    } else if (calendarRow >= 5) {
+      range = [28, 42];
+    } else {
+      range = [14, 28];
+    }
+    const finalCalendarArr = calendarArr.slice(range[0], range[1]);
 
     // =================================
     const margin = 2;
-    for (let row = 0; row < 6; row++) {
+    for (let row = 0; row < rowCount; row++) {
       for (let col = 0; col < 7; col++) {
-        let rect = new Rect(col * hCellWidth, (topPadding + weekCellHeight) + row * dateCellHeight + topPadding, hCellWidth, dateCellHeight);
-        let calendarInfo = calendarArr[7 * row + col];
+        let marginTop = 0;
+        if (isLarge) {
+          marginTop = topPadding / 2;
+        }
+        let rect = new Rect(col * hCellWidth, (topPadding + weekCellHeight) + row * dateCellHeight + marginTop, hCellWidth, dateCellHeight);
+        let calendarInfo = finalCalendarArr[7 * row + col];
         if (calendarInfo.isWeekend && !calendarInfo.showWorkDay || calendarInfo.showHoliday) {
           drawContext.setTextColor(Color.dynamic(new Color(this.holidayDateDayColor()), new Color(this.holidayDateNightColor())));
         } else {
@@ -388,13 +414,12 @@ class Widget extends BaseWidget {
     ctx.size = new Size(width, height);
     ctx.respectScreenScale = true;
     ctx.setTextAlignedCenter();
-    ctx.setFont(Font.semiboldSystemFont(300));
+    ctx.setFont(Font.semiboldSystemFont(100));
     ctx.setTextColor(Color.dynamic(new Color(this.monthBgTextDayColor()), new Color(this.monthBgTextNightColor())));
-    ctx.drawTextInRect(`${new Date().getMonth() + 1}`, new Rect(0, 0, width, height));
+    ctx.drawText(`${new Date().getMonth() + 1}月`, new Point(width / 2 - 80, height / 2 - 50)); // TODO
     img = await ctx.getImage();
     stack.backgroundImage = img;
     // 日历跳转
-    const currDate = new Date();
     const jumpType = widgetSetting['jumpType'] ?? 1;
     if (jumpType == 1) {
       stack.url = `https://mobile.51wnl-cq.com/huangli_tab_h5/?posId=BDSS&STIME=${currDate.getFullYear()}-${currDate.getMonth() + 1}-${currDate.getDate()}`;
