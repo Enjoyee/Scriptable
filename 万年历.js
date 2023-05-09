@@ -450,7 +450,7 @@ class Widget extends BaseWidget {
       response = keyGet(this.md5(this.scriptName), '');
       console.log(`使用缓存的${dateKey}日历数据...`);
     }
-    if (response.length == 0) {
+    if (response == undefined || response.length == 0) {
       console.log(`网络请求日历数据...`);
       const url = `https://opendata.baidu.com/api.php?tn=wisetpl&format=json&resource_id=39043&query=${currDate.getFullYear()}%E5%B9%B4${currDate.getMonth() + 1}%E6%9C%88&t=${currDate.getTime()}`
       response = await this.httpGet(
