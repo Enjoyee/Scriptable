@@ -416,9 +416,14 @@ class Widget extends BaseWidget {
     ctx.size = new Size(width, height);
     ctx.respectScreenScale = true;
     ctx.setTextAlignedCenter();
-    ctx.setFont(Font.semiboldSystemFont(100));
     ctx.setTextColor(Color.dynamic(new Color(this.monthBgTextDayColor()), new Color(this.monthBgTextNightColor())));
-    ctx.drawText(`${new Date().getMonth() + 1}月`, new Point(width / 2 - 80, height / 2 - 50)); // TODO
+    if (isLarge) {
+      ctx.setFont(Font.semiboldSystemFont(300));
+      ctx.drawTextInRect(`${new Date().getMonth() + 1}`, new Rect(0, 0, width, height));
+    } else {
+      ctx.setFont(Font.semiboldSystemFont(100));
+      ctx.drawText(`${new Date().getMonth() + 1}月`, new Point(width / 2 - 80, height / 2 - 50));
+    }
     img = await ctx.getImage();
     stack.backgroundImage = img;
     // 日历跳转
