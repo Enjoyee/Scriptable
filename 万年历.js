@@ -92,6 +92,25 @@ class Widget extends BaseWidget {
       // 预览界面的组件设置item
       settingItems: [
         {
+          name: 'jumpType',
+          label: '点击跳转',
+          type: 'select',
+          icon: { name: 'link', color: '#ef233c' },
+          options: [
+            { label: '网页黄历', value: '1' },
+            { label: '系统日历', value: '2' },
+          ],
+          default: "1"
+        },
+        {
+          name: 'openSchedule',
+          label: '日程指示器',
+          type: 'switch',
+          icon: { name: 'calendar', color: '#27E1C1' },
+          default: false,
+          needLoading: false,
+        },
+        {
           name: 'otherSetting',
           label: '其他设置',
           type: 'cell',
@@ -247,11 +266,11 @@ class Widget extends BaseWidget {
     };
   }
 
-  async render() {
-    return await this.provideWidget();
+  async render({ widgetSetting }) {
+    return await this.provideWidget(widgetSetting);
   }
 
-  async provideWidget() {
+  async provideWidget(widgetSetting) {
     // ========================================
     const widgetSize = this.getWidgetSize('大号');
     const width = widgetSize.width;
@@ -321,14 +340,14 @@ class Widget extends BaseWidget {
         }
 
         // 新历
-        let text = calendarInfo.day;
+        let newDay = calendarInfo.day;
         if (calendarInfo.isToday) {
           drawContext.setFont(Font.semiboldSystemFont(19));
         } else {
           drawContext.setFont(Font.systemFont(18));
         }
-        let newDatePoint = new Point(rect.x + hCellWidth / 2 - 5 * (text.length), rect.y + dateCellHeight / 2 - 20);
-        drawContext.drawText(text, newDatePoint);
+        let newDatePoint = new Point(rect.x + hCellWidth / 2 - 5 * (newDay.length), rect.y + dateCellHeight / 2 - 20);
+        drawContext.drawText(newDay, newDatePoint);
 
         // 农历
         if (calendarInfo.isToday) {
@@ -337,8 +356,19 @@ class Widget extends BaseWidget {
           drawContext.setFont(Font.systemFont(10));
         }
         let subText = calendarInfo.subText;
-        let lunDatePoint = new Point(rect.x + hCellWidth / 2 - 5.4 * subText.length, rect.y + dateCellHeight / 2 + 2);
+        let lunDatePoint = new Point(rect.x + hCellWidth / 2 - 5.3 * subText.length, rect.y + dateCellHeight / 2 + 2);
         drawContext.drawText(subText, lunDatePoint);
+
+        // 日程指示
+        const openSchedule = widgetSetting['openSchedule'] ?? false;
+        if (openSchedule && calendarInfo.schedules.length > 0) {
+          let scheduleDotPath = new Path();
+          const scheduleDotSize = 4;
+          scheduleDotPath.addRoundedRect(new Rect(lunDatePoint.x + 3 * subText.length + Math.round(scheduleDotSize / 2) * newDay.length, lunDatePoint.y + 15, scheduleDotSize, scheduleDotSize), scheduleDotSize, scheduleDotSize);
+          scheduleDotPath.closeSubpath();
+          drawContext.addPath(scheduleDotPath);
+          drawContext.fillPath(scheduleDotPath);
+        }
 
         // 角标
         drawContext.setFont(Font.regularSystemFont(9));
@@ -363,6 +393,14 @@ class Widget extends BaseWidget {
     ctx.drawTextInRect(`${new Date().getMonth() + 1}`, new Rect(0, 0, width, height));
     img = await ctx.getImage();
     stack.backgroundImage = img;
+    // 日历跳转
+    const currDate = new Date();
+    const jumpType = widgetSetting['jumpType'] ?? 1;
+    if (jumpType == 1) {
+      stack.url = `https://mobile.51wnl-cq.com/huangli_tab_h5/?posId=BDSS&STIME=${currDate.getFullYear()}-${currDate.getMonth() + 1}-${currDate.getDate()}`;
+    } else {
+      stack.url = 'calshow://';
+    }
 
     return widget;
   }
@@ -394,6 +432,8 @@ class Widget extends BaseWidget {
           dateItem['day'] = `${day}`;
           dateItem['month'] = month;
           let matchDate = almanac.filter(item => item.month == dateItem.month && item.day == dateItem.day)[0];
+          dateItem['jumpUrl'] = matchDate.yjJumpUrl;
+          dateItem['year'] = matchDate.year;
           dateItem['lunarMonth'] = matchDate.lMonth;
           dateItem['lunarDay'] = matchDate.lDate;
           dateItem['lunarDate'] = `${matchDate.lMonth}月${matchDate.lDate}`;
@@ -451,6 +491,28 @@ class Widget extends BaseWidget {
       }
     }
 
+    // 日程
+    const first = totalCalendarArr[0];
+    const last = totalCalendarArr[totalCalendarArr.length - 1];
+    const totalSchedules = await CalendarEvent.between(
+      new Date(parseInt(first.year), parseInt(first.month) - 1, parseInt(first.day)),
+      new Date(parseInt(last.year), parseInt(last.month) - 1, parseInt(last.day)),
+      []
+    );
+    const finalSchedules = [];
+    totalSchedules.forEach(schedule => {
+      finalSchedules.push({
+        'title': schedule.title,
+        'notes': schedule.notes,
+        'date': new Date(schedule.endDate)
+      });
+    });
+    totalCalendarArr.forEach(calendar => {
+      let filterDaySchedules = finalSchedules.filter(schedule => calendar.year == schedule.date.getFullYear() && calendar.month == (schedule.date.getMonth() + 1) && calendar.day == schedule.date.getDate());
+      calendar['schedules'] = filterDaySchedules;
+    });
+
+    // console.log(JSON.stringify(totalCalendarArr, null, 2));
     return totalCalendarArr;
   }
 
