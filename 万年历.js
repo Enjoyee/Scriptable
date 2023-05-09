@@ -318,16 +318,18 @@ class Widget extends BaseWidget {
 
     // =================================
     const calendarArr = await this.loadCalendarData();
-    const matchCalendar = calendarArr.filter(item => item.year == currDate.getFullYear() && item.month == (currDate.getMonth() + 1) && item.day == currDate.getDate())[0];
-    const index = calendarArr.indexOf(matchCalendar);
-    const calendarRow = Math.floor(index / 7 + 1);
     let range = [0, 42];
-    if (calendarRow <= 2) {
-      range = [0, 14];
-    } else if (calendarRow >= 5) {
-      range = [28, 42];
-    } else {
-      range = [14, 28];
+    if (!isLarge) {
+      const matchCalendar = calendarArr.filter(item => item.year == currDate.getFullYear() && item.month == (currDate.getMonth() + 1) && item.day == currDate.getDate())[0];
+      const index = calendarArr.indexOf(matchCalendar);
+      const calendarRow = Math.floor(index / 7 + 1);
+      if (calendarRow <= 2) {
+        range = [0, 14];
+      } else if (calendarRow >= 5) {
+        range = [28, 42];
+      } else {
+        range = [14, 28];
+      }
     }
     const finalCalendarArr = calendarArr.slice(range[0], range[1]);
 
