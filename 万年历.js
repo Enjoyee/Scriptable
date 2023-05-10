@@ -29,7 +29,8 @@ const { BaseWidget } = require(dependencyFileName);
 
 // @定义小组件
 class Widget extends BaseWidget {
-  weekTitleArr = ['一', '二', '三', '四', '五', '六', '日'];
+  mondayFirstTitleArr = ['一', '二', '三', '四', '五', '六', '日'];
+  sundayFirstTitleArr = ['日', '一', '二', '三', '四', '五', '六'];
 
   defaultPreference = {
     weekdayTitleDayColor: '#333333',
@@ -92,6 +93,17 @@ class Widget extends BaseWidget {
       },
       // 预览界面的组件设置item
       settingItems: [
+        {
+          name: 'startDay',
+          label: '每周起始日',
+          type: 'select',
+          icon: { name: 'tray.full.fill', color: '#4cc9f0' },
+          options: [
+            { label: '周一', value: '1' },
+            { label: '周日', value: '2' },
+          ],
+          default: "1"
+        },
         {
           name: 'jumpType',
           label: '点击跳转',
@@ -275,6 +287,7 @@ class Widget extends BaseWidget {
   }
 
   async provideWidget({ widgetSetting, isLarge }) {
+    const startDay = widgetSetting['startDay'] ?? 1;
     // ========================================
     const currDate = new Date();
     let widgetSize = this.getWidgetSize('中号');
@@ -313,11 +326,15 @@ class Widget extends BaseWidget {
         drawContext.setTextColor(Color.dynamic(new Color(this.weekdayTitleDayColor()), new Color(this.weekdayTitleNightColor())));
       }
       let rect = new Rect(index * hCellWidth, 0, hCellWidth, weekCellHeight);
-      drawContext.drawTextInRect(this.weekTitleArr[index], rect);
+      let title = this.mondayFirstTitleArr[index];
+      if (startDay == 2) {
+        title = this.sundayFirstTitleArr[index];
+      }
+      drawContext.drawTextInRect(title, rect);
     }
 
     // =================================
-    const calendarArr = await this.loadCalendarData();
+    const calendarArr = await this.loadCalendarData(startDay);
     let range = [0, 42];
     if (!isLarge) {
       const matchCalendar = calendarArr.filter(item => item.year == currDate.getFullYear() && item.month == (currDate.getMonth() + 1) && item.day == currDate.getDate())[0];
@@ -439,7 +456,7 @@ class Widget extends BaseWidget {
 
   // --------------------------NET START------------------------
 
-  async loadCalendarData() {
+  async loadCalendarData(startDay = 1) {
     const totalCalendarArr = [];
     //
     const currDate = new Date();
@@ -504,15 +521,31 @@ class Widget extends BaseWidget {
           return dateItem;
         }
         // ================================
-
-        let firstDate = new Date(currDate.getFullYear(), currDate.getMonth(), 1);
-        let lastDate = new Date(currDate.getFullYear(), currDate.getMonth() + 1, 0);
+        let currDateYear = currDate.getFullYear();
+        let currDateMonth = currDate.getMonth();
+        let currMonthLastDate = new Date(currDate.getFullYear(), currDateMonth + 1, 0);
         // [0, 6] 0表示周日，6表示周六
-        const firstDayIndex = firstDate.getDay();
-        const lastDay = lastDate.getDate();
+        const lastDay = currMonthLastDate.getDate();
         //
-        let lastMonthDays = firstDayIndex - 1;
-        lastMonthDays = lastMonthDays < 0 ? 6 : lastMonthDays;
+        let lastDateYear = currDateYear;
+        let lastDateMonth = currDateMonth;
+        if (currDateMonth == 1) {
+          lastDateMonth = 12;
+          lastDateYear = currDateYear - 1;
+        }
+        let preMonthLastDate = new Date(lastDateYear, lastDateMonth, 0);
+        const preMonthLastDay = preMonthLastDate.getDay();
+        let lastMonthDays = 0;
+        if (startDay == 2) {
+          lastMonthDays = preMonthLastDay + 1;
+          if (preMonthLastDay == 0) { // 周日
+            lastMonthDays = 1;
+          } else if (preMonthLastDay == 6) {
+            lastMonthDays = 0;
+          }
+        } else {
+          lastMonthDays = preMonthLastDay < 0 ? 6 : preMonthLastDay;
+        }
         // 上一个月数据
         if (lastMonthDays > 0) {
           const firstAlmanac = almanac[0];
