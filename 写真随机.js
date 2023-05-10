@@ -3,12 +3,12 @@
 // icon-color: red; icon-glyph: user-astronaut;
 /**
 * Author:LSP
-* Date:2023-04-20
+* Date:2023-05-10
 */
 // -------------------------------------------------------
 // 是否是开发环境，配合手机端调试使用，正式发布设置为false
 const isDev = false;
-const dependencyLSP = '20230420';
+const dependencyLSP = '20230510';
 console.log(`当前环境 👉👉👉👉👉 ${isDev ? 'DEV' : 'RELEASE'}`);
 console.log(`----------------------------------------`);
 // 分支
