@@ -33,7 +33,7 @@ class Widget extends BaseWidget {
 
   defaultPreference = {
     caiyun: 'UR8ASaplvIwavDfR',
-    enFontUrl: `${remoteRoot}/font/Facon.ttf`,
+    enFontUrl: `${this.getRemoteRootPath()}/font/Facon.ttf`,
     descMap: {
       'CLEAR_DAY': '𝑪𝒍𝒆𝒂𝒓',
       'CLEAR_NIGHT': '𝑪𝒍𝒆𝒂𝒓',
@@ -80,7 +80,7 @@ class Widget extends BaseWidget {
           name: 'caiyun',
           label: '彩云key',
           type: 'cell',
-          icon: `${remoteRoot}/img/ic_weather_loop.gif`,
+          icon: `${this.getRemoteRootPath()}/img/ic_weather_loop.gif`,
           alert: {
             title: '彩云key',
             message: "外部已使用默认key\\n如果不可用了需要自己去申请填入替换",

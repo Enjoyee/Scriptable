@@ -190,7 +190,7 @@ class Widget extends BaseWidget {
     super(scriptName);
     this.defaultConfig.refreshInterval = '60';
     this.changeBgMode2OnLineBg(
-      [`${remoteRoot}/img/jd/bg_orange.png`],
+      [`${this.getRemoteRootPath()}/img/jd/bg_orange.png`],
       { blur: false, darkBlur: false, blurRadius: 50 }
     );
     // --------------------------------------------
@@ -592,7 +592,7 @@ class Widget extends BaseWidget {
     let avatarStack = infoStack.addStack();
     let avatarImage = await this.circleCropImage(this.userInfo.headImageUrl);
     const avatarImageSize = avatarImage.size;
-    let plusBgImage = await this.getImageByUrl(`${remoteRoot}/img/jd/bg_plus_avatar.png`);
+    let plusBgImage = await this.getImageByUrl(`${this.getRemoteRootPath()}/img/jd/bg_plus_avatar.png`);
     //
     const ctx = new DrawContext();
     ctx.opaque = false;
@@ -613,7 +613,7 @@ class Widget extends BaseWidget {
     nameStack.size = stackSize;
     nameStack.centerAlignContent();
     if (this.userInfo.isPlusVip) {
-      image = await this.getImageByUrl(`${remoteRoot}/img/jd/icon_plus.jpg`);
+      image = await this.getImageByUrl(`${this.getRemoteRootPath()}/img/jd/icon_plus.jpg`);
       imgSpan = nameStack.addImage(image);
       imgSpan.imageSize = new Size(15, 15);
       nameStack.addSpacer(8);
@@ -628,7 +628,7 @@ class Widget extends BaseWidget {
     jvStackContainer.size = stackSize;
     jvStackContainer.centerAlignContent();
     let jvStack = jvStackContainer.addStack();
-    image = await this.getImageByUrl(`${remoteRoot}/img/jd/bg_red_rect.png`);
+    image = await this.getImageByUrl(`${this.getRemoteRootPath()}/img/jd/bg_red_rect.png`);
     jvStack.backgroundColor = jvBgColor;
     jvStack.backgroundImage = image;
     jvStack.setPadding(2, 8, 2, 8);
@@ -657,12 +657,12 @@ class Widget extends BaseWidget {
     detailInfoStack.layoutVertically();
     let totalBeanStack = detailInfoStack.addStack();
     totalBeanStack.centerAlignContent();
-    image = await this.getImageByUrl(`${remoteRoot}/img/jd/ic_jd_logo.png`);
+    image = await this.getImageByUrl(`${this.getRemoteRootPath()}/img/jd/ic_jd_logo.png`);
     imgSpan = totalBeanStack.addImage(image);
     imgSpan.imageSize = bannerSize;
     //
     totalBeanStack.addSpacer(8);
-    image = await this.getImageByUrl(`${remoteRoot}/img/jd/ic_jd_text.jpg`);
+    image = await this.getImageByUrl(`${this.getRemoteRootPath()}/img/jd/ic_jd_text.jpg`);
     imgSpan = totalBeanStack.addImage(image);
     imgSpan.imageSize = textBannerSize;
     //
@@ -672,7 +672,7 @@ class Widget extends BaseWidget {
     textSpan.font = Font.boldSystemFont(20);
     //
     totalBeanStack.addSpacer(2);
-    image = await this.getImageByUrl(`${remoteRoot}/img/jd/ic_bean_color.jpg`);
+    image = await this.getImageByUrl(`${this.getRemoteRootPath()}/img/jd/ic_bean_color.jpg`);
     imgSpan = totalBeanStack.addImage(image);
     imgSpan.imageSize = normalBeanSize;
     // ------------------------
@@ -682,7 +682,7 @@ class Widget extends BaseWidget {
     textSpan.font = Font.mediumSystemFont(14);
     //
     totalBeanStack.addSpacer(2);
-    image = await this.getImageByUrl(`${remoteRoot}/img/jd/icon_bean_yellow.png`);
+    image = await this.getImageByUrl(`${this.getRemoteRootPath()}/img/jd/icon_bean_yellow.png`);
     imgSpan = totalBeanStack.addImage(image);
     imgSpan.imageOpacity = 0.6;
     imgSpan.imageSize = expireBeanSize;
@@ -706,7 +706,7 @@ class Widget extends BaseWidget {
     textSpan.font = Font.regularSystemFont(25);
     //================================
     beanInfoStack.addSpacer();
-    image = await this.getImageByUrl(`${remoteRoot}/${icon}`);
+    image = await this.getImageByUrl(`${this.getRemoteRootPath()}/${icon}`);
     imgSpan = beanInfoStack.addImage(image);
     imgSpan.imageSize = emojiSize;
     imgSpan.imageOpacity = 0.8;
@@ -754,7 +754,7 @@ class Widget extends BaseWidget {
     let walletStack = detailInfoStack.addStack();
     walletStack.centerAlignContent();
     walletStack.addSpacer(6);
-    image = await this.getImageByUrl(`${remoteRoot}/img/jd/icon_wallet.jpg`);
+    image = await this.getImageByUrl(`${this.getRemoteRootPath()}/img/jd/icon_wallet.jpg`);
     imgSpan = walletStack.addImage(image);
     imgSpan.imageSize = walletSize;
     //
@@ -787,7 +787,7 @@ class Widget extends BaseWidget {
     fruitStack.url = this.defaultPreference.link_fruit;
     fruitStack.centerAlignContent();
     fruitStack.addSpacer(6);
-    image = await this.getImageByUrl(`${remoteRoot}/img/jd/icon_fruit.png`);
+    image = await this.getImageByUrl(`${this.getRemoteRootPath()}/img/jd/icon_fruit.png`);
     imgSpan = fruitStack.addImage(image);
     imgSpan.imageSize = fruitSize;
     //
@@ -820,7 +820,7 @@ class Widget extends BaseWidget {
     let baiTiaoStack = detailInfoStack.addStack();
     baiTiaoStack.centerAlignContent();
     baiTiaoStack.addSpacer(6);
-    image = await this.getImageByUrl(`${remoteRoot}/img/jd/icon_baitiao.jpg`);
+    image = await this.getImageByUrl(`${this.getRemoteRootPath()}/img/jd/icon_baitiao.jpg`);
     imgSpan = baiTiaoStack.addImage(image);
     imgSpan.imageSize = baiTiaoSize;
     //
@@ -941,7 +941,7 @@ class Widget extends BaseWidget {
           jvalue: this.wrapperValue(jvalue),
           alias: this.wrapperValue(alias),
           nickname: this.wrapperValue(nickname),
-          headImageUrl: headImgUrlTmp?.length == 0 ? `${remoteRoot}/img/jd/icon_avatar_jd.png` : headImgUrlTmp,
+          headImageUrl: headImgUrlTmp?.length == 0 ? `${this.getRemoteRootPath()}/img/jd/icon_avatar_jd.png` : headImgUrlTmp,
           isPlusVip,
         }
       }

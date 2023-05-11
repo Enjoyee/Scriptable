@@ -58,12 +58,12 @@ class Widget extends BaseWidget {
     //
     quickConfigs: [
       {
-        icon: `${remoteRoot}/img/other/wechat.png`,
+        icon: `${this.getRemoteRootPath()}/img/other/wechat.png`,
         name: '扫一扫',
         scheme: 'weixin://scanqrcode'
       },
       {
-        icon: `${remoteRoot}/img/other/payment.png`,
+        icon: `${this.getRemoteRootPath()}/img/other/payment.png`,
         name: '付款码',
         scheme: 'alipay://platformapi/startapp?appId=20000056'
       },
@@ -73,12 +73,12 @@ class Widget extends BaseWidget {
         scheme: 'alipay://platformapi/startapp?appId=200011235'
       },
       {
-        icon: `${remoteRoot}/img/other/delivery-man.png`,
+        icon: `${this.getRemoteRootPath()}/img/other/delivery-man.png`,
         name: '菜鸟包裹',
         scheme: 'alipay://platformapi/startapp?appId=2021001141626787'
       },
     ],
-    enFontUrl: `${remoteRoot}/font/Facon.ttf`,
+    enFontUrl: `${this.getRemoteRootPath()}/font/Facon.ttf`,
     isShowNewYear: [],
     newYearTips: {},
   };
@@ -124,7 +124,7 @@ class Widget extends BaseWidget {
           name: 'weatherIco',
           label: '天气图标',
           type: 'select',
-          icon: `${remoteRoot}/img/ic_weather.gif`,
+          icon: `${this.getRemoteRootPath()}/img/ic_weather.gif`,
           needLoading: false,
           options: [
             { label: '第1套图标', value: '1' },
@@ -164,7 +164,7 @@ class Widget extends BaseWidget {
                   name: 'caiyun',
                   label: '彩云key',
                   type: 'cell',
-                  icon: `${remoteRoot}/img/icon_caiyun.png`,
+                  icon: `${this.getRemoteRootPath()}/img/icon_caiyun.png`,
                   alert: {
                     title: '彩云key',
                     message: "已使用默认key，如果不可用了需要自己去申请填入替换",
@@ -260,7 +260,7 @@ class Widget extends BaseWidget {
                   name: 'dateFontSize',
                   label: '日期文字大小',
                   type: 'cell',
-                  icon: `${remoteRoot}/img/ic_calendar.png`,
+                  icon: `${this.getRemoteRootPath()}/img/ic_calendar.png`,
                   needLoading: false,
                   alert: {
                     title: '日期文字大小',
@@ -297,7 +297,7 @@ class Widget extends BaseWidget {
                   name: 'weatherFontSize',
                   label: '天气文字大小',
                   type: 'cell',
-                  icon: `${remoteRoot}/img/ic_weather.png`,
+                  icon: `${this.getRemoteRootPath()}/img/ic_weather.png`,
                   needLoading: false,
                   alert: {
                     title: '天气文字大小',
@@ -334,7 +334,7 @@ class Widget extends BaseWidget {
                   name: 'holidayFontSize',
                   label: '节假日文字大小',
                   type: 'cell',
-                  icon: `${remoteRoot}/img/ic_calendar.png`,
+                  icon: `${this.getRemoteRootPath()}/img/ic_calendar.png`,
                   needLoading: false,
                   alert: {
                     title: '节假日文字大小',
@@ -436,7 +436,7 @@ class Widget extends BaseWidget {
     rightStack.addSpacer();
 
     if (this.defaultPreference.isShowNewYear.indexOf(this.getDateStr(new Date(), 'yyyyMMdd')) != -1) {
-      let image = await this.getImageByUrl(`${remoteRoot}/img/ic_fireworks_a20.png`);
+      let image = await this.getImageByUrl(`${this.getRemoteRootPath()}/img/ic_fireworks_a20.png`);
       rightStack.backgroundImage = image;
     }
 
@@ -682,7 +682,7 @@ class Widget extends BaseWidget {
 
     // 获取天气icon
     function getWeatherIco(weatherDesc, keyIndex) {
-      return { keyIndex, url: `${remoteRoot}/img/icon/weather${keyIndex}/${weatherDesc}.png` };
+      return { keyIndex, url: `${this.getRemoteRootPath()}/img/icon/weather${keyIndex}/${weatherDesc}.png` };
     }
 
     // 获取位置

@@ -99,7 +99,7 @@ class Widget extends BaseWidget {
           name: 'chinaTelecomCK',
           label: '天翼信息',
           type: 'cell',
-          icon: `${remoteRoot}/img/icon_10000.png`,
+          icon: `${this.getRemoteRootPath()}/img/icon_10000.png`,
           needLoading: true,
           desc: this.getValueByKey('cookie')?.length > 0 ? '已登录' : '未登录'
         },
@@ -249,7 +249,7 @@ class Widget extends BaseWidget {
     // ========================================
     const widgetSize = this.getWidgetSize('小号');
     let stack = widget.addStack();
-    let image = await this.getImageByUrl(`${remoteRoot}/img/bg_doraemon_1.png`);
+    let image = await this.getImageByUrl(`${this.getRemoteRootPath()}/img/bg_doraemon_1.png`);
     stack.setPadding(4, 12, 0, 12);
     stack.backgroundImage = image;
     stack.size = new Size(widgetSize.width, widgetSize.height);
@@ -324,7 +324,7 @@ class Widget extends BaseWidget {
     textSpan.textColor = refreshTimeTextColor;
     textSpan.font = Font.lightSystemFont(10);
     btStack.addSpacer();
-    image = await this.getImageByUrl(`${remoteRoot}/img/ic_logo_10000.jpg`);
+    image = await this.getImageByUrl(`${this.getRemoteRootPath()}/img/ic_logo_10000.jpg`);
     imgSpan = btStack.addImage(image);
     imgSpan.imageSize = new Size(14, 14);
     stack.addSpacer();

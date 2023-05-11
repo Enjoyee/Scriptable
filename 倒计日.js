@@ -65,7 +65,7 @@ class Widget extends BaseWidget {
     super(scriptName);
     this.backgroundColor = '#FEFCF3,#0A2647';
     this.changeBgMode2OnLineBg(
-      [`${remoteRoot}/img/ic_clock.png`]
+      [`${this.getRemoteRootPath()}/img/ic_clock.png`]
     );
   }
 
@@ -334,7 +334,7 @@ class Widget extends BaseWidget {
     countDownStack.centerAlignContent();
     countDownStack.addSpacer();
     if (isToday) {
-      let image = await this.getImageByUrl(`${remoteRoot}/img/party-popper.png`);
+      let image = await this.getImageByUrl(`${this.getRemoteRootPath()}/img/party-popper.png`);
       let imgSpan = countDownStack.addImage(image);
       imgSpan.imageSize = new Size(60, 60);
       imgSpan.imageOpacity = 0.9;

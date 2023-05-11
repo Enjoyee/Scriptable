@@ -96,7 +96,7 @@ class Widget extends BaseWidget {
           name: 'otherSetting',
           label: '其他设置',
           type: 'cell',
-          icon: `${remoteRoot}/img/setting.gif`,
+          icon: `${this.getRemoteRootPath()}/img/setting.gif`,
           needLoading: true,
           childItems: [
             {

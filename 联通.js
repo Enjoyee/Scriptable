@@ -95,7 +95,7 @@ class Widget extends BaseWidget {
           name: 'chinaUnicomCK',
           label: '联通Cookie',
           type: 'cell',
-          icon: `${remoteRoot}/img/icon_10010.png`,
+          icon: `${this.getRemoteRootPath()}/img/icon_10010.png`,
           needLoading: true,
           desc: this.getValueByKey('cookie')?.length > 0 ? '已填写' : '未填写'
         },
@@ -218,7 +218,7 @@ class Widget extends BaseWidget {
     // ========================================
     const widgetSize = this.getWidgetSize('小号');
     let stack = widget.addStack();
-    let image = await this.getImageByUrl(`${remoteRoot}/img/bg_doraemon_1.png`);
+    let image = await this.getImageByUrl(`${this.getRemoteRootPath()}/img/bg_doraemon_1.png`);
     stack.setPadding(4, 12, 0, 12);
     stack.backgroundImage = image;
     stack.size = new Size(widgetSize.width, widgetSize.height);
@@ -293,7 +293,7 @@ class Widget extends BaseWidget {
     textSpan.textColor = refreshTimeTextColor
     textSpan.font = Font.lightSystemFont(10);
     btStack.addSpacer();
-    image = await this.getImageByUrl(`${remoteRoot}/img/ic_logo_10010.png`);
+    image = await this.getImageByUrl(`${this.getRemoteRootPath()}/img/ic_logo_10010.png`);
     imgSpan = btStack.addImage(image);
     imgSpan.imageSize = new Size(14, 14);
     stack.addSpacer();

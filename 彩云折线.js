@@ -69,7 +69,7 @@ class Widget extends BaseWidget {
           name: 'weatherIco',
           label: '天气图标',
           type: 'select',
-          icon: `${remoteRoot}/img/ic_weather.gif`,
+          icon: `${this.getRemoteRootPath()}/img/ic_weather.gif`,
           needLoading: false,
           options: [
             { label: '第1套图标', value: '1' },
@@ -113,7 +113,7 @@ class Widget extends BaseWidget {
                   name: 'caiyun',
                   label: '彩云key',
                   type: 'cell',
-                  icon: `${remoteRoot}/img/icon_caiyun.png`,
+                  icon: `${this.getRemoteRootPath()}/img/icon_caiyun.png`,
                   alert: {
                     title: '彩云key',
                     message: "已使用默认key，如果不可用了需要自己去申请填入替换",
@@ -399,7 +399,7 @@ class Widget extends BaseWidget {
 
     // 获取天气icon
     function getWeatherIco(weatherDesc, keyIndex) {
-      return { keyIndex, url: `${remoteRoot}/img/icon/weather${keyIndex}/${weatherDesc}.png` };
+      return { keyIndex, url: `${this.getRemoteRootPath()}/img/icon/weather${keyIndex}/${weatherDesc}.png` };
     }
 
     // 获取位置

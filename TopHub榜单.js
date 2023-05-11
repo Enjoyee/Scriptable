@@ -92,7 +92,7 @@ class Widget extends BaseWidget {
   constructor(scriptName) {
     super(scriptName);
     this.changeBgMode2OnLineBg(
-      [`${remoteRoot}/img/bg_1.jpg`],
+      [`${this.getRemoteRootPath()}/img/bg_1.jpg`],
       { blur: true, blurMode: 'dark', blurRadius: 10 }
     );
   }
@@ -329,7 +329,7 @@ class Widget extends BaseWidget {
                   name: 'weiboOpenType',
                   label: '微博打开方式',
                   type: 'select',
-                  icon: `${remoteRoot}/img/ic_weibo.png`,
+                  icon: `${this.getRemoteRootPath()}/img/ic_weibo.png`,
                   needLoading: false,
                   options: [
                     { label: '浏览器', value: '1' },
