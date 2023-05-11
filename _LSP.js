@@ -44,6 +44,7 @@ class BaseWidget {
 
   getRemoteRootPath = () => {
     const use_github = this.keyGet(this.scriptName, `${this.defaultConfig.useGithub}`);
+    console.log(`use_github=${use_github}`);
     if (use_github == 'true') {
       return remoteGithubRoot;
     } else {
