@@ -43,9 +43,8 @@ class BaseWidget {
   }
 
   getRemoteRootPath = () => {
-    const use_github = this.keyGet(this.scriptName, `${this.defaultConfig.useGithub}`);
-    console.log(`use_github=${use_github}`);
-    if (use_github == 'true') {
+    const { use_github = this.defaultConfig.useGithub } = this.readWidgetSetting();
+    if (use_github) {
       return remoteGithubRoot;
     } else {
       return remoteHomeLandRoot;
@@ -395,7 +394,7 @@ class BaseWidget {
   }
 
   notify = async (title, body, url, opts = {}) => {
-    const widgetSetting = await this.readWidgetSetting();
+    const widgetSetting = this.readWidgetSetting();
     if (widgetSetting.notify) {
       return await this.realNotify(title, body, url, opts);
     } else {

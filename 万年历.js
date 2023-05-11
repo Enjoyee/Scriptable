@@ -604,7 +604,14 @@ await new Widget(Script.name()).run();
 // =================================================================================
 async function downloadLSPDependency() {
   let fm = FileManager.local();
-  const dependencyURL = `${keyGet(Script.name(), 'true') == 'true' ? remoteGithubRoot : remoteHomeLandRoot}/_LSP.js`;
+  const fileName = fm.joinPath(fm.documentsDirectory(), `LSP/${this.scriptName}/settings.json`);
+  const fileExists = fm.fileExists(fileName);
+  let cacheString = '{}';
+  if (fileExists) {
+    cacheString = fm.readString(fileName);
+  }
+  const use_github = JSON.parse(cacheString)['use_github'];
+  const dependencyURL = `${use_github ? remoteGithubRoot : remoteHomeLandRoot}/_LSP.js`;
   const update = needUpdateDependency();
   if (isDev) {
     const iCloudPath = FileManager.iCloud().documentsDirectory();
