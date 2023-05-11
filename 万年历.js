@@ -604,7 +604,7 @@ await new Widget(Script.name()).run();
 // =================================================================================
 async function downloadLSPDependency() {
   let fm = FileManager.local();
-  const fileName = fm.joinPath(fm.documentsDirectory(), `LSP/${this.scriptName}/settings.json`);
+  const fileName = fm.joinPath(fm.documentsDirectory(), `LSP/${Script.name()}/settings.json`);
   const fileExists = fm.fileExists(fileName);
   let cacheString = '{}';
   if (fileExists) {

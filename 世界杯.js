@@ -2,19 +2,20 @@
 // These must be at the very top of the file. Do not edit.
 // icon-color: red; icon-glyph: user-astronaut;
 /**
-* Author:LSP
-* Date:2023-04-20
-*/
+ * Author:LSP
+ * Date:2023-05-11
+ */
 // -------------------------------------------------------
 // 是否是开发环境，配合手机端调试使用，正式发布设置为false
 const isDev = false;
-const dependencyLSP = '20230510';
+const dependencyLSP = '20230511';
 console.log(`当前环境 👉👉👉👉👉 ${isDev ? 'DEV' : 'RELEASE'}`);
 console.log(`----------------------------------------`);
 // 分支
 const branch = 'v2';
 // 仓库根目录
-const remoteRoot = `https://raw.githubusercontent.com/Enjoyee/Scriptable/${branch}`;
+const remoteGithubRoot = `https://raw.githubusercontent.com/Enjoyee/Scriptable/${branch}`;
+const remoteHomeLandRoot = `https://glimmerk.coding.net/p/Scriptable/shared-depot/source/git/raw/${branch}`;
 // 依赖包目录
 const fm = FileManager.local();
 const rootDir = fm.documentsDirectory();
@@ -401,18 +402,27 @@ await new Widget(Script.name()).run();
 // =================================================================================
 async function downloadLSPDependency() {
   let fm = FileManager.local();
-  const dependencyURL = `${remoteRoot}_LSP.js`;
+  const fileName = fm.joinPath(fm.documentsDirectory(), `LSP/${Script.name()}/settings.json`);
+  const fileExists = fm.fileExists(fileName);
+  let cacheString = '{}';
+  if (fileExists) {
+    cacheString = fm.readString(fileName);
+  }
+  const use_github = JSON.parse(cacheString)['use_github'];
+  const dependencyURL = `${use_github ? remoteGithubRoot : remoteHomeLandRoot}/_LSP.js`;
+  const update = needUpdateDependency();
   if (isDev) {
     const iCloudPath = FileManager.iCloud().documentsDirectory();
     const localIcloudDependencyExit = fm.isFileStoredIniCloud(`${iCloudPath}/_LSP.js`);
     const localDependencyExit = fm.fileExists(`${rootDir}/_LSP.js`);
     const fileExist = localIcloudDependencyExit || localDependencyExit;
     console.log(`🚀 DEV开发依赖文件${fileExist ? '已存在 ✅' : '不存在 🚫'}`);
-    if (!fileExist) {
-      console.log(`🤖 DEV 开始下载依赖~`);
+    if (!fileExist || update) {
+      console.log(`🤖 DEV 开始${update ? '更新' + dependencyLSP : '下载'}依赖~`);
+      keySave('VERSION', dependencyLSP);
       await downloadFile2Scriptable('_LSP', dependencyURL);
     }
-    return
+    return;
   }
 
   //////////////////////////////////////////////////////////
