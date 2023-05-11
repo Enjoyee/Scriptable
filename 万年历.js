@@ -3,18 +3,19 @@
 // icon-color: red; icon-glyph: calendar-alt;
 /**
  * Author:LSP
- * Date:2023-05-10
+ * Date:2023-05-11
  */
 // -------------------------------------------------------
 // 是否是开发环境，配合手机端调试使用，正式发布设置为false
 const isDev = false;
-const dependencyLSP = '20230510';
+const dependencyLSP = '20230511';
 console.log(`当前环境 👉👉👉👉👉 ${isDev ? 'DEV' : 'RELEASE'}`);
 console.log(`----------------------------------------`);
 // 分支
 const branch = 'v2';
 // 仓库根目录
-const remoteRoot = `https://raw.githubusercontent.com/Enjoyee/Scriptable/${branch}`;
+const remoteGithubRoot = `https://raw.githubusercontent.com/Enjoyee/Scriptable/${branch}`;
+const remoteHomeLandRoot = `https://glimmerk.coding.net/p/Scriptable/shared-depot/source/git/raw/${branch}`;
 // 依赖包目录
 const fm = FileManager.local();
 const rootDir = fm.documentsDirectory();
@@ -603,7 +604,7 @@ await new Widget(Script.name()).run();
 // =================================================================================
 async function downloadLSPDependency() {
   let fm = FileManager.local();
-  const dependencyURL = `${remoteRoot}/_LSP.js`;
+  const dependencyURL = `${keyGet(Script.name(), 'true') == 'true' ? remoteGithubRoot : remoteHomeLandRoot}/_LSP.js`;
   const update = needUpdateDependency();
   if (isDev) {
     const iCloudPath = FileManager.iCloud().documentsDirectory();
