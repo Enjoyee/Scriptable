@@ -3,12 +3,12 @@
 // icon-color: red; icon-glyph: user-astronaut;
 /**
  * Author:LSP
- * Date:2023-05-11
+ * Date:2023-05-12
  */
 // -------------------------------------------------------
 // 是否是开发环境，配合手机端调试使用，正式发布设置为false
 const isDev = false;
-const dependencyLSP = '20230511';
+const dependencyLSP = '20230512';
 console.log(`当前环境 👉👉👉👉👉 ${isDev ? 'DEV' : 'RELEASE'}`);
 console.log(`----------------------------------------`);
 // 分支
@@ -32,7 +32,7 @@ const { BaseWidget } = require(dependencyFileName);
 class Widget extends BaseWidget {
 
   defaultPreference = {
-    sourceIndex: '0',
+    pic_name: 'girls_pic_20230512.json',
     sourceArr: [
       { name: 'dopaminegirl' },
       { name: 'dounimei' },
@@ -44,6 +44,7 @@ class Widget extends BaseWidget {
   constructor(scriptName) {
     super(scriptName);
     this.backgroundColor = '#03071e,#03071e';
+    this.picJsonArr = [];
   }
 
   async getAppViewOptions() {
@@ -69,33 +70,26 @@ class Widget extends BaseWidget {
           ],
           default: "1"
         },
-        {
-          name: 'source',
-          label: '图源选择',
-          type: 'select',
-          icon: { name: 'tray', color: '#a663cc', },
-          options: [
-            { label: 'dopaminegirl', value: '1' },
-            { label: 'dounimei', value: '2' },
-          ],
-          default: "2"
-        },
       ],
     };
   }
 
   async render({ widgetSetting, family }) {
     // 
-    // this.useFileManager().writeJSONCache(settingConfigName, data);
-    const url = `${this.getRemoteRootPath()}/file/girls_pic_20230512.json`;
-    const jsonPics = await this.httpGet(url, { jsonFormat: false, useCache: false });
-    console.log(`--->${jsonPics.length}`);
+    const cacheJsonArr = this.useFileManager().readJSONCache(this.defaultPreference.pic_name);
+    if (JSON.stringify(cacheJsonArr) != '{}') {
+      this.picJsonArr = JSON.parse(cacheJsonArr);
+      this.picJsonArr.sort(() => Math.random() - 0.5);
+    } else {
+      const url = `${this.getRemoteRootPath()}/file/${this.defaultPreference.pic_name}`;
+      const jsonPics = await this.httpGet(url, { jsonFormat: false, useCache: false });
+      this.useFileManager().writeJSONCache(this.defaultPreference.pic_name, jsonPics);
+    }
     return await this.provideWidget(family, widgetSetting);
   }
 
   async provideWidget(widgetFamily, widgetSetting) {
     const photoHalving = widgetSetting.photoHalving ?? 1;
-    const sourceIndex = Number(widgetSetting.source ?? '2');
     let name = '大号';
     switch (widgetFamily) {
       case 'small':
@@ -112,7 +106,7 @@ class Widget extends BaseWidget {
     //=================================
     let stack = widget.addStack();
     widget.backgroundColor = new Color('#03071e');
-    const imgRes = await this.loadMirrorPhotoRes(sourceIndex);
+    const imgRes = this.picJsonArr.slice(0, 10);
     const widgetSize = this.getWidgetSize(name);
     const widgetWidth = widgetSize.width + 10 * Device.screenScale();
     const widgetHeight = widgetSize.height + 6 * Device.screenScale();
@@ -194,9 +188,8 @@ class Widget extends BaseWidget {
   addStackImg = async (imgRes, imgStack) => {
     if (imgRes && imgRes.length > 0) {
       const index = parseInt(Math.random() * imgRes.length)
-      let item = imgRes[index];
+      let imgUrl = imgRes[index];
       imgRes.splice(index, 1);
-      let imgUrl = item.url;
       imgStack.url = imgUrl;
       let img = await this.getImageByUrl(imgUrl, 'mirror', true);
       let imgSpan = imgStack.addImage(img);
@@ -205,53 +198,6 @@ class Widget extends BaseWidget {
   }
 
   // --------------------------NET START--------------------------
-
-  loadMirrorPhotoRes = async (source = 2) => {
-    const imgResArr = [];
-    switch (source) {
-      case 1:
-        const imgRes = await this.httpGet('https://dopaminegirl.com/api/art');
-        imgRes.forEach(element => {
-          imgResArr.push({ url: element.url });
-        });
-        break;
-
-      case 2:
-        const url = `https://www.dounimei.us/page/${parseInt(Math.random() * 80) + 1}?orderby=hot`;
-        const headers = {
-          "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.67 Safari/537.36"
-        };
-        const webview = new WebView();
-        const html = await this.httpGet(url, { jsonFormat: false, headers });
-        await webview.loadHTML(html);
-        const getData = `
-          function getData() {
-              let imgArr = []; 
-              try {
-                  let imgData = document.getElementsByTagName('img');
-                  for (let index = 0; index < imgData.length; index++) {
-                    let elementSrc = imgData[index].getAttribute("data-src");
-                    if(elementSrc != null && elementSrc != undefined) {
-                      let start = elementSrc.indexOf('?src=');
-                      let end = elementSrc.lastIndexOf('&h');
-                      imgArr.push({url : elementSrc.slice(start + 5, end)});
-                    }
-                  }
-              } catch(e) {
-                  console.log('抖你妹资源获取出错->' + e);
-              }
-              return imgArr;
-          }
-          getData();
-        `
-        const dounimeiRes = await webview.evaluateJavaScript(getData, false);
-        dounimeiRes.forEach(element => {
-          imgResArr.push({ url: element.url });
-        });
-        break;
-    }
-    return imgResArr;
-  }
 
   // --------------------------NET END--------------------------
 
