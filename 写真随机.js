@@ -85,6 +85,11 @@ class Widget extends BaseWidget {
   }
 
   async render({ widgetSetting, family }) {
+    // 
+    // this.useFileManager().writeJSONCache(settingConfigName, data);
+    const url = `${this.getRemoteRootPath()}/file/girls_pic_20230512.json`;
+    const jsonPics = await this.httpGet(url, { jsonFormat: false, useCache: false });
+    console.log(`--->${jsonPics.length}`);
     return await this.provideWidget(family, widgetSetting);
   }
 

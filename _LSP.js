@@ -8,7 +8,7 @@
 */
 
 // 当前环境版本号
-const VERSION = 20230511
+const VERSION = 20230512
 // 组件配置文件名
 const settingConfigName = 'settings.json';
 // 分支
@@ -543,6 +543,11 @@ class BaseWidget {
 
   drawTextWithCustomFont = async (fontUrl, text, fontSize, textColor, option = { lineLimit: 1, align: "center", rowSpacing: 8 }) => {
     try {
+      const fontKey = fontUrl + text + fontSize + textColor;
+      let cache = this.useFileManager().readImgCache(this.md5(fontKey));
+      if (cache != undefined && cache != null) {
+        return cache;
+      }
       const font = new CustomFont(new WebView(), {
         fontFamily: 'customFont', // 字体名称
         fontUrl: fontUrl, // 字体地址
@@ -556,14 +561,10 @@ class BaseWidget {
         scale: 2, // 缩放因子
         ...option
       })
-      this.useFileManager().writeImgCache('customFont', image);
+      this.useFileManager().writeImgCache(this.md5(text), image);
       return image;
     } catch (error) {
       console.error(error);
-      let cache = this.useFileManager().readImgCache('customFont');
-      if (cache != undefined && cache != null) {
-        return cache;
-      }
     }
   }
 

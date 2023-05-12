@@ -3,12 +3,12 @@
 // icon-color: green; icon-glyph: frog;
 /**
  * Author:LSP
- * Date:2023-05-11
+ * Date:2023-05-12
  */
 // -------------------------------------------------------
 // 是否是开发环境，配合手机端调试使用，正式发布设置为false
 const isDev = false;
-const dependencyLSP = '20230511';
+const dependencyLSP = '20230512';
 console.log(`当前环境 👉👉👉👉👉 ${isDev ? 'DEV' : 'RELEASE'}`);
 console.log(`----------------------------------------`);
 // 分支
