@@ -72,15 +72,15 @@ class Widget extends BaseWidget {
 
   async render({ widgetSetting, family }) {
     // 
-    const cacheJsonArr = this.useFileManager().readJSONCache(this.defaultPreference.pic_name);
-    if (JSON.stringify(cacheJsonArr) != '{}') {
-      this.picJsonArr = JSON.parse(cacheJsonArr);
-      this.picJsonArr.sort(() => Math.random() - 0.5);
-    } else {
+    let cacheJsonArr = this.useFileManager().readJSONCache(this.defaultPreference.pic_name);
+    if (JSON.stringify(cacheJsonArr) == '{}') {
       const url = `${this.getRemoteRootPath()}/file/${this.defaultPreference.pic_name}`;
       const jsonPics = await this.httpGet(url, { jsonFormat: false, useCache: false });
+      cacheJsonArr = JSON.stringify(jsonPics);
       this.useFileManager().writeJSONCache(this.defaultPreference.pic_name, jsonPics);
     }
+    this.picJsonArr = JSON.parse(cacheJsonArr);
+    this.picJsonArr.sort(() => Math.random() - 0.5);
     return await this.provideWidget(family, widgetSetting);
   }
 
