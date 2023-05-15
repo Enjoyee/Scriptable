@@ -3,12 +3,12 @@
 // icon-color: blue; icon-glyph: mobile-alt;
 /**
  * Author:LSP
- * Date:2023-05-12
+ * Date:2023-05-15
  */
 // -------------------------------------------------------
 // 是否是开发环境，配合手机端调试使用，正式发布设置为false
 const isDev = false;
-const dependencyLSP = '20230511';
+const dependencyLSP = '20230512';
 console.log(`当前环境 👉👉👉👉👉 ${isDev ? 'DEV' : 'RELEASE'}`);
 console.log(`----------------------------------------`);
 // 分支
@@ -407,12 +407,12 @@ class Widget extends BaseWidget {
     // 剩余语音
     let totalBalanceVoiceAmount = 0;
     // 语音
-    if (response.voiceAmount && response.voiceBalance) {
+    if (response?.voiceAmount && response?.voiceBalance) {
       totalVoiceAmount = response.voiceAmount;
       totalBalanceVoiceAmount = response.voiceBalance;
     }
     // 流量&语音
-    response.items?.forEach((data) => {
+    response?.items?.forEach((data) => {
       if (data.offerType !== 19) {
         data.items?.forEach((item) => {
           if (item.unitTypeId == 3) {
