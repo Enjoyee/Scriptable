@@ -3,7 +3,7 @@
 // icon-color: red; icon-glyph: user-astronaut;
 /**
  * Author:LSP
- * Date:2023-05-12
+ * Date:2023-05-15
  */
 // -------------------------------------------------------
 // 是否是开发环境，配合手机端调试使用，正式发布设置为false
@@ -32,11 +32,7 @@ const { BaseWidget } = require(dependencyFileName);
 class Widget extends BaseWidget {
 
   defaultPreference = {
-    pic_name: 'girls_pic_20230512.json',
-    sourceArr: [
-      { name: 'dopaminegirl' },
-      { name: 'dounimei' },
-    ]
+    pic_name: 'girls_pic_20230515.json',
   };
 
   getValueByKey = (key) => this.readWidgetSetting()[key] ?? this.defaultPreference[key];
