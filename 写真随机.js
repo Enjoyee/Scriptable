@@ -78,8 +78,9 @@ class Widget extends BaseWidget {
       const jsonPics = await this.httpGet(url, { jsonFormat: false, useCache: false });
       cacheJsonArr = JSON.stringify(jsonPics);
       this.useFileManager().writeJSONCache(this.defaultPreference.pic_name, jsonPics);
+    } else {
+      this.picJsonArr = cacheJsonArr;
     }
-    this.picJsonArr = JSON.parse(cacheJsonArr);
     this.picJsonArr.sort(() => Math.random() - 0.5);
     return await this.provideWidget(family, widgetSetting);
   }
