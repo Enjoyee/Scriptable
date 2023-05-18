@@ -3,12 +3,12 @@
 // icon-color: red; icon-glyph: user-astronaut;
 /**
  * Author:LSP
- * Date:2023-05-12
+ * Date:2023-05-18
  */
 // -------------------------------------------------------
 // 是否是开发环境，配合手机端调试使用，正式发布设置为false
 const isDev = false;
-const dependencyLSP = '20230511';
+const dependencyLSP = '20230512';
 console.log(`当前环境 👉👉👉👉👉 ${isDev ? 'DEV' : 'RELEASE'}`);
 console.log(`----------------------------------------`);
 // 分支
@@ -696,8 +696,8 @@ class Widget extends BaseWidget {
     let weatherInfo = {};
     if (weatherJsonData) {
       // 天气突发预警
-      let alertWeather = weatherJsonData.result.alert.content;
-      if (alertWeather.length > 0) {
+      let alertWeather = weatherJsonData.result?.alert?.content;
+      if (alertWeather?.length > 0) {
         const alertWeatherTitle = alertWeather[0].title;
         console.log(`👉突发的天气预警：${alertWeatherTitle}`);
         weatherInfo.alertWeatherTitle = alertWeatherTitle;
