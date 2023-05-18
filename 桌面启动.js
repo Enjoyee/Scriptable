@@ -661,6 +661,8 @@ class Widget extends BaseWidget {
    * @returns 
    */
   getWeather = async (dailysteps = 6) => {
+    const remoteRootPath = this.getRemoteRootPath();
+
     // 开启质量
     function airQuality(levelNum) {
       // 0-50 优，51-100 良，101-150 轻度污染，151-200 中度污染
@@ -682,7 +684,7 @@ class Widget extends BaseWidget {
 
     // 获取天气icon
     function getWeatherIco(weatherDesc, keyIndex) {
-      return { keyIndex, url: `${this.getRemoteRootPath()}/img/icon/weather${keyIndex}/${weatherDesc}.png` };
+      return { keyIndex, url: `${remoteRootPath}/img/icon/weather${keyIndex}/${weatherDesc}.png` };
     }
 
     // 获取位置
