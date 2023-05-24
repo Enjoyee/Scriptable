@@ -3,12 +3,12 @@
 // icon-color: deep-blue; icon-glyph: bolt;
 /**
  * Author:LSP
- * Date:2023-05-12
+ * Date:2023-05-24
  */
 // -------------------------------------------------------
 // 是否是开发环境，配合手机端调试使用，正式发布设置为false
 const isDev = false;
-const dependencyLSP = '20230511';
+const dependencyLSP = '20230512';
 console.log(`当前环境 👉👉👉👉👉 ${isDev ? 'DEV' : 'RELEASE'}`);
 console.log(`----------------------------------------`);
 // 分支
@@ -378,6 +378,8 @@ class Widget extends BaseWidget {
    * @returns 
    */
   getWeather = async (dailysteps = 7) => {
+    const remoteRootPath = this.getRemoteRootPath();
+
     // 开启质量
     function airQuality(levelNum) {
       // 0-50 优，51-100 良，101-150 轻度污染，151-200 中度污染
@@ -399,7 +401,7 @@ class Widget extends BaseWidget {
 
     // 获取天气icon
     function getWeatherIco(weatherDesc, keyIndex) {
-      return { keyIndex, url: `${this.getRemoteRootPath()}/img/icon/weather${keyIndex}/${weatherDesc}.png` };
+      return { keyIndex, url: `${remoteRootPath}/img/icon/weather${keyIndex}/${weatherDesc}.png` };
     }
 
     // 获取位置
