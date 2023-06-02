@@ -8,7 +8,7 @@
 */
 
 // 当前环境版本号
-const VERSION = 20230512
+const VERSION = 20230602
 // 组件配置文件名
 const settingConfigName = 'settings.json';
 // 分支
@@ -1914,7 +1914,7 @@ class BaseWidget {
       console.log(`🚀 在线请求农历数据`);
       const day = currDate.getDate() - 1;
       // 万年历数据
-      const url = "https://wannianrili.51240.com/";
+      const url = "https://wannianrili.bmcx.com/";
       const headers = {
         "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.67 Safari/537.36"
       };
