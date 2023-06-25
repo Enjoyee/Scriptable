@@ -3,7 +3,7 @@
 // icon-color: red; icon-glyph: user-astronaut;
 /**
  * Author:LSP
- * Date:2023-05-18
+ * Date:2023-06-25
  */
 // -------------------------------------------------------
 // 是否是开发环境，配合手机端调试使用，正式发布设置为false
@@ -592,15 +592,15 @@ class Widget extends BaseWidget {
    * @returns 节假日信息
    */
   holidayInfo = async () => {
+    let infoTips = '';
     const datePre = 'date_';
-    let infoTips = '数据飞到外太空了(งȌ_Ȍ)ง';
-    let url;
     const currDate = new Date();
-    let dateStr = this.getDateStr(currDate, 'yyyyMMdd');
+    let dateStr = this.getDateStr(currDate, 'yyyyMM');
     let holidayJsonData = this.useFileManager().readJSONCache(datePre + dateStr);
-    if (JSON.stringify(holidayJsonData) == '{}' || holidayJsonData?.length == 0 || holidayJsonData.code != 0) {
-      url = 'https://api.apihubs.cn/holiday/get?field=date,workday,holiday_legal,holiday_today,holiday_recess,holiday,weekend&order_by=1&cn=1&size=31';
-      holidayJsonData = await this.httpGet(url, { useCache: false, dataSuccess: (res) => res?.code == 0 });
+    const url = `https://opendata.baidu.com/api.php?tn=wisetpl&format=json&resource_id=39043&query=${currDate.getFullYear()}%E5%B9%B4${currDate.getMonth() + 1}%E6%9C%88&t=${currDate.getTime()}`
+    if (JSON.stringify(holidayJsonData) == '{}' || holidayJsonData?.length == 0 || holidayJsonData.status != 0) {
+      holidayJsonData = await this.httpGet(url, { useCache: false, jsonFormat: false });
+      holidayJsonData = JSON.parse(holidayJsonData);
       //
       const listFiles = this.useFileManager().fm.listContents(this.useFileManager().cacheDir);
       for (let index = listFiles.length - 1; index >= 0; index--) {
@@ -613,43 +613,24 @@ class Widget extends BaseWidget {
       //
       this.useFileManager().writeJSONCache(datePre + dateStr, holidayJsonData);
     }
-    if (holidayJsonData?.code === 0) {
-      let list = holidayJsonData.data.list;
-      let currItem = list.find(item => item.date == dateStr);
-      if (currItem) {
-        if (currItem.workday_cn == '非工作日') {
-          infoTips = 'Η𝒶𝓋е 𝐚 𝓷𝖎𝖈𝖾 ⅆ𝙖𝛄~ ᕕ(ȍᴥȍ)ᕗ';
-        } else {
-          let currIndex = list.indexOf(currItem);
-          let remainArr = list.slice(currIndex, list.size);
-          let notWorkday = remainArr.find(item => item.workday_cn == '非工作日');
-          if (notWorkday == undefined) {
-            let nextMonth = '';
-            const currMonth = currDate.getMonth() + 1;
-            if (currMonth == 12) {
-              nextMonth = `${currDate.getFullYear() + 1}${this.getDateStr(currDate, 'MM')}`;
-            } else {
-              nextMonth = currMonth + 1;
-              if (nextMonth < 10) {
-                nextMonth = '0' + nextMonth;
-              }
-              nextMonth = `${currDate.getFullYear()}${nextMonth}`;
-            }
-            url = `https://api.apihubs.cn/holiday/get?field=date,workday,holiday_legal,holiday_today,holiday_recess,holiday,weekend&order_by=1&month=${nextMonth}&cn=1&size=31`;
-            holidayJsonData = await this.httpGet(url, { useCache: false, dataSuccess: (res) => res?.code == 0 });
-            list = holidayJsonData.data.list;
-            notWorkday = list.find(item => item.workday_cn == '非工作日');
-          }
-          let currDayFullYear = currItem.date_cn.replace('年', '-').replace('月', '-').replace('日', '');
-          let notWorkdayFullYear = notWorkday.date_cn.replace('年', '-').replace('月', '-').replace('日', '');
-          let remainDay = (new Date(notWorkdayFullYear) - new Date(currDayFullYear)) / 86400 / 1000;
-          let holidayTips = notWorkday.holiday_cn == '非节假日' ? notWorkday.weekend_cn : notWorkday.holiday_cn;
-          if (remainDay == 1) {
-            infoTips = '明天就『' + holidayTips + '』啦 (ง⚆‿⚆)ง';
-          } else {
-            infoTips = `离${holidayTips}还有：${remainDay}天！(งȌ_Ȍ)ง`;
-          }
-        }
+    let list = holidayJsonData.data[0].almanac;
+    let currItem = list.find(item => item.year == currDate.getFullYear() && item.month == currDate.getMonth() + 1 && item.day == currDate.getDate());
+    if (currItem.status == 1) {
+      infoTips = 'Η𝒶𝓋е 𝐚 𝓷𝖎𝖈𝖾 ⅆ𝙖𝛄~ ᕕ(ȍᴥȍ)ᕗ';
+    } else {
+      let currIndex = list.indexOf(currItem);
+      let remainArr = list.slice(currIndex + 1, list.size);
+      let notWorkday = remainArr.find(item => item.status == 1 || (item.status == undefined && (item.cnDay == '六' || item.cnDay == '日')));
+      let remainDay = (+new Date(parseInt(notWorkday.timestamp) * 1000) - (+new Date(parseInt(currItem.timestamp) * 1000))) / 86400 / 1000;
+      let holidayTips = '周末';
+      const { term } = notWorkday;
+      if (term.length > 0) {
+        holidayTips = term;
+      }
+      if (remainDay == 1) {
+        infoTips = '明天就『' + holidayTips + '』啦 (ง⚆‿⚆)ง';
+      } else {
+        infoTips = `离${holidayTips}还有：${remainDay}天！(งȌ_Ȍ)ง`;
       }
     }
     return this.defaultPreference.newYearTips[dateStr] || infoTips;
