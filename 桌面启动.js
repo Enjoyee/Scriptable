@@ -3,7 +3,7 @@
 // icon-color: red; icon-glyph: user-astronaut;
 /**
  * Author:LSP
- * Date:2023-06-25
+ * Date:2023-07-06
  */
 // -------------------------------------------------------
 // 是否是开发环境，配合手机端调试使用，正式发布设置为false
@@ -615,7 +615,7 @@ class Widget extends BaseWidget {
     }
     let list = holidayJsonData.data[0].almanac;
     let currItem = list.find(item => item.year == currDate.getFullYear() && item.month == currDate.getMonth() + 1 && item.day == currDate.getDate());
-    if (currItem.status == 1) {
+    if ((currItem.status == 1) || (currItem.status == undefined && (currItem.cnDay == '六' || currItem.cnDay == '日'))) {
       infoTips = 'Η𝒶𝓋е 𝐚 𝓷𝖎𝖈𝖾 ⅆ𝙖𝛄~ ᕕ(ȍᴥȍ)ᕗ';
     } else {
       let currIndex = list.indexOf(currItem);
