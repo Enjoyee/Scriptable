@@ -3,7 +3,7 @@
 // icon-color: pink; icon-glyph: feather-alt;
 /**
  * Author:LSP
- * Date:2023-05-12
+ * Date:2023-07-13
  */
 // -------------------------------------------------------
 // 是否是开发环境，配合手机端调试使用，正式发布设置为false
@@ -1105,24 +1105,28 @@ class Widget extends BaseWidget {
    * 物流
    */
   packageFlowFun = async () => {
-    const url = 'https://wq.jd.com/bases/wuliudetail/notify?sceneval=2&sceneval=2&g_login_type=1&callback';
+    const url = `https://api.m.jd.com/client.action?t=${+new Date()}&loginType=2&loginWQBiz=golden-trade&appid=m_core&client=MacIntel&clientVersion=&build=&osVersion=iOS&screen=390*844&networkType=4g&partner=&forcebot=&d_brand=iPhone&d_model=iPhone&lang=zh-CN&scope=&sdkVersion=&openudid=&uuid=1623999132064880641936&x-api-eid-token=jdd03GJCIKBSNYKA7Z4BCQJDAQY6LWVGIOOL5AN4LK4A5PJ6FTXDW6UOELGTW4NFDWTMBJVAYDGWIWIVSMA6GAIAQKYKK3YAAAAMJFYNLBUQAAAAAC43VSGNQ7GABGMX&functionId=order_list_m&body=%7B%22appType%22%3A3%2C%22bizType%22%3A%222%22%2C%22source%22%3A%22-1%22%2C%22deviceUUId%22%3A%22%22%2C%22platform%22%3A3%2C%22sceneval%22%3A%222%22%2C%22systemBaseInfo%22%3A%22%7B%5C%22pixelRatio%5C%22%3A3%2C%5C%22screenWidth%5C%22%3A390%2C%5C%22screenHeight%5C%22%3A844%2C%5C%22windowWidth%5C%22%3A390%2C%5C%22windowHeight%5C%22%3A844%2C%5C%22statusBarHeight%5C%22%3Anull%2C%5C%22safeArea%5C%22%3A%7B%5C%22bottom%5C%22%3A0%2C%5C%22height%5C%22%3A0%2C%5C%22left%5C%22%3A0%2C%5C%22right%5C%22%3A0%2C%5C%22top%5C%22%3A0%2C%5C%22width%5C%22%3A0%7D%2C%5C%22bluetoothEnabled%5C%22%3Afalse%2C%5C%22locationEnabled%5C%22%3Afalse%2C%5C%22wifiEnabled%5C%22%3Afalse%2C%5C%22deviceOrientation%5C%22%3A%5C%22portrait%5C%22%2C%5C%22benchmarkLevel%5C%22%3A-1%2C%5C%22brand%5C%22%3A%5C%22iPhone%5C%22%2C%5C%22model%5C%22%3A%5C%22iPhone%5C%22%2C%5C%22system%5C%22%3A%5C%22iOS%5C%22%2C%5C%22platform%5C%22%3A%5C%22MacIntel%5C%22%2C%5C%22SDKVersion%5C%22%3A%5C%22%5C%22%2C%5C%22enableDebug%5C%22%3Afalse%2C%5C%22language%5C%22%3A%5C%22zh-CN%5C%22%2C%5C%22version%5C%22%3A%5C%22%5C%22%2C%5C%22theme%5C%22%3A%5C%22light%5C%22%2C%5C%22fontSizeSetting%5C%22%3Anull%2C%5C%22albumAuthorized%5C%22%3Afalse%2C%5C%22cameraAuthorized%5C%22%3Afalse%2C%5C%22locationAuthorized%5C%22%3Afalse%2C%5C%22microphoneAuthorized%5C%22%3Afalse%2C%5C%22notificationAuthorized%5C%22%3Afalse%2C%5C%22notificationAlertAuthorized%5C%22%3Afalse%2C%5C%22notificationBadgeAuthorized%5C%22%3Afalse%2C%5C%22notificationSoundAuthorized%5C%22%3Afalse%2C%5C%22phoneCalendarAuthorized%5C%22%3Afalse%2C%5C%22locationReducedAccuracy%5C%22%3Afalse%2C%5C%22environment%5C%22%3A%5C%22%5C%22%7D%22%2C%22orderListTag%22%3A128%2C%22curTab%22%3A%22waitReceipt%22%2C%22page%22%3A1%2C%22pageSize%22%3A10%2C%22tenantCode%22%3A%22jgm%22%2C%22bizModelCode%22%3A%222%22%2C%22bizModeClientType%22%3A%22M%22%2C%22bizModeFramework%22%3A%22Taro%22%2C%22externalLoginType%22%3A1%2C%22token%22%3A%223852b12f8c4d869b7ed3e2b3c68c9436%22%2C%22appId%22%3A%22m91d27dbf599dff74%22%7D&h5st=20230707101110131%3B55i653mnt9zg6it3%3B44550%3Btk03wbe7f1cc218nzb3KRxPU2bI9P5wmvtQDLxHFdLm-rkwr24jjlhi9hLik3nWEVW2eWjMVKz0ygZneJe9X6YRHYqqE%3B23ff4d1fd278262b7f332b647ddbfe4d%3B4.1%3B1688695870131%3B5f7a486ba29fbc5d176654e46394ec5e0bd88693c61e67c8c7fe08d7d4a9d656c1e3ef12e12f644ae066ec4ea392564125e722195b5d50800bb957380a05952c7d2ffd1e5825ea5e52f63c89d97c65e80c75c93d497fe2d308a6e0e8cf8608fc7cf1e8c3a889f77bc47a60e6df58c66a10828446464bb6205cbeb99c6e107f1e5854ee6f4560872931ef2f39458e418ca6872476d2e7cb032c7b91ad4be9b349bdad1c6d62166c8b7289b414c463623656f7d6a48550c2bae4143c1e9308fc23fa3146b2eca29a4d534f91f9109b9db6`;
     const options = {
       headers: {
         ...this.defaultHeaders,
-        'referer': 'https://home.m.jd.com/myJd/newhome.action?sceneval=2&ufc=&',
+        'sec-fetch-mode': 'cors',
+        'origin': 'https://trade.m.jd.com',
+        'referer': 'https://trade.m.jd.com/',
       },
     };
-    const RES = await this.httpGet(url, { ...options, dataSuccess: (res) => res?.errCode == '0' });
-    const { errCode, dealLogList = [] } = RES;
-    if (errCode == '0') {
-      const count = parseInt(dealLogList?.length ?? 0);
+    const RES = await this.httpGet(url, { ...options, dataSuccess: (res) => res?.body?.baseInfo != undefined });
+    const { code, body = {} } = RES;
+    console.log(RES);
+    if (code == '0') {
+      const orderList = body.orderList;
+      const count = parseInt(orderList?.length ?? 0);
       this.packageFlow.count = count;
       if (count > 0) {
-        this.packageFlow.details = dealLogList.map(deal => ({
-          cover: deal.img,
-          title: this.wrapperValue(deal.name),
-          desc: this.wrapperValue(deal.wlStateDesc)?.replace(/您的/g, ''),
-          time: this.wrapperValue(deal.createTime),
+        this.packageFlow.details = orderList.map(order => ({
+          cover: order.wareInfoList[0].imageUrl,
+          title: this.wrapperValue(order.wareInfoList[0].wareName),
+          desc: this.wrapperValue(order.progressInfo?.content || order.orderStatusInfo?.orderStatusName),
+          time: this.wrapperValue(order.progressInfo?.tip || ''),
         }));
       }
       console.log(`物流信息：`);
@@ -1151,8 +1155,6 @@ class Widget extends BaseWidget {
         this.baitiao.title = this.wrapperValue(bill.title);
         this.baitiao.amount = this.wrapperValue(bill.amount)?.replace(/,/g, '');
         this.baitiao.desc = this.wrapperValue(bill?.buttonName)?.replace(/最近还款日/, '');
-      } else {
-        console.error('白条信息bill获取失败！');
       }
       console.log(`白条信息：`);
       console.log(
