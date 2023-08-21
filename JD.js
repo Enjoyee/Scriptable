@@ -3,12 +3,12 @@
 // icon-color: pink; icon-glyph: feather-alt;
 /**
  * Author:LSP
- * Date:2023-07-13
+ * Date:2023-08-21
  */
 // -------------------------------------------------------
 // 是否是开发环境，配合手机端调试使用，正式发布设置为false
 const isDev = false;
-const dependencyLSP = '20230511';
+const dependencyLSP = '20230602';
 console.log(`当前环境 👉👉👉👉👉 ${isDev ? 'DEV' : 'RELEASE'}`);
 console.log(`----------------------------------------`);
 // 分支
@@ -53,13 +53,16 @@ class Widget extends BaseWidget {
     ],
     leftStackWidth: 80,
     userInfoParam: {
-      'functionId': 'queryJDUserInfo',
-      'appid': 'jd-cphdeveloper-m',
-      'body': JSON.stringify({ "tenantCode": "jgm", "bizModelCode": "6", "bizModeClientType": "M", "externalLoginType": "1" }),
-      'sceneval': '2',
-      'g_login_type': '1',
-      'g_ty': 'ajax',
-      'appCode': 'ms0ca95114'
+      'functionId': 'jx.userinfo.query',
+      'appid': 'jx_h5',
+      't': 1692596879037,
+      'channel': 'jxh5',
+      'client': 'jxh5',
+      'cthr': '1',
+      'cv': '1.2.5',
+      'clientVersion': '1.2.5',
+      'loginType': '2',
+      'body': JSON.stringify({ "sceneid": 80027, "sceneval": 2, "buid": 325, "appCode": "ms0ca95114", "time": 1692596879037, "signStr": "e3013086b16b6ad04ac13d143d0bda07" }),
     },
     myBeanParam: {
       'appid': 'jd-cphdeveloper-m',
@@ -110,7 +113,6 @@ class Widget extends BaseWidget {
   userInfo = {
     levelName: '', // 等级名称
     jvalue: 0, // 京享值
-    alias: '',
     nickname: '',
     headImageUrl: '',
     isPlusVip: false,
@@ -197,6 +199,7 @@ class Widget extends BaseWidget {
     this.cookie = this.ck();
     this.defaultHeaders = {
       'cookie': this.cookie,
+      'Sec-Fetch-Mode': 'cors',
       'user-agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1',
     }
     if (!this.cookie) {
@@ -519,8 +522,10 @@ class Widget extends BaseWidget {
               });
             }
             this.cookie = ck;
+            console.log("2====================");
+            console.log(this.cookie);
+            console.log("2====================");
             insertDesc = ck?.length > 0 ? '已登录' : '未登录';
-            this.writeWidgetSetting({ ...widgetSetting });
             break;
         }
         // 写入更新配置
@@ -900,8 +905,8 @@ class Widget extends BaseWidget {
   async loadData() {
     await this.userInfoFun();
     await this.redPackageInfoFun();
-    await this.myBeanInfoFun();
     await this.loadNearbyBeanDetailsFun();
+    await this.myBeanInfoFun();
     await this.packageFlowFun();
     await this.baiTiaoInfoFun();
     await this.fruitInfoFun();
@@ -922,7 +927,7 @@ class Widget extends BaseWidget {
    * 个人信息
    */
   userInfoFun = async () => {
-    const url = `https://api.m.jd.com${this.joinQueryParams(this.defaultPreference.userInfoParam)}`;
+    const url = `https://api.m.jd.com/api${this.joinQueryParams(this.defaultPreference.userInfoParam)}`;
     const options = {
       headers: {
         ...this.defaultHeaders,
@@ -934,13 +939,12 @@ class Widget extends BaseWidget {
     if (RES?.retcode == '0') {
       const { base, isPlusVip } = RES;
       if (base) {
-        const { levelName, jvalue, alias, nickname, headImageUrl } = base;
+        const { levelName, jvalue, nickname, headImageUrl } = base;
         const headImgUrlTmp = headImageUrl?.replace(/_mid/g, '_big');
         this.userInfo = {
           ...this.userInfo,
           levelName: this.wrapperValue(levelName),
           jvalue: this.wrapperValue(jvalue),
-          alias: this.wrapperValue(alias),
           nickname: this.wrapperValue(nickname),
           headImageUrl: headImgUrlTmp?.length == 0 ? `${this.getRemoteRootPath()}/img/jd/icon_avatar_jd.png` : headImgUrlTmp,
           isPlusVip,
@@ -1027,27 +1031,14 @@ class Widget extends BaseWidget {
       const currDate = new Date();
       const todayDateStr = this.getDateStr(currDate, 'yyyy-MM-dd');
       const yesterdayDateStr = this.getDateStr(new Date((+new Date()) - 86400000), 'yyyy-MM-dd');
-      let continueRequest = true;
       let page = 1;
       let todayDetails = [];
       let yesterdayDetails = [];
-      do {
-        continueRequest = true;
-        let tmpList = await this.beanDetailsFun(page);
-        todayDetails = todayDetails.concat(tmpList.filter(detail => detail.date.indexOf(todayDateStr) !== -1));
-        yesterdayDetails = yesterdayDetails.concat(tmpList.filter(detail => detail.date.indexOf(yesterdayDateStr) !== -1));
-        if (tmpList.length === 0) {
-          continueRequest = false;
-        } else {
-          let tmpListIndex = tmpList.length - 1;
-          let todayIndex = tmpList[tmpListIndex].date.indexOf(todayDateStr);
-          let yesterdayIndex = tmpList[tmpListIndex].date.indexOf(yesterdayDateStr);
-          if (yesterdayIndex == -1 && todayIndex == -1) {
-            continueRequest = false;
-          }
-        }
-        page++;
-      } while (continueRequest && page <= 30)
+
+      const { details, willExpireNum } = await this.beanDetailsFun(page);
+      todayDetails = todayDetails.concat(details.filter(detail => detail.date.indexOf(todayDateStr) !== -1));
+      yesterdayDetails = yesterdayDetails.concat(details.filter(detail => detail.date.indexOf(yesterdayDateStr) !== -1));
+
       let yesterdayGain = 0;
       yesterdayDetails.map(detail => yesterdayGain = parseInt(detail.amount) + yesterdayGain);
       console.log(`昨日京豆总收获：${yesterdayGain}`);
@@ -1058,6 +1049,7 @@ class Widget extends BaseWidget {
       this.logDivider();
       this.beanInfo = {
         ...this.beanInfo,
+        willExpireNum,
         yesterdayGain: this.wrapperValue(yesterdayGain),
         todayGain: this.wrapperValue(todayGain),
       }
@@ -1075,30 +1067,29 @@ class Widget extends BaseWidget {
   }
 
   /**
-   * 分页获取京豆明细列表
+   * 获取京豆明细列表
    */
   beanDetailsFun = async (page = 1) => {
-    const url = `https://bean.m.jd.com/beanDetail/detail.json`;
+    const url = `https://api.m.jd.com/?appid=jd-cphdeveloper-m&functionId=myBean&appCode=ms0ca95114&g_ty=ajax&g_login_type=1&sceneval=2&loginType=2&body=${this.joinQueryParams({ "tenantCode": "jgm", "bizModelCode": 6, "bizModeClientType": "M", "externalLoginType": 1 })}`;
     const options = {
       useCache: false,
-      body: `page=${page}`,
       headers: {
         ...this.defaultHeaders,
-        'X-Requested-With': `XMLHttpRequest`,
-        'origin': `https://bean.m.jd.com`,
-        'host': `bean.m.jd.com`,
-        'referer': `https://bean.m.jd.com/beanDetail/index.action?resourceValue=bean`,
+        'origin': `https://wqs.jd.com`,
+        'referer': `https://wqs.jd.com`,
       },
     };
-    const RES = await this.httpPost(url, { ...options, dataSuccess: (res) => res?.code == '0' });
+    const RES = await this.httpGet(url, { ...options, dataSuccess: (res) => res?.list });
     let details = [];
-    if (RES.code == '0') {
-      const { jingDetailList = [] } = RES;
-      details = jingDetailList.map(detail => ({ amount: detail.amount, date: detail.date }))
+    let willExpireNum = 0;
+    if (RES.list) {
+      const { list = [] } = RES;
+      willExpireNum = RES.willExpireNum;
+      details = list.map(detail => ({ amount: detail.amount, date: detail.createDate }))
     } else {
-      console.error(`第${page}页京豆明细列表获取失败！`);
+      console.error(`京豆明细列表获取失败！`);
     }
-    return details;
+    return { details, willExpireNum };
   }
 
   /**
