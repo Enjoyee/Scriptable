@@ -3,12 +3,13 @@
 // icon-color: red; icon-glyph: user-astronaut;
 /**
  * Author:LSP
- * Date:2023-05-12
+ * Date:2023-08-21
+ * Desc:修复DOM操作无法获取对应信息问题
  */
 // -------------------------------------------------------
 // 是否是开发环境，配合手机端调试使用，正式发布设置为false
 const isDev = false;
-const dependencyLSP = '20230511';
+const dependencyLSP = '20230602';
 console.log(`当前环境 👉👉👉👉👉 ${isDev ? 'DEV' : 'RELEASE'}`);
 console.log(`----------------------------------------`);
 // 分支
@@ -552,7 +553,8 @@ class Widget extends BaseWidget {
                   //////
                   const webview = new WebView();
                   await webview.loadURL(`${this.defaultPreference.domain}/search?q=${encodeURIComponent(keyword)}`);
-                  const html = await webview.getHTML();
+                  let html = await webview.getHTML();
+                  html = html.replaceAll(html.substring(html.indexOf('<head>') + 6, html.lastIndexOf('</head>')), '');
                   await webview.loadHTML(html);
                   // 通过dom操作把HTML里面的热榜内容提取出来
                   const getData = `
@@ -805,6 +807,7 @@ class Widget extends BaseWidget {
       "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36",
     };
     let html = await req.loadString();
+    html = html.replaceAll(html.substring(html.indexOf('<head>') + 6, html.lastIndexOf('</head>')), '');
     return html.replace(/(\r\n|\n|\r)/gm, "");
   }
 
@@ -834,33 +837,21 @@ class Widget extends BaseWidget {
         `
         function getData() {
             // logo链接
-            logoUrl = ''
+            logoUrl = document.getElementsByClassName('f-g')[0].getAttribute('src')
             // 榜单标题
-            hotTitle = '--'
-            branLogoArr = document.getElementsByClassName('brand logo')
-            if(JSON.stringify(branLogoArr) == '{}') {
-              return getPCData()
-            }
-            if(branLogoArr.length > 0) {
-              branLogo = branLogoArr[0]
-              logoUrl = branLogo.style['background-image'].slice(5).slice(0, -2)
-              //
-              mainTitle = branLogo.innerText
-              subTitle = document.getElementsByClassName('tab-nav-item active')[0]?.innerText ?? ''
-              hotTitle = mainTitle + (subTitle.length > 0 ? ' · ' : '') + subTitle
-            }
+            hotTitle = document.getElementsByClassName('Xc-ec-L b-L')[0].innerText
             // 链接
             linkArr = []
             // 标题
             titleArr = []       
-            allItemNodeList = document.querySelectorAll('.rank-item-container')
+            allItemNodeList = document.getElementsByClassName('al')
             // 链接&标题
             nodeSize = 0
             for(let node of allItemNodeList) {
               if(nodeSize < 30) {
-                link = node.href;
+                link = node.getElementsByTagName('a')[0].getAttribute('href');
                 linkArr.push(link);
-                title = node.getElementsByClassName('s-title')[0].innerText
+                title = node.innerText
                 titleArr.push(title);
               } else {
                 break
@@ -868,31 +859,6 @@ class Widget extends BaseWidget {
               nodeSize += 1
             }
             return { hotTitle, logoUrl, linkArr, titleArr };
-        }
-        function getPCData() {
-          // 获取榜单标题
-          hotTitle = document.querySelector('.Xc-ec-L').innerText
-          // 获取logo链接
-          logoImgHtml = document.querySelector('#tabbed-header-panel div').innerHTML;
-          // 提取src的正则表达式
-          logoPattern = /<img.*?src{1}=['"]([^'"]+)['"]+/g;
-          // 提取logo链接
-          logoUrl = logoPattern.exec(logoImgHtml)[1]
-          // 链接
-          linkArr = []
-          // 标题
-          titleArr = []
-          // 所有节点
-          allItemNodeList = document.querySelectorAll('.al')
-          for(let node of allItemNodeList) {
-              // 链接
-              node.innerHTML.replace(/<a [^>]*href=['"]([^'"]+)[^>]*/gi, function(match, link){
-                  linkArr.push(link)
-              });
-              // 标题
-              titleArr.push(node.innerText)
-          }
-          return { hotTitle, logoUrl, linkArr, titleArr };
         }
         getData()
       `
