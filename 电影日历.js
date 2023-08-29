@@ -3,12 +3,12 @@
 // icon-color: deep-blue; icon-glyph: film;
 /**
  * Author:LSP
- * Date:2023-05-11
+ * Date:2023-08-29
  */
 // -------------------------------------------------------
 // 是否是开发环境，配合手机端调试使用，正式发布设置为false
 const isDev = false;
-const dependencyLSP = '20230511';
+const dependencyLSP = '20230602';
 console.log(`当前环境 👉👉👉👉👉 ${isDev ? 'DEV' : 'RELEASE'}`);
 console.log(`----------------------------------------`);
 // 分支
@@ -33,7 +33,7 @@ class Widget extends BaseWidget {
 
   constructor(scriptName) {
     super(scriptName);
-    this.domain = 'https://www.cikeee.com';
+    this.domain = 'https://cikeee.cc';
     this.defaultConfig.refreshInterval = `${2 * 60}`;
     this.backgroundColor = '#f0f0f4,#161823';
     this.defaultConfig.bgType = '2';
