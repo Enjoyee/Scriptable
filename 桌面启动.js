@@ -3,7 +3,7 @@
 // icon-color: red; icon-glyph: user-astronaut;
 /**
  * Author:LSP
- * Date:2023-07-06
+ * Date:2023-09-11
  */
 // -------------------------------------------------------
 // 是否是开发环境，配合手机端调试使用，正式发布设置为false
@@ -624,7 +624,7 @@ class Widget extends BaseWidget {
       let remainDay = (+new Date(parseInt(notWorkday.timestamp) * 1000) - (+new Date(parseInt(currItem.timestamp) * 1000))) / 86400 / 1000;
       let holidayTips = '周末';
       const { term } = notWorkday;
-      if (term.length > 0) {
+      if (term?.length > 0) {
         holidayTips = term;
       }
       if (remainDay == 1) {
