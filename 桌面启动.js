@@ -155,7 +155,7 @@ class Widget extends BaseWidget {
           name: 'otherSetting',
           label: '其他设置',
           type: 'cell',
-          icon: `${this.getRemoteRootPath()}/img/setting.gif`,
+          icon: 'https://cdnjson.com/images/2024/02/05/settings.png',
           needLoading: true,
           childItems: [
             {
