@@ -3,7 +3,7 @@
 // icon-color: blue; icon-glyph: mobile-alt;
 /**
  * Author:LSP
- * Date:2023-05-15
+ * Date:2024-02-05
  */
 // -------------------------------------------------------
 // 是否是开发环境，配合手机端调试使用，正式发布设置为false
@@ -115,7 +115,7 @@ class Widget extends BaseWidget {
           name: 'otherSetting',
           label: '其他设置',
           type: 'cell',
-          icon: `${this.getRemoteRootPath()}/img/setting.gif`,
+          icon: 'https://cdnjson.com/images/2024/02/05/settings.png',
           needLoading: true,
           childItems: [
             {
@@ -195,6 +195,7 @@ class Widget extends BaseWidget {
               await webview.present();
               const request = new Request(this.defaultPreference.fetchUrl.balance);
               request.method = 'POST';
+              request.credentials = 'include';
               const response = await request.loadJSON();
               console.log(
                 JSON.stringify(response, null, 2)
