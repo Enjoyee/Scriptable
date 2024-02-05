@@ -79,7 +79,7 @@ class Widget extends BaseWidget {
       },
     ],
     enFontUrl: `${this.getRemoteRootPath()}/font/Facon.ttf`,
-    isShowNewYear: [],
+    isShowNewYear: ['20240209', '20240210', '20240211', '20240212'],
     newYearTips: {},
   };
 
