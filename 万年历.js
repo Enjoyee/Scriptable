@@ -1,9 +1,6 @@
-// Variables used by Scriptable.
-// These must be at the very top of the file. Do not edit.
-// icon-color: red; icon-glyph: calendar-alt;
 /**
  * Author:LSP
- * Date:2023-05-12
+ * Date:2024-02-05
  */
 // -------------------------------------------------------
 // 是否是开发环境，配合手机端调试使用，正式发布设置为false
@@ -128,7 +125,7 @@ class Widget extends BaseWidget {
           name: 'otherSetting',
           label: '其他设置',
           type: 'cell',
-          icon: `${this.getRemoteRootPath()}/img/setting.gif`,
+          icon: 'https://cdnjson.com/images/2024/02/05/settings.png',
           needLoading: true,
           childItems: [
             {
@@ -300,8 +297,8 @@ class Widget extends BaseWidget {
     const width = widgetSize.width;
     const height = widgetSize.height;
     const hCellWidth = width / 7;
-    const topPadding = 8;
-    const bottomPadding = 8;
+    const topPadding = 6;
+    const bottomPadding = 6;
     const weekCellHeight = 16;
     const dateCellHeight = (height - weekCellHeight - 2 * topPadding - bottomPadding) / rowCount;
     const canvasHeight = height - 2 * topPadding;
@@ -417,7 +414,7 @@ class Widget extends BaseWidget {
         }
 
         // 角标
-        drawContext.setFont(Font.regularSystemFont(9));
+        drawContext.setFont(Font.regularSystemFont(8));
         let anchorTextPoint = new Point(rect.x + margin * 2.2, rect.y + 2.2 * margin);
         drawContext.drawText(calendarInfo.anchorText, anchorTextPoint);
       }
@@ -436,7 +433,7 @@ class Widget extends BaseWidget {
     ctx.setTextAlignedCenter();
     ctx.setTextColor(Color.dynamic(new Color(this.monthBgTextDayColor()), new Color(this.monthBgTextNightColor())));
     if (isLarge) {
-      ctx.setFont(Font.semiboldSystemFont(300));
+      ctx.setFont(Font.semiboldSystemFont(288));
       ctx.drawTextInRect(`${new Date().getMonth() + 1}`, new Rect(0, 0, width, height));
     } else {
       ctx.setFont(Font.semiboldSystemFont(100));
@@ -516,26 +513,27 @@ class Widget extends BaseWidget {
             subText = `${matchDate.lMonth}月`;
           }
           if (matchDate.term != undefined && matchDate.term.length > 0) {
-            subText = matchDate.term;
+            subText = matchDate.festivalList.split(',')[0];
           }
           dateItem['subText'] = subText;
           return dateItem;
         }
         // ================================
         let currDateYear = currDate.getFullYear();
-        let currDateMonth = currDate.getMonth();
-        let currMonthLastDate = new Date(currDate.getFullYear(), currDateMonth + 1, 0);
+        let currDateMonth = currDate.getMonth() + 1;
+        let currMonthLastDate = new Date(currDate.getFullYear(), currDateMonth, 0);
         // [0, 6] 0表示周日，6表示周六
         const lastDay = currMonthLastDate.getDate();
         //
         let lastDateYear = currDateYear;
-        let lastDateMonth = currDateMonth;
+        let lastDateMonth = currDateMonth - 1;
         if (currDateMonth == 1) {
           lastDateMonth = 12;
           lastDateYear = currDateYear - 1;
         }
         let preMonthLastDate = new Date(lastDateYear, lastDateMonth, 0);
         const preMonthLastDay = preMonthLastDate.getDay();
+        log(preMonthLastDay)
         let lastMonthDays = 0;
         if (startDay == 2) {
           lastMonthDays = preMonthLastDay + 1;
@@ -590,7 +588,7 @@ class Widget extends BaseWidget {
       calendar['schedules'] = filterDaySchedules;
     });
 
-    // console.log(JSON.stringify(totalCalendarArr, null, 2));
+    console.log(JSON.stringify(totalCalendarArr, null, 2));
     return totalCalendarArr;
   }
 
