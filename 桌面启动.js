@@ -3,7 +3,7 @@
 // icon-color: red; icon-glyph: user-astronaut;
 /**
  * Author:LSP
- * Date:2023-09-11
+ * Date:2024-02-05
  */
 // -------------------------------------------------------
 // 是否是开发环境，配合手机端调试使用，正式发布设置为false
@@ -124,7 +124,7 @@ class Widget extends BaseWidget {
           name: 'weatherIco',
           label: '天气图标',
           type: 'select',
-          icon: `${this.getRemoteRootPath()}/img/ic_weather.gif`,
+          icon: { name: 'cloud.moon', color: '#480ca8', },
           needLoading: false,
           options: [
             { label: '第1套图标', value: '1' },
@@ -147,7 +147,7 @@ class Widget extends BaseWidget {
           name: 'quickStart',
           label: '快捷启动设置',
           type: 'cell',
-          icon: { name: 'lasso.and.sparkles', color: '#7743DB', },
+          icon: { name: 'lasso.and.sparkles', color: '#ffc300', },
           needLoading: false,
           showDesc: false,
         },
