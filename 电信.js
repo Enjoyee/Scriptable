@@ -3,7 +3,7 @@
 // icon-color: blue; icon-glyph: mobile-alt;
 /**
  * Author:LSP
- * Date:2024-02-05
+ * Date:2024-03-15
  */
 // -------------------------------------------------------
 // 是否是开发环境，配合手机端调试使用，正式发布设置为false
@@ -108,6 +108,14 @@ class Widget extends BaseWidget {
           label: '过滤定向流量',
           type: 'switch',
           icon: { name: 'bag.fill', color: '#F14A16', },
+          needLoading: false,
+          default: false
+        },
+        {
+          name: 'showUsedFlow',
+          label: '显示已使用流量',
+          type: 'switch',
+          icon: { name: 'archivebox.fill', color: '#ECA97A', },
           needLoading: false,
           default: false
         },
@@ -242,7 +250,7 @@ class Widget extends BaseWidget {
   async provideSmallWidget(widgetSetting) {
     // ========================================
     await this.loadMoneyBalance();
-    await this.loadDetailInfo(widgetSetting.filterOrientateFlow);
+    await this.loadDetailInfo(widgetSetting);
     const voiceBalance = this.voice.balance;
     // ========================================
     const widget = new ListWidget();
@@ -388,7 +396,8 @@ class Widget extends BaseWidget {
    * 加载明细
    * @returns 
    */
-  loadDetailInfo = async (filterOrientateFlow) => {
+  loadDetailInfo = async (widgetSetting) => {
+    const { filterOrientateFlow, showUsedFlow } = widgetSetting;
     const response = await this.httpGet(
       this.defaultPreference.fetchUrl.detail,
       {
@@ -403,6 +412,8 @@ class Widget extends BaseWidget {
     let totalFlowAmount = 0;
     // 剩余流量
     let totalBalanceFlowAmount = 0;
+    // 已用流量
+    let totalUsedFlowAmount = 0;
     // 总语音
     let totalVoiceAmount = 0;
     // 剩余语音
@@ -421,9 +432,11 @@ class Widget extends BaseWidget {
               let ratableResourcename = item.ratableResourcename;
               let ratableAmount = item.ratableAmount;
               let balanceAmount = item.balanceAmount;
+              let usedAmount = ratableAmount - balanceAmount;
               console.log(`套餐名称：«${ratableResourcename}»`);
               console.log(`套餐总流量：${ratableAmount} MB`);
               console.log(`套餐剩余流量：${balanceAmount} MB`);
+              console.log(`套餐已用流量：${usedAmount} MB`);
               console.log(`================================= `);
               if (filterOrientateFlow && ratableResourcename.search('定向') != -1 || balanceAmount == '999999999999') {
                 ratableAmount = 0;
@@ -431,6 +444,10 @@ class Widget extends BaseWidget {
               }
               totalFlowAmount += parseFloat(ratableAmount);
               totalBalanceFlowAmount += parseFloat(balanceAmount);
+              totalUsedFlowAmount += parseFloat(usedAmount);
+            }
+            if (showUsedFlow) {
+              this.flow.title = '⛽️ 流量已用：';
             }
             if (data.offerType == 21 && item.ratableAmount == '0') {
               // 无限流量用户
@@ -448,15 +465,18 @@ class Widget extends BaseWidget {
     });
     const totalFlowObj = this.formatFlow(totalFlowAmount);
     const totalBalanceFlowObj = this.formatFlow(totalBalanceFlowAmount);
+    const totalUsedFlowObj = this.formatFlow(totalUsedFlowAmount);
+    const finalBalanceFlowObj = showUsedFlow ? totalUsedFlowObj : totalBalanceFlowObj;
     console.log(`总流量：${totalFlowObj.amount}${totalFlowObj.unit} `);
     console.log(`剩余流量：${totalBalanceFlowObj.amount}${totalBalanceFlowObj.unit} `);
+    console.log(`已使用流量：${totalUsedFlowObj.amount}${totalUsedFlowObj.unit} `);
     console.log(`总语音：${totalVoiceAmount}${this.voice.unit} `);
     console.log(`剩余语音：${totalBalanceVoiceAmount}${this.voice.unit} `);
     console.log(`================================= `);
     // 设置流量
     this.flow.percent = ((totalBalanceFlowAmount / (totalFlowAmount || 1)) * 100).toFixed(2);
-    this.flow.balance = totalBalanceFlowObj.amount;
-    this.flow.unit = totalBalanceFlowObj.unit;
+    this.flow.balance = finalBalanceFlowObj.amount;
+    this.flow.unit = finalBalanceFlowObj.unit;
     // 设置语音
     this.voice.percent = ((totalBalanceVoiceAmount / (totalVoiceAmount || 1)) * 100).toFixed(2);
     this.voice.balance = totalBalanceVoiceAmount;

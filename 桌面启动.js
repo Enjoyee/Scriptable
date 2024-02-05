@@ -79,7 +79,7 @@ class Widget extends BaseWidget {
       },
     ],
     enFontUrl: `${this.getRemoteRootPath()}/font/Facon.ttf`,
-    isShowNewYear: [],
+    isShowNewYear: ['20240209', '20240210', '20240211', '20240212'],
     newYearTips: {},
   };
 
@@ -533,7 +533,7 @@ class Widget extends BaseWidget {
     stack.addSpacer();
     let weatherStack = stack.addStack();
     weatherStack.layoutHorizontally();
-    weatherStack.centerAlignContent();
+    weatherStack.bottomAlignContent();
     //
     let image = await this.getImageByUrl(weatherInfo.weatherIcoUrl);
     let imgSpan = weatherStack.addImage(image);
@@ -553,7 +553,14 @@ class Widget extends BaseWidget {
     imgSpan.leftAlignImage();
     //
     weatherStack.addSpacer(16);
+    // 刷新时间
     let textWidget;
+    textWidget = weatherStack.addText(this.getDateStr(new Date(), 'HH:mm'))
+    textWidget.textColor = this.dynamicColor(this.dateFontDayColor(), this.dateFontNightColor());
+    textWidget.font = Font.systemFont(10);
+    textWidget.textOpacity = 0.8;
+    textWidget.lineLimit = 1;
+    //
     // ------------------------------------------------
     const infoLunarText = `  ${lunarInfo.infoLunarText}`;
     let holidayText = lunarInfo.holidayText;
