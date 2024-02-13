@@ -1,37 +1,117 @@
 // Variables used by Scriptable.
 // These must be at the very top of the file. Do not edit.
-// icon-color: blue; icon-glyph: user-astronaut;
+// icon-color: deep-gray; icon-glyph: user-astronaut;
+
 /**
  * 公众号：杂货万事屋
+ * 很多模板源自于互联网，有侵权的请公众号留言
  * Author:LSP
- * Date:2021-09-29
 */
 
 // 当前环境版本号
-const VERSION = 20210929
+const VERSION = 20221122
 
 class Base {
-    constructor(scriptName) {
-        this.init(scriptName)
-    }
 
-    init(scriptName, widgetFamily = config.widgetFamily) {
+    constructor(scriptName) {
+        //=====================
         // 设置脚本名字
         this.scriptName = scriptName
+        this.initCommonCacheKey();
+        //=====================
+        this.initDefaultValue();
+        //=====================
+        // 设置默认间距
+        this.paddingSetting()
+        //=====================
+        // 背景模式
+        const colorBgMode = this.keyGet(this.colorBgModeKey, 'true');
+        // 初始化背景模式
+        this.setColorBgMode(colorBgMode)
+        //=====================
+        // 设置刷新时间
+        let refreshTimeCache = this.keyGet(this.refreshTimeKey, `${this.defaultRefreshTime}`);
+        this.refreshIntervalTime(Number(refreshTimeCache));
+        //=====================
+        // 设置预览参数
+        this.configSetting()
+        // 设置预览尺寸-中等
+        this.setPreViewSizeMode(1)
+    }
+
+    // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    /**
+     * 获取缓存key
+     * @param {*} cacheKey 
+     * @returns 
+     */
+    getCacheKey = (cacheKey) => {
+        return `${this.scriptName}_${cacheKey}`;
+    }
+
+    /**
+     * 初始化缓存通用key
+     */
+    initCommonCacheKey = () => {
+        // 颜色
+        this.colorCacheKey = this.getCacheKey('colorKey');
+        // 渐变角度
+        this.colorAngleCacheKey = this.getCacheKey('colorAngleKey');
+        // 颜色背景模式
+        this.colorBgModeKey = this.getCacheKey('colorBgModeKey');
+        // 组件刷新时间
+        this.refreshTimeKey = this.getCacheKey('refreshKey');
+        // 是否使用iCloud
+        this.useiCloudKey = this.getCacheKey('useiCloudKey');
+    }
+
+    /**
+     * 使用缓存
+     * @returns 
+     */
+    useCache = (cacheKey) => {
+        const iCloud = this.keyGet(this.useiCloudKey, 'false');
+        const fm = FileManager[iCloud == 'true' ? 'iCloud' : 'local']();
+        const cacheDirectory = fm.joinPath(fm.documentsDirectory(), `${this.scriptName}/cache`);
+        const cacheFile = fm.joinPath(cacheDirectory, this.getCacheKey(cacheKey));
+        if (!fm.fileExists(cacheDirectory)) {
+            fm.createDirectory(cacheDirectory, true);
+        }
+
+        const saveStringCache = (content) => {
+            console.log('cececec-?' + cacheFile);
+            fm.writeString(cacheFile, content);
+        };
+
+        const getStringCache = () => {
+            const fileExists = fm.fileExists(cacheFile)
+            let cacheString = ""
+            if (fileExists) {
+                cacheString = fm.readString(cacheFile)
+            }
+            return cacheString
+        }
+
+        return {
+            saveStringCache,
+            getStringCache,
+        }
+    };
+    // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    initDefaultValue(widgetFamily = config.widgetFamily) {
+        //=====================
+        this.defaultRefreshTime = 30;
+        this.defaultBgAlpha = 0.5;
+        this.defaultBgShadowColor = '#000';
+        this.defaultGradientAngle = 0;
+        this.defaultWidgetBgColor = '#141E30,#243B55';
+        //=====================
         // 组件大小：small,medium,large
         this.widgetFamily = widgetFamily
         // 本地存储管理
         this.fmLocal = FileManager.local()
-        // 设置默认间距
-        this.paddingSetting()
-        // 默认开启图片模式
-        this.setSelectPicBg(true)
-        // 默认关闭纯色模式
-        this.setColorBgMode(false)
-        // 设置默认刷新时间
-        this.refreshIntervalTime()
-        // 设置预览尺寸-中等
-        this.setPreViewSizeMode(1)
     }
 
     /**
@@ -46,16 +126,8 @@ class Base {
     * 设置组件刷新间隔
     * @param {number}} interval 刷新间隔(单位：分钟)
     */
-    refreshIntervalTime(interval = 10) {
+    refreshIntervalTime(interval = 30) {
         this.refreshInterval = interval
-    }
-
-    /**
-    * 是否是图片背景模式
-    * @param {bool} mode 模式开关
-    */
-    setSelectPicBg(mode) {
-        this.picBgMode = mode
     }
 
     /**
@@ -65,7 +137,17 @@ class Base {
     */
     setColorBgMode(mode, bgColor = Color.black()) {
         this.colorBgMode = mode
+        this.picBgMode = !mode
         this.bgColor = bgColor
+        this.keySave(this.colorBgModeKey, '' + mode);
+    }
+
+    /**
+    * 是否是背景模式
+    * @param {bool} mode 模式开关
+    */
+    setSelectPicBg(mode) {
+        this.setColorBgMode(!mode)
     }
 
     /**
@@ -76,7 +158,58 @@ class Base {
         this.padding = padding
     }
 
-    //==========================================
+    /**
+    * 小组件参数设置
+    * @param {configArr} 小组件预览配置
+    */
+    configSetting(configArr = []) {
+        this.configArr = configArr
+    }
+
+    /**
+    * 小组件全路径名
+    * @param {name} 名称
+    */
+    setModuleName(name = '') {
+        this.moduleName = name
+    }
+
+    //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+    getColors = (color = '') => {
+        const colors = typeof color === 'string' ? color.split(',') : color
+        return colors
+    }
+
+    /**
+     * 渐变色
+     * @param {颜色} colors 
+     * @returns 
+     */
+    getLinearGradientColor = (colors) => {
+        const colorAngleCache = this.keyGet(this.colorAngleCacheKey, this.defaultGradientAngle);
+        let angle = Number(colorAngleCache);
+        const locations = [];
+        const linearColor = new LinearGradient();
+        let x = 0, y = 0;
+        if (angle < 45) {
+            y = 0.5 - 0.5 / 45 * angle;
+        } else if (angle < 135) {
+            x = 1 / 90 * (angle - 45);
+        } else if (angle <= 180) {
+            x = 1;
+            y = 0.5 / 45 * (angle - 135);
+        }
+        linearColor.startPoint = new Point(x, y);
+        linearColor.endPoint = new Point(1 - x, 1 - y);
+        let avg = 1 / (colors.length - 1);
+        linearColor.colors = colors.map((item, index) => {
+            locations.push(index * avg);
+            return new Color(item);
+        });
+        linearColor.locations = locations;
+        return linearColor;
+    }
 
     /**
     * 字符串是否包含中文
@@ -94,6 +227,80 @@ class Base {
     */
     strAllCn(str) {
         return /^[\u4e00-\u9fa5]+$/.test(str)
+    }
+
+    /**
+     * 画icon
+     * @param {*} icon 
+     * @param {*} color 
+     * @param {*} cornerWidth 
+     * @returns 
+     */
+    drawTableIcon = async (
+        icon = 'square.grid.2x2',
+        color = '#e8e8e8',
+        cornerWidth = 42
+    ) => {
+        let sf = SFSymbol.named(icon);
+        if (sf == null) {
+            sf = SFSymbol.named('scribble');
+        }
+        sf.applyFont(Font.mediumSystemFont(30));
+        const imgData = Data.fromPNG(sf.image).toBase64String();
+        const html = `
+        <img id="sourceImg" src="data:image/png;base64,${imgData}" />
+        <img id="silhouetteImg" src="" />
+        <canvas id="mainCanvas" />
+        `
+        const js = `
+        var canvas = document.createElement("canvas");
+        var sourceImg = document.getElementById("sourceImg");
+        var silhouetteImg = document.getElementById("silhouetteImg");
+        var ctx = canvas.getContext('2d');
+        var size = sourceImg.width > sourceImg.height ? sourceImg.width : sourceImg.height;
+        canvas.width = size;
+        canvas.height = size;
+        ctx.drawImage(sourceImg, (canvas.width - sourceImg.width) / 2, (canvas.height - sourceImg.height) / 2);
+        var imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        var pix = imgData.data;
+        //convert the image into a silhouette
+        for (var i=0, n = pix.length; i < n; i+= 4){
+          //set red to 0
+          pix[i] = 255;
+          //set green to 0
+          pix[i+1] = 255;
+          //set blue to 0
+          pix[i+2] = 255;
+          //retain the alpha value
+          pix[i+3] = pix[i+3];
+        }
+        ctx.putImageData(imgData,0,0);
+        silhouetteImg.src = canvas.toDataURL();
+        output=canvas.toDataURL()
+        `
+
+        let wv = new WebView()
+        await wv.loadHTML(html)
+        const base64Image = await wv.evaluateJavaScript(js)
+        const iconImage = await new Request(base64Image).loadImage()
+        const size = new Size(160, 160)
+        const ctx = new DrawContext()
+        ctx.opaque = false
+        ctx.respectScreenScale = true
+        ctx.size = size
+        const path = new Path()
+        const rect = new Rect(0, 0, size.width, size.width)
+
+        path.addRoundedRect(rect, cornerWidth, cornerWidth)
+        path.closeSubpath()
+        ctx.setFillColor(new Color(color))
+        ctx.addPath(path)
+        ctx.fillPath()
+        const rate = 36
+        const iw = size.width - rate
+        const x = (size.width - iw) / 2
+        ctx.drawImageInRect(iconImage, new Rect(x, x, iw, iw))
+        return ctx.getImage()
     }
 
     /**
@@ -150,13 +357,10 @@ class Base {
     * @param {bool} json 返回数据是否为json，默认true
     * @param {Obj} headers 请求头
     * @param {string} pointCacheKey 指定缓存key
-    * @param {bool} logable 是否打印数据，默认false
+    * @param {bool} logable 是否打印数据，默认true
     * @return {string | json | null}
     */
     async httpGet(url, json = true, headers, pointCacheKey, logable = false) {
-        console.log("")
-        console.log(`----------------------------------------`)
-
         // 根据URL进行md5生成cacheKey
         let cacheKey = pointCacheKey
         if (cacheKey == undefined || cacheKey == null || cacheKey.length == 0) {
@@ -164,19 +368,17 @@ class Base {
         }
         // 读取本地缓存
         const localCache = this.loadStringCache(cacheKey)
-
         // 判断是否需要刷新
         const lastCacheTime = this.getCacheModificationDate(cacheKey)
         const timeInterval = Math.floor((this.getCurrentTimeStamp() - lastCacheTime) / 60)
+        const canLoadCache = localCache != null && localCache.length > 0;
+        console.log(`⏰已缓存：${timeInterval}min, 缓存时间：${this.getDateStr(new Date(lastCacheTime * 1000), 'HH:mm')}, 刷新：${this.refreshInterval}min`);
         // 过时且有本地缓存则直接返回本地缓存数据 
-        console.log(`httpGet缓存判断，上次缓存时间=${timeInterval}分钟前，缓存过期时间=${this.refreshInterval}分钟，cache=${localCache.length}`)
-        if (timeInterval <= this.refreshInterval && localCache != null && localCache.length > 0) {
-            console.log(`httpGet读取缓存数据：==> ${url}`)
+        if (timeInterval <= this.refreshInterval && canLoadCache) {
+            console.log(`🤖Get读取缓存：${url}`)
             // 是否打印响应数据
             if (logable) {
-                console.log(``)
-                console.log(`httpGet请求响应数据：${localCache}`)
-                console.log(``)
+                console.log(`🤖Get请求响应：${localCache}`)
             }
             console.log(`----------------------------------------`)
             return json ? JSON.parse(localCache) : localCache
@@ -184,7 +386,7 @@ class Base {
 
         let data = null
         try {
-            console.log(`httpGet在线请求数据：==> ${url}`)
+            console.log(`🚀Get在线请求：${url}`)
             let req = new Request(url)
             req.method = 'GET'
             if (headers != null && headers != undefined) {
@@ -192,14 +394,12 @@ class Base {
             }
             data = await (json ? req.loadJSON() : req.loadString())
         } catch (e) {
-            console.error(`httpGet请求失败：${e}：==> ${url}`)
+            console.error(`🚫Get请求失败：${e}： ${url}`)
         }
 
         // 判断数据是否为空（加载失败）
-        if (!data && localCache != null && localCache.length > 0) {
-            console.log(``)
-            console.log(`httpGet读取缓存数据：==> ${url}`)
-            console.log(``)
+        if (!data && canLoadCache) {
+            console.log(`🤖Get读取缓存：${url}`)
             console.log(`----------------------------------------`)
             return json ? JSON.parse(localCache) : localCache
         }
@@ -209,12 +409,9 @@ class Base {
 
         // 是否打印响应数据
         if (logable) {
-            console.log(``)
-            console.log(`httpGet请求响应数据：${JSON.stringify(data)}`)
-            console.log(``)
+            console.log(`🤖Get请求响应：${JSON.stringify(data)}`)
         }
         console.log(`----------------------------------------`)
-
         return data
     }
 
@@ -228,9 +425,7 @@ class Base {
     * @param {bool} logable 是否打印数据，默认false
     * @return {string | json | null}
     */
-    async httpPost(url, parameterKV, json = true, headers, pointCacheKey, logable = false) {
-        console.log("")
-        console.log(`----------------------------------------`)
+    async httpPost(url, parameterKV, json = true, headers, pointCacheKey, logable = true) {
         // 根据URL进行md5生成cacheKey
         let cacheKey = pointCacheKey
         if (cacheKey == undefined || cacheKey == null || cacheKey.length == 0) {
@@ -238,19 +433,17 @@ class Base {
         }
         // 读取本地缓存
         const localCache = this.loadStringCache(cacheKey)
-
         // 判断是否需要刷新
         const lastCacheTime = this.getCacheModificationDate(cacheKey)
         const timeInterval = Math.floor((this.getCurrentTimeStamp() - lastCacheTime) / 60)
+        const canLoadCache = localCache != null && localCache.length > 0;
+        console.log(`⏰已缓存：${timeInterval}min, 缓存时间：${this.getDateStr(new Date(lastCacheTime * 1000), 'HH:mm')}, 刷新：${this.refreshInterval}min`);
         // 过时且有本地缓存则直接返回本地缓存数据
-        console.log(`httpPost缓存判断，上次缓存时间=${timeInterval}分钟前，缓存过期时间=${this.refreshInterval}分钟，cache=${localCache.length}`)
-        if (timeInterval <= this.refreshInterval && localCache != null && localCache.length > 0) {
-            console.log(`httpPost读取缓存数据：==> ${url}`)
+        if (timeInterval <= this.refreshInterval && canLoadCache) {
+            console.log(`🤖Post读取缓存： ${url}`)
             // 是否打印响应数据
             if (logable) {
-                console.log(``)
-                console.log(`httpPost请求响应数据：${localCache}`)
-                console.log(``)
+                console.log(`🤖Post请求响应：${localCache}`)
             }
             console.log(`----------------------------------------`)
             return json ? JSON.parse(localCache) : localCache
@@ -258,7 +451,7 @@ class Base {
 
         let data = null
         try {
-            console.log(`httpPost在线请求数据：==> ${url}`)
+            console.log(`🚀Post在线请求：${url}`)
             let req = new Request(url)
             req.method = 'POST'
             if (headers != null && headers != undefined) {
@@ -269,14 +462,12 @@ class Base {
             }
             data = await (json ? req.loadJSON() : req.loadString())
         } catch (e) {
-            console.error(`httpPost请求失败：${e}：==> ${url}`)
+            console.error(`🚫Post请求失败：${e}： ${url}`)
         }
 
         // 判断数据是否为空（加载失败）
-        if (!data && localCache != null && localCache.length > 0) {
-            console.log(``)
-            console.log(`httpPost读取缓存数据：==> ${url}`)
-            console.log(``)
+        if (!data && canLoadCache) {
+            console.log(`🤖Post读取缓存： ${url}`)
             console.log(`----------------------------------------`)
             return json ? JSON.parse(localCache) : localCache
         }
@@ -286,12 +477,9 @@ class Base {
 
         // 是否打印响应数据
         if (logable) {
-            console.log(``)
-            console.log(`httpPost请求响应数据：${JSON.stringify(data)}`)
-            console.log(``)
+            console.log(`🤖Post请求响应：${JSON.stringify(data)}`)
         }
         console.log(`----------------------------------------`)
-
         return data
     }
 
@@ -301,10 +489,6 @@ class Base {
     * @return 定位信息
     */
     async getLocation(locale = "zh_cn") {
-        console.log("")
-
-        console.log(`----------------------------------------`)
-        console.log(`开始定位`)
         // 定位信息
         let locationData = {
             "latitude": undefined,
@@ -312,22 +496,20 @@ class Base {
             "locality": undefined,
             "subLocality": undefined
         }
-
         // 缓存key
         const cacheKey = "lsp-location-cache"
-
         // 判断是否需要刷新
         const lastCacheTime = this.getCacheModificationDate(cacheKey)
         const timeInterval = Math.floor((this.getCurrentTimeStamp() - lastCacheTime) / 60)
         // 缓存数据
         const locationCache = this.loadStringCache(cacheKey)
-        console.log(`定位缓存判断，上次缓存时间=${timeInterval}分钟前，缓存过期时间=${this.refreshInterval}分钟，cache=${locationCache.length}`)
 
         if (timeInterval <= this.refreshInterval && locationCache != null && locationCache.length > 0) {
             // 读取缓存数据
-            console.log(`读取定位缓存数据：${locationCache}`)
+            console.log(`🤖读取定位缓存数据：${locationCache}`)
             locationData = JSON.parse(locationCache)
         } else {
+            console.log(`📌开始定位`)
             try {
                 const location = await Location.current()
                 const geocode = await Location.reverseGeocode(location.latitude, location.longitude, locale)
@@ -344,20 +526,17 @@ class Base {
                 }
                 // 街道
                 locationData.street = geo.thoroughfare
-
                 // 缓存数据
                 this.saveStringCache(cacheKey, JSON.stringify(locationData))
-
-                console.log(`定位信息：latitude=${location.latitude}，longitude=${location.longitude}，locality=${locationData.locality}，subLocality=${locationData.subLocality}，street=${locationData.street}`)
+                console.log(`🚀定位信息：latitude=${location.latitude}，longitude=${location.longitude}，locality=${locationData.locality}，subLocality=${locationData.subLocality}，street=${locationData.street}`)
             } catch (e) {
-                console.log(`定位出错了，${e.toString()}`)
+                console.error(`🚫定位出错了，${e.toString()}`)
                 // 读取缓存数据
                 const locationCache = this.loadStringCache(cacheKey)
-                console.log(`读取定位缓存数据：${locationCache}`)
+                console.log(`🤖读取定位缓存数据：${locationCache}`)
                 locationData = JSON.parse(locationCache)
             }
         }
-
         console.log(`----------------------------------------`)
         return locationData
     }
@@ -381,16 +560,14 @@ class Base {
     }
 
     /**
-    * 获取图片
+    * 获取在线图片
     * @param {string} url 图片链接
     * @param {string} pointCacheKey 指定缓存key
+    * @param {bool} temporary 是否临时目录
     * @param {bool} useCache 是否使用缓存
     * @return {Image}
     */
-    async getImageByUrl(url, pointCacheKey = null, useCache = true) {
-        console.log('')
-        console.log(`----------------------------------------`)
-
+    async getImageByUrl(url, pointCacheKey = null, temporary = false, useCache = true) {
         // 根据URL进行md5生成cacheKey
         let cacheKey = pointCacheKey
         let isPointCacheKey = true
@@ -399,60 +576,60 @@ class Base {
             cacheKey = this.md5(url)
         }
 
-
         // 缓存数据
         if (useCache) {
-            const cacheImg = this.loadImgCache(cacheKey)
+            const cacheImg = this.loadImgCache(cacheKey, temporary);
             if (cacheImg != undefined && cacheImg != null) {
-                console.log(`图片是否指定了缓存key：${isPointCacheKey}`)
                 if (isPointCacheKey) {
                     // 判断是否需要刷新
-                    const lastCacheTime = this.getCacheModificationDate(cacheKey)
+                    const lastCacheTime = this.getCacheModificationDate(cacheKey, temporary);
                     const timeInterval = Math.floor((this.getCurrentTimeStamp() - lastCacheTime) / 60)
-                    console.log(`图片缓存判断，上次缓存时间=${timeInterval}分钟前，缓存过期时间=${this.refreshInterval}分钟`)
                     // 是否使用缓存
                     if (timeInterval <= this.refreshInterval) {
-                        console.log(`使用缓存图片：${url}`)
-                        console.log(`----------------------------------------`)
                         return cacheImg
                     }
                 } else {
-                    console.log(`使用缓存图片：${url}`)
-                    console.log(`----------------------------------------`)
                     return cacheImg
                 }
-
             }
         }
 
-
         // 在线
         try {
-            console.log(`在线请求图片：${url}`)
-            console.log(`----------------------------------------`)
+            console.log(`🚀在线请求图片：${url}`)
             const req = new Request(url)
             const img = await req.loadImage()
             // 存储到缓存
             this.saveImgCache(cacheKey, img)
+            console.log(`----------------------------------------`)
             return img
         } catch (e) {
             console.error(`图片加载失败：${e}`)
             // 判断本地是否有缓存，有的话直接返回缓存
             let cacheImg = this.loadImgCache(cacheKey)
             if (cacheImg != undefined) {
-                console.log(`使用缓存图片：${url}`)
+                console.error(`🚫图片加载失败，返回缓存图片`)
                 console.log(`----------------------------------------`)
                 return cacheImg
             }
             // 没有缓存+失败情况下，返回灰色背景
-            console.log(`返回默认图片：${url}`)
-            console.log(`----------------------------------------`)
+            console.log(`📵返回默认图片，原链接：${url}`)
             let ctx = new DrawContext()
             ctx.size = new Size(80, 80)
             ctx.setFillColor(Color.darkGray())
             ctx.fillRect(new Rect(0, 0, 80, 80))
+            console.log(`----------------------------------------`)
             return await ctx.getImage()
         }
+    }
+
+    /**
+     * 获取缓存路径
+     * @param {是否是临时目录} temporary 
+     */
+    getCacheFilePath(cacheKey, temporary = false) {
+        let path = this.fmLocal.joinPath(temporary ? FileManager.local().temporaryDirectory() : FileManager.local().documentsDirectory(), cacheKey);
+        return path;
     }
 
     /**
@@ -461,7 +638,7 @@ class Base {
     * @param {string} content 缓存内容
     */
     saveStringCache(cacheKey, content) {
-        const cacheFile = this.fmLocal.joinPath(FileManager.local().documentsDirectory(), cacheKey)
+        const cacheFile = this.getCacheFilePath(cacheKey);
         this.fmLocal.writeString(cacheFile, content)
     }
 
@@ -471,7 +648,7 @@ class Base {
     * @return {string} 本地字符串缓存
     */
     loadStringCache(cacheKey) {
-        const cacheFile = this.fmLocal.joinPath(FileManager.local().documentsDirectory(), cacheKey)
+        const cacheFile = this.getCacheFilePath(cacheKey);
         const fileExists = this.fmLocal.fileExists(cacheFile)
         let cacheString = ""
         if (fileExists) {
@@ -484,9 +661,10 @@ class Base {
     * 保存图片到本地
     * @param {string} cacheKey 缓存key
     * @param {Image} img 缓存图片
+    * @param {boolean} temporary 是否是缓存目录
     */
-    saveImgCache(cacheKey, img) {
-        const cacheFile = this.fmLocal.joinPath(FileManager.local().documentsDirectory(), cacheKey)
+    saveImgCache(cacheKey, img, temporary = false) {
+        const cacheFile = this.getCacheFilePath(cacheKey, temporary);
         this.fmLocal.writeImage(cacheFile, img)
     }
 
@@ -494,13 +672,14 @@ class Base {
     * 获取本地缓存图片
     * @param {string} cacheKey 缓存key
     * @return {Image} 本地图片缓存
+    * @param {boolean} temporary 是否是缓存目录
     */
-    loadImgCache(cacheKey) {
-        const cacheFile = this.fmLocal.joinPath(FileManager.local().documentsDirectory(), cacheKey)
-        const fileExists = this.fmLocal.fileExists(cacheFile)
-        let img = undefined
+    loadImgCache(cacheKey, temporary) {
+        const cacheFile = this.getCacheFilePath(cacheKey, temporary);
+        const fileExists = this.fmLocal.fileExists(cacheFile);
+        let img = undefined;
         if (fileExists) {
-            img = this.fmLocal.readImage(cacheFile)
+            img = this.fmLocal.readImage(cacheFile);
         }
         return img
     }
@@ -508,13 +687,14 @@ class Base {
     /**
     * 获取缓存文件的上次修改时间
     * @param {string} cacheKey 缓存key
+    * @param {boolean} temporary 是否是临时目录
     * @return 返回上次缓存文件修改的时间戳(单位：秒)
     */
-    getCacheModificationDate(cacheKey) {
-        const cacheFile = this.fmLocal.joinPath(FileManager.local().documentsDirectory(), cacheKey)
+    getCacheModificationDate(cacheKey, temporary = false) {
+        const cacheFile = this.getCacheFilePath(cacheKey, temporary);
         const fileExists = this.fmLocal.fileExists(cacheFile)
         if (fileExists) {
-            return this.fmLocal.modificationDate(cacheFile).getTime() / 1000
+            return Math.floor(this.fmLocal.modificationDate(cacheFile).getTime() / 1000)
         } else {
             return 0
         }
@@ -524,7 +704,16 @@ class Base {
     * 获取当前时间戳(单位：秒)
     */
     getCurrentTimeStamp() {
-        return new Date().getTime() / 1000
+        return Math.floor(new Date().getTime() / 1000)
+    }
+
+    /**
+    * 删除本地缓存
+    */
+    removeAllCache() {
+        const cacheFile = this.fmLocal.joinPath(FileManager.local().documentsDirectory(), '')
+        this.fmLocal.remove(cacheFile)
+        this.fmLocal.createDirectory(this.fmLocal.joinPath(FileManager.local().documentsDirectory(), '/'))
     }
 
     /**
@@ -532,8 +721,10 @@ class Base {
     * @param {string} cacheKey 缓存key
     */
     removeCache(cacheKey) {
-        const cacheFile = this.fmLocal.joinPath(FileManager.local().documentsDirectory(), cacheKey)
-        this.fmLocal.remove(cacheFile)
+        const cacheFile = this.getCacheFilePath(cacheKey);
+        if (this.fmLocal.fileExists(cacheFile)) {
+            this.fmLocal.remove(cacheFile)
+        }
     }
 
     /**
@@ -556,14 +747,35 @@ class Base {
         if (Keychain.contains(cacheKey)) {
             let cacheString = Keychain.get(cacheKey)
             index = parseInt(cacheString)
-            console.log(`索引缓存值---${index}`);
         }
 
         index = index + 1
         index = index % size
-        console.log(`索引值轮播---${index}`);
         Keychain.set(cacheKey, `${index}`)
         return index
+    }
+
+    /**
+     * 保存key相关设置，缓存清除不会清理这个
+     * @param {string} cacheKey 
+     * @param {string} cache 
+     */
+    keySave(cacheKey, cache) {
+        if (cache) {
+            Keychain.set(cacheKey, cache);
+        }
+    }
+
+    /**
+     * 获取key相关设置
+     * @param {string} cacheKey 
+     */
+    keyGet(cacheKey, defaultValue = '') {
+        if (Keychain.contains(cacheKey)) {
+            return Keychain.get(cacheKey);
+        } else {
+            return defaultValue;
+        }
     }
 
     /**
@@ -601,8 +813,40 @@ class Base {
         } else {
             phoneWidgetSize = this.phoneSizes()[screenHeight]
         }
-        const width = phoneWidgetSize[size] / screenScale
+        let width = phoneWidgetSize[size] / screenScale
+        if (size === '大号') {
+            width = phoneWidgetSize['中号'] / screenScale
+        }
         return width
+    }
+
+    /**
+    * 获取组件尺寸高度大小
+    * @param {string} size 组件尺寸【小号】、【中号】、【大号】
+    * @param {bool} isIphone12Mini 是否是12mini
+    */
+    getWidgetHeightSize(size, isIphone12Mini) {
+        // 屏幕缩放比例
+        const screenScale = Device.screenScale()
+        // 组件宽度
+        let phoneWidgetSize = undefined
+        // 手机屏幕高度
+        const screenHeight = Device.screenSize().height * screenScale
+        if (screenHeight == 2436) {
+            // 2436尺寸的手机有【11 Pro, XS, X】 & 【12 mini】
+            if (isIphone12Mini) {
+                phoneWidgetSize = this.phoneSizes()[screenHeight].mini
+            } else {
+                phoneWidgetSize = this.phoneSizes()[screenHeight].x
+            }
+        } else {
+            phoneWidgetSize = this.phoneSizes()[screenHeight]
+        }
+        let height = phoneWidgetSize['小号'] / screenScale
+        if (size === '大号') {
+            height = phoneWidgetSize['大号'] / screenScale
+        }
+        return height
     }
 
     /**
@@ -900,8 +1144,8 @@ class Base {
     }
 
     /**
-    * ------------------------------------------------------------------------------
-    */
+     * ------------------------------------------------------------------------------
+     */
 
     /**
     * 透明背景
@@ -914,32 +1158,10 @@ class Base {
             // Determine if user has taken the screenshot.
             var message
             message = "如需实现透明背景请先滑到最右边的空白页并截图"
-            let options = ["继续选择图片", "退出进行截图", "同步远程环境"]
+            let options = ["继续选择图片", "退出进行截图"]
             let response = await this.generateAlert(message, options)
             // Return if we need to exit.
             if (response == 1) return null
-
-            // Update the code.
-            if (response == 2) {
-                // Determine if the user is using iCloud.
-                let files = FileManager.local()
-                const iCloudInUse = files.isFileStoredIniCloud(module.filename)
-                // If so, use an iCloud file manager.
-                files = iCloudInUse ? FileManager.iCloud() : files
-                // Try to download the file.
-                try {
-                    const req = new Request("https://gitee.com/enjoyee/scriptable/raw/master/%E6%96%B0%E7%B3%BB%E5%88%97/lsp%E7%8E%AF%E5%A2%83.js")
-                    const codeString = await req.loadString()
-                    files.writeString(module.filename, codeString)
-                    message = "环境脚本已更新，下次运行时生效。"
-                } catch {
-                    message = "更新失败，请稍后再试。"
-                }
-                options = ["好的"]
-                await this.generateAlert(message, options)
-                return
-            }
-
             // Get screenshot and determine phone size.
             let img = await Photos.fromLibrary()
             let height = img.size.height
@@ -955,12 +1177,10 @@ class Base {
                 let files = FileManager.local()
                 let cacheName = "lsp-phone-type"
                 let cachePath = files.joinPath(files.libraryDirectory(), cacheName)
-
                 // If we already cached the phone size, load it.
                 if (files.fileExists(cachePath)) {
                     let typeString = files.readString(cachePath)
                     phone = phone[typeString]
-
                     // Otherwise, prompt the user.
                 } else {
                     message = "你使用什么型号的iPhone？"
@@ -1032,7 +1252,7 @@ class Base {
             }
 
             message = tips
-            const exportPhotoOptions = ["完成预览", "导出到相册"]
+            const exportPhotoOptions = ["完成", "导出"]
             const exportToPhoto = await this.generateAlert(message, exportPhotoOptions)
 
             if (exportToPhoto) {
@@ -1042,23 +1262,6 @@ class Base {
             // 保存
             this.saveImgCache(this.scriptName, imgCrop)
         }
-    }
-
-    /**
-    * 弹窗
-    * @param {string} message 信息
-    * @param {Array} options 选项
-    */
-    async generateAlert(message, options) {
-        let alert = new Alert()
-        alert.message = message
-
-        for (const option of options) {
-            alert.addAction(option)
-        }
-
-        let response = await alert.presentAlert()
-        return response
     }
 
     /**
@@ -1419,7 +1622,6 @@ class Base {
         }
         
         function lightBlur(hsl) {
-        
             // Adjust the luminance.
             let lumCalc = 0.35 + (0.3 / hsl[2]);
             if (lumCalc < 1) { lumCalc = 1; }
@@ -1431,7 +1633,6 @@ class Base {
             const s = hsl[1] * colorful * 1.5;
         
             return [hsl[0], s, l];
-        
         }
         
         function darkBlur(hsl) {
@@ -1440,7 +1641,6 @@ class Base {
             const s = hsl[1] * (1 - hsl[2]) * 3;
         
             return [hsl[0], s, hsl[2]];
-        
         }
         // Set up the canvas.
         const img = document.getElementById("blurImg");
@@ -1482,7 +1682,7 @@ class Base {
         // Draw over the old image.
         context.putImageData(imageData, 0, 0);
         // Blur the image.
-        stackBlurCanvasRGB("mainCanvas", 0, 0, w, h, ${ blur });
+        stackBlurCanvasRGB("mainCanvas", 0, 0, w, h, ${blur});
         
         // Perform the additional processing for dark images.
         if (style == "dark") {
@@ -1535,204 +1735,587 @@ class Base {
     }
 
     /**
+    * 弹窗
+    * @param {string} message 信息
+    * @param {Array} options 选项
+    */
+    async generateAlert(message, options) {
+        let alert = new Alert()
+        alert.message = message
+
+        for (const option of options) {
+            alert.addAction(option)
+        }
+
+        let response = await alert.presentAlert()
+        return response
+    }
+
+    async generateInputAlert(title, message, hint, value, confirm) {
+        const urlInputAlert = new Alert();
+        urlInputAlert.title = title;
+        urlInputAlert.message = message;
+        urlInputAlert.addAction("取消");
+        urlInputAlert.addAction("确定");
+        urlInputAlert.addTextField(hint, value);
+        let selectIndex = await urlInputAlert.presentAlert();
+        if (selectIndex == 1) {
+            const content = urlInputAlert.textFieldValue();
+            if (content.length == 0) return;
+            confirm(content);
+        }
+        return selectIndex;
+    }
+
+    /**
     * 手机各大小组件尺寸
     */
     phoneSizes() {
         let phones = {
-
+            // 14 Pro Max
+            "2796": { 小号: 510, 中号: 1092, 大号: 1146, 左边: 99, 右边: 681, 顶部: 282, 中间: 918, 底部: 1554 },
+            // 14 Pro
+            "2556": { 小号: 474, 中号: 1014, 大号: 1062, 左边: 82, 右边: 622, 顶部: 270, 中间: 858, 底部: 1446 },
             // 12 Pro Max
-            "2778": {
-                小号: 510,
-                中号: 1092,
-                大号: 1146,
-                左边: 96,
-                右边: 678,
-                顶部: 246,
-                中间: 882,
-                底部: 1518
-            },
-
+            "2778": { 小号: 510, 中号: 1092, 大号: 1146, 左边: 96, 右边: 678, 顶部: 246, 中间: 882, 底部: 1518 },
             // 12 and 12 Pro
-            "2532": {
-                小号: 474,
-                中号: 1014,
-                大号: 1062,
-                左边: 78,
-                右边: 618,
-                顶部: 231,
-                中间: 819,
-                底部: 1407
-            },
-
+            "2532": { 小号: 474, 中号: 1014, 大号: 1062, 左边: 78, 右边: 618, 顶部: 231, 中间: 819, 底部: 1407 },
             // 11 Pro Max, XS Max
-            "2688": {
-                小号: 507,
-                中号: 1080,
-                大号: 1137,
-                左边: 81,
-                右边: 654,
-                顶部: 228,
-                中间: 858,
-                底部: 1488
-            },
-
+            "2688": { 小号: 507, 中号: 1080, 大号: 1137, 左边: 81, 右边: 654, 顶部: 228, 中间: 858, 底部: 1488 },
             // 11, XR
-            "1792": {
-                小号: 338,
-                中号: 720,
-                大号: 758,
-                左边: 54,
-                右边: 436,
-                顶部: 160,
-                中间: 580,
-                底部: 1000
-            },
-
-
+            "1792": { 小号: 338, 中号: 720, 大号: 758, 左边: 54, 右边: 436, 顶部: 160, 中间: 580, 底部: 1000 },
             // 11 Pro, XS, X, 12 mini
             "2436": {
-                x: {
-                    小号: 465,
-                    中号: 987,
-                    大号: 1035,
-                    左边: 69,
-                    右边: 591,
-                    顶部: 213,
-                    中间: 783,
-                    底部: 1353,
-                },
-
-                mini: {
-                    小号: 465,
-                    中号: 987,
-                    大号: 1035,
-                    左边: 69,
-                    右边: 591,
-                    顶部: 231,
-                    中间: 801,
-                    底部: 1371,
-                }
-
+                x: { 小号: 465, 中号: 987, 大号: 1035, 左边: 69, 右边: 591, 顶部: 213, 中间: 783, 底部: 1353, },
+                mini: { 小号: 465, 中号: 987, 大号: 1035, 左边: 69, 右边: 591, 顶部: 231, 中间: 801, 底部: 1371, }
             },
-
             // Plus phones
-            "2208": {
-                小号: 471,
-                中号: 1044,
-                大号: 1071,
-                左边: 99,
-                右边: 672,
-                顶部: 114,
-                中间: 696,
-                底部: 1278
-            },
-
+            "2208": { 小号: 471, 中号: 1044, 大号: 1071, 左边: 99, 右边: 672, 顶部: 114, 中间: 696, 底部: 1278 },
             // SE2 and 6/6S/7/8
-            "1334": {
-                小号: 296,
-                中号: 642,
-                大号: 648,
-                左边: 54,
-                右边: 400,
-                顶部: 60,
-                中间: 412,
-                底部: 764
-            },
-
+            "1334": { 小号: 296, 中号: 642, 大号: 648, 左边: 54, 右边: 400, 顶部: 60, 中间: 412, 底部: 764 },
             // SE1
-            "1136": {
-                小号: 282,
-                中号: 584,
-                大号: 622,
-                左边: 30,
-                右边: 332,
-                顶部: 59,
-                中间: 399,
-                底部: 399
-            },
-
+            "1136": { 小号: 282, 中号: 584, 大号: 622, 左边: 30, 右边: 332, 顶部: 59, 中间: 399, 底部: 399 },
             // 11 and XR in Display Zoom mode
-            "1624": {
-                小号: 310,
-                中号: 658,
-                大号: 690,
-                左边: 46,
-                右边: 394,
-                顶部: 142,
-                中间: 522,
-                底部: 902
-            },
-
+            "1624": { 小号: 310, 中号: 658, 大号: 690, 左边: 46, 右边: 394, 顶部: 142, 中间: 522, 底部: 902 },
             // Plus in Display Zoom mode
-            "2001": {
-                小号: 444,
-                中号: 963,
-                大号: 972,
-                左边: 81,
-                右边: 600,
-                顶部: 90,
-                中间: 618,
-                底部: 1146
-            },
+            "2001": { 小号: 444, 中号: 963, 大号: 972, 左边: 81, 右边: 600, 顶部: 90, 中间: 618, 底部: 1146 },
         }
         return phones
     }
 
     /**
-    * ------------------------------------------------------------------------------
-    */
-
+     * ------------------------------------------------------------------------------
+     */
 
     /**
-    * 运行小组件
-    * @param {ListWidget} widget 小组件
-    * @param {bool} needSetBg 是否需要设置背景
+    * 获取农历信息
     */
-    async runWidget(widget, needSetBg = true) {
-        // 设置边距(上，左，下，右)
-        widget.setPadding(this.padding.top, this.padding.left, this.padding.bottom, this.padding.right)
-        // 设置刷新间隔
-        widget.refreshAfterDate = new Date(this.refreshInterval * 60 * 1000)
+    async getLunar() {
+        const day = new Date().getDate() - 1
+        // 万年历数据
+        const url = "https://wannianrili.51240.com/"
+        const defaultHeaders = {
+            "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.67 Safari/537.36"
+        }
+        const html = await this.httpGet(url, false, defaultHeaders)
+        let webview = new WebView()
+        await webview.loadHTML(html)
+        var getData = `
+            function getData() {
+                try {
+                    infoLunarText = document.querySelector('div#wnrl_k_you_id_${day}.wnrl_k_you .wnrl_k_you_id_wnrl_nongli').innerText
+                    holidayText = document.querySelectorAll('div.wnrl_k_zuo div.wnrl_riqi')[${day}].querySelector('.wnrl_td_bzl').innerText
+                    lunarYearText = document.querySelector('div.wnrl_k_you_id_wnrl_nongli_ganzhi').innerText
+                    lunarYearText = lunarYearText.slice(0, lunarYearText.indexOf('年') + 1)
+                    if (infoLunarText.search(holidayText) != -1) {
+                        holidayText = ''
+                    }
+                } catch {
+                    infoLunarText = '*'
+                    holidayText = '*'
+                    lunarYearText = '*'
+                }
+                return { infoLunarText: infoLunarText, holidayText: holidayText , lunarYearText: lunarYearText}
+            }
+            getData()
+        `
+        // 节日数据  
+        const response = await webview.evaluateJavaScript(getData, false)
+        console.log(`🤖农历数据：${JSON.stringify(response)}`);
+        console.log(`----------------------------------------`)
+        return response
+    }
 
+    //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+    provideDefaultWidget() {
+        //====================================
+        const widget = new ListWidget();
+        //====================================
+        let stack = widget.addStack();
+        stack.addText("未提供此组件");
+        stack.centerAlignContent();
+        //====================================
+        return widget;
+    }
+
+    /**
+     * 菜单渲染
+     * @param {配置菜单} configArr 
+     */
+    async renderTable(configArr, table = new UITable()) {
+        table.showSeparators = true;
+        table.removeAllRows();
+        for (const config of configArr) {
+            //-------------------------------------------
+            const header = new UITableRow();
+            const heading = header.addText(config.header);
+            heading.titleFont = Font.semiboldMonospacedSystemFont(17);
+            heading.titleColor = new Color('#444');
+            heading.leftAligned();
+            table.addRow(header);
+            //-------------------------------------------
+            for (const child of config.children) {
+                const row = new UITableRow();
+                if (child.cellSpacing) {
+                    row.cellSpacing = child.cellSpacing;
+                }
+                row.height = child.height || 44;
+                let image;
+                let icon = child.icon;
+                if ((icon + '').startsWith('http')) {
+                    image = await this.getImageByUrl(icon);
+                } else {
+                    image = await this.drawTableIcon(
+                        icon.name,
+                        icon.color,
+                        child.cornerWidth
+                    )
+                }
+                const imageCell = row.addImage(image);
+                imageCell.widthWeight = 100;
+                //
+                const rowTitle = row.addText(child.title);
+                rowTitle.widthWeight = 600;
+                rowTitle.titleFont = Font.regularMonospacedSystemFont(15);
+                rowTitle.titleColor = child.titleColor || new Color('#6C5CE9');
+                //
+                const valText = row.addText(`${child.subTitle || ''} ›`);
+                valText.widthWeight = 300;
+                valText.rightAligned();
+                valText.titleColor = child.subTitleColor || new Color('#6C5CE9');
+                valText.titleFont = Font.regularMonospacedSystemFont(14);
+                //
+                row.dismissOnSelect = child.clickDismiss || false;
+                row.onSelect = async () => {
+                    try {
+                        await child.onClick(child);
+                    } catch (e) {
+                        console.error(e);
+                    }
+                };
+                table.addRow(row);
+            };
+        }
+        //-------------------------------------------
+        const gzhRow = new UITableRow();
+        gzhRow.height = 200;
+        let gzhImage = await this.getImageByUrl('https://gitee.com/enjoyee/img/raw/master/other/wechat_pay.png');
+        gzhRow.addImage(gzhImage);
+        gzhRow.dismissOnSelect = false;
+        table.addRow(gzhRow);
+        //-------------------------------------------
+        table.reload();
+        table.present(false);
+    }
+
+    /**
+     * 环境同步更新
+     * @returns 
+     */
+    async fetchEnv() {
+        let updateResult = false;
+        const envFileName = module.filename;
+        const envDownloadUrl = 'https://gitee.com/enjoyee/scriptable/raw/develop/lsp%E7%8E%AF%E5%A2%83.js';
+        let fileManager = FileManager.local();
+        try {
+            const iCloudInUse = fileManager.isFileStoredIniCloud(envFileName);
+            fileManager = iCloudInUse ? FileManager.iCloud() : fileManager;
+            const req = new Request(envDownloadUrl);
+            const codeString = await req.loadString();
+            fileManager.writeString(envFileName, codeString);
+            updateResult = true;
+            console.log("✅环境同步更新完成");
+        } catch {
+            this.generateAlert('❌环境同步更新失败', ["好的"]);
+            console.log("❌环境同步更新失败");
+        }
+        console.log(`----------------------------------------`)
+        return updateResult;
+    }
+
+    /**
+    * 下载更新
+    */
+    async downloadUpdate(filename, downloadURL) {
+        const result = await this.fetchEnv();
+        console.log(`✋🏻filename=${filename}, downloadURL=${downloadURL}`);
+        if (result) {
+            let fileManager = FileManager.local();
+            try {
+                const iCloudInUse = fileManager.isFileStoredIniCloud(filename);
+                fileManager = iCloudInUse ? FileManager.iCloud() : fileManager;
+                const req = new Request(downloadURL);
+                const codeString = await req.loadString();
+                fileManager.writeString(filename, codeString);
+                await this.generateAlert('✅同步更新完成', ["重新运行"]);
+                console.log("✅组件更新完成");
+                console.log(`----------------------------------------`)
+                Safari.open(`scriptable:///run/${encodeURIComponent(this.scriptName)}`);
+            } catch {
+                this.generateAlert('❌组件更新失败，请稍后重试', ["好的"]);
+                console.error("❌组件更新失败，请稍后重试");
+                console.log(`----------------------------------------`)
+            }
+        }
+    }
+
+    /**
+     * 兼容旧版本
+     * @param {*} needSetBg 
+     */
+    async _oldPreSet(needSetBg = true) {
         if (needSetBg) {
             // 需要选择图片
             if (this.picBgMode) {
                 await this.transparentBg()
             }
+        }
+    }
 
-            // 设置图片背景
-            if (!this.colorBgMode) {
-                const bgImg = this.loadImgCache(this.scriptName)
-                if (bgImg != undefined && bgImg != null) {
-                    widget.backgroundImage = bgImg
-                }
-            } else {
-                // 设置纯色背景 
-                widget.backgroundColor = this.bgColor
+    /**
+    * 运行小组件
+    * @param {ListWidget} widget 小组件
+    * @param {bool} needSetBg 是否需要设置背景
+    * @param {bool} visualMode 可视化编辑模式
+    */
+    async runWidget(widget, needSetBg = true, visualMode = false) {
+        // 设置边距(上，左，下，右)
+        widget.setPadding(this.padding.top, this.padding.left, this.padding.bottom, this.padding.right)
+        // 设置刷新间隔
+        widget.refreshAfterDate = new Date(this.refreshInterval * 60 * 1000)
+        // 兼容旧版本
+        if (!visualMode) {
+            await this._oldPreSet(needSetBg);
+        }
+        // 设置图片背景
+        const colorBgMode = this.keyGet(this.colorBgModeKey, 'true');
+        if (colorBgMode == 'true') {
+            // 设置渐变色背景 
+            console.log(`🪢纯色背景🪢`);
+            let colorCache = this.keyGet(this.colorCacheKey, this.defaultWidgetBgColor);
+            widget.backgroundGradient = this.getLinearGradientColor(this.getColors(colorCache));
+        } else {
+            console.log(`🪢图片背景🪢`);
+            const bgImg = this.loadImgCache(this.scriptName)
+            if (bgImg != undefined && bgImg != null) {
+                widget.backgroundImage = bgImg
             }
         }
-
-        // 设置组件
-        Script.setWidget(widget)
         if (this.previewSizeMode >= 0) {
             // 预览
             if (config.runsInApp) {
-                if (this.previewSizeMode == 1) {
-                    widget.presentMedium()
-                } else if (this.previewSizeMode == 2) {
-                    widget.presentLarge()
-                } else {
-                    widget.presentSmall()
+                switch (this.previewSizeMode) {
+                    case 1:
+                        widget.presentMedium();
+                        break;
+                    case 2:
+                        widget.presentLarge();
+                        break;
+                    default:
+                        widget.presentSmall();
+                        break;
                 }
             }
         }
+        // 设置组件
+        Script.setWidget(widget)
         // 完成脚本
         Script.complete()
     }
 
 }
+//================================================================================================
+const Running = async (Widget, scriptName, needSetBg = true, newConfig = { visualMode: false, small: false, medium: false, large: false, accessoryCircular: false, accessoryRectangular: false, accessoryInline: false }) => {
+    const M = new Widget(scriptName)
+    if (newConfig.visualMode) {
+        if (config.runsInApp) {
+            // 预览点击
+            const previewClick = async (item) => {
+                try {
+                    let W;
+                    switch ((item.subTitle || '').toLowerCase()) {
+                        case 'medium':
+                            M.setPreViewSizeMode(1);
+                            W = newConfig.medium ? await M.provideMediumWidget() : M.provideDefaultWidget();
+                            break;
 
-//================================
+                        case 'large':
+                            M.setPreViewSizeMode(2);
+                            W = newConfig.large ? await M.provideLargeWidget() : M.provideDefaultWidget();
+                            break;
+
+                        default:
+                            M.setPreViewSizeMode(0);
+                            W = newConfig.small ? await M.provideSmallWidget() : M.provideDefaultWidget();
+                            break;
+                    }
+                    if (W != undefined) {
+                        await M.runWidget(W, false, true);
+                    }
+                } catch (err) {
+                    M.generateAlert(`运行错误❌\n${err}`, ["好的"]);
+                    console.error(err);
+                }
+            }
+            // 通用设置点击
+            const commonClick = async (item) => {
+                switch (item.title) {
+                    case '组件背景':
+                        await M.renderTable(widgetBgSettingArr);
+                        break;
+
+                    case '刷新时间':
+                        const refreshTimeCache = M.keyGet(M.refreshTimeKey, '30');
+                        M.generateInputAlert('组件刷新时间', '1.刷新时间仅供参考\n2.具体刷新间隔由系统决定，单位：分钟', "请输入时间", refreshTimeCache, (content) => {
+                            // 保存本地
+                            M.keySave(M.refreshTimeKey, content);
+                            M.refreshIntervalTime(Number(content));
+                        });
+                        break;
+
+                    case '组件更新':
+                        await M.downloadUpdate(M.moduleName, `https://gitee.com/enjoyee/scriptable/raw/develop/${encodeURIComponent(M.scriptName)}.js`);
+                        break;
+
+                    case '清理缓存':
+                        let response = await M.generateAlert('是否清理所有组件缓存？\n注意：包括所有组件背景图!', ['取消', '清理']);
+                        if (response === 1) {
+                            M.removeAllCache();
+                            response = await M.generateAlert('缓存已清理完成', ['重新运行']);
+                            if (response === 0) {
+                                Safari.open(`scriptable:///run/${encodeURIComponent(M.scriptName)}`);
+                            }
+                        }
+                        break;
+                }
+            };
+            // 组件背景点击
+            const bgItemClick = async (item) => {
+                switch (item.title) {
+                    case '透明背景':
+                        await M.transparentBg();
+                        M.keySave(M.colorBgModeKey, 'false');
+                        M.setColorBgMode(false);
+                        break;
+
+                    case '在线背景':
+                        try {
+                            //======================================================
+                            const cacheUrlKey = M.scriptName + '_online_bg';
+                            let cacheUrl = M.keyGet(cacheUrlKey, '');
+                            const cacheColorKey = M.scriptName + '_online_color';
+                            let cacheColor = M.keyGet(cacheColorKey, M.defaultBgShadowColor);
+                            const cacheAlphaKey = M.scriptName + '_online_alpha';
+                            let cacheAlpha = M.keyGet(cacheAlphaKey, `${M.defaultBgAlpha}`);
+                            //======================================================
+                            let alert = new Alert();
+                            alert.title = '在线图片';
+                            alert.message = '图片尺寸不要过大\n要不然可能会设置失败\n最好自己裁剪成合适尺寸';
+                            alert.addTextField('请输入图片地址', cacheUrl);
+                            alert.addTextField('请输入图片蒙层颜色', cacheColor);
+                            alert.addTextField('请输入图片蒙层透明度0~1', cacheAlpha);
+                            alert.addCancelAction("取消");
+                            alert.addAction("确定");
+                            let selectIndex = await alert.presentAlert();
+                            if (selectIndex !== -1) {
+                                let imgUrl = alert.textFieldValue(0);
+                                if (imgUrl.length == 0) return;
+                                let image = await M.getImageByUrl(imgUrl);
+                                M.keySave(cacheUrlKey, imgUrl);
+                                //
+                                let shadowColor = alert.textFieldValue(1) || M.defaultBgShadowColor;
+                                M.keySave(cacheColorKey, shadowColor);
+                                let shadowColorAlph = alert.textFieldValue(2);
+                                M.keySave(cacheAlphaKey, shadowColorAlph);
+                                image = await M.loadShadowColor2Image(image, new Color(shadowColor, Number(shadowColorAlph)));
+                                //
+                                M.saveImgCache(M.scriptName, image);
+                                M.keySave(M.colorBgModeKey, 'false');
+                                M.setColorBgMode(false);
+                                await M.generateAlert('✅在线图片背景设置完成', ['好的']);
+                            }
+                        } catch (error) {
+                            M.generateAlert(`填写格式❌\n${error}`, ["好的"]);
+                            console.error(error);
+                        }
+                        break;
+
+                    case '颜色背景':
+                        const colorCache = M.keyGet(M.colorCacheKey, M.defaultWidgetBgColor);
+                        const colorAngleCache = M.keyGet(M.colorAngleCacheKey, M.defaultGradientAngle);
+                        let alert = new Alert();
+                        alert.title = '小组件背景颜色';
+                        alert.message = '1.颜色，各颜色之间以英文逗号分隔\n2.请自行去网站上搜寻颜色（Hex 颜色）';
+                        alert.addTextField('请输入颜色组', `${colorCache}`);
+                        alert.addTextField('请输入渐变角度0~180', `${colorAngleCache}`);
+                        alert.addCancelAction("取消");
+                        alert.addAction("确定");
+                        let selectIndex = await alert.presentAlert();
+                        if (selectIndex !== -1) {
+                            let colors = alert.textFieldValue(0);
+                            if (colors.length == 0) return;
+                            M.keySave(M.colorCacheKey, colors);
+                            M.setColorBgMode(true);
+                            //==========================================
+                            let colorAngle = alert.textFieldValue(1) || M.defaultGradientAngle;
+                            M.keySave(M.colorAngleCacheKey, colorAngle);
+                            M.keySave(M.colorBgModeKey, 'true');
+                            //
+                            await M.generateAlert('✅颜色背景设置完成', ['好的']);
+                        }
+                        break;
+                }
+            }
+            const widgetPreviewArr = [];
+            if (newConfig.small) {
+                widgetPreviewArr.push({
+                    icon: { name: 'app', color: '#9B97E8', cornerWidth: 40 },
+                    title: '小尺寸',
+                    subTitle: 'Small',
+                    onClick: previewClick
+                });
+            }
+            if (newConfig.medium) {
+                widgetPreviewArr.push({
+                    icon: { name: 'rectangle', color: '#9B97E8', cornerWidth: 40 },
+                    title: '中尺寸',
+                    subTitle: 'Medium',
+                    onClick: previewClick
+                });
+            }
+            if (newConfig.large) {
+                widgetPreviewArr.push({
+                    icon: { name: 'rectangle.portrait', color: '#9B97E8', cornerWidth: 40 },
+                    title: '大尺寸',
+                    subTitle: 'Large',
+                    onClick: previewClick
+                });
+            }
+            // 组件设置菜单
+            const widgetSettingConfigArr = M.configArr;
+            widgetSettingConfigArr.push({
+                icon: { name: 'text.below.photo.fill', color: '#E6639B', cornerWidth: 40 },
+                title: '组件背景',
+                onClick: commonClick
+            });
+            const widgetSettingArr = [
+                {
+                    header: '组件设置',
+                    children: widgetSettingConfigArr
+                },
+                {
+                    header: '通用设置',
+                    children: [
+                        {
+                            icon: { name: 'clock.arrow.circlepath', color: '#FF8066', cornerWidth: 40 },
+                            title: '刷新时间',
+                            onClick: commonClick
+                        },
+                        {
+                            icon: { name: 'arrow.down.doc', color: '#00C9A7', cornerWidth: 40 },
+                            title: '组件更新',
+                            onClick: commonClick
+                        },
+                        {
+                            icon: { name: 'trash', color: '#6794C7', cornerWidth: 40 },
+                            title: '清理缓存',
+                            onClick: commonClick
+                        },
+                    ]
+                },
+                {
+                    header: '组件预览',
+                    children: widgetPreviewArr
+                }
+            ];
+            // 组件背景设置菜单
+            const widgetBgSettingArr = [
+                {
+                    header: '组件背景设置',
+                    children: [
+                        {
+                            icon: { name: 'photo.on.rectangle.angled', color: '#FC867D', cornerWidth: 40 },
+                            title: '透明背景',
+                            onClick: bgItemClick
+                        },
+                        {
+                            icon: { name: 'photo.artframe', color: '#EF5064', cornerWidth: 40 },
+                            title: '在线背景',
+                            onClick: bgItemClick
+                        },
+                        {
+                            icon: { name: 'photo.stack', color: '#c02c38', cornerWidth: 40 },
+                            title: '颜色背景',
+                            onClick: bgItemClick
+                        },
+                    ]
+                },
+            ];
+            // 渲染
+            await M.renderTable(widgetSettingArr);
+        } else {
+            let W;
+            const widgetFamily = config.widgetFamily;
+            switch (widgetFamily) {
+                case 'medium':
+                    W = newConfig.medium ? await M.provideMediumWidget() : M.provideDefaultWidget();
+                    break;
+
+                case 'large':
+                    W = newConfig.large ? await M.provideLargeWidget() : M.provideDefaultWidget();
+                    break;
+
+                case 'accessoryCircular': // 锁屏小
+                    W = newConfig.accessoryCircular ? await M.provideCircularWidget() : M.provideDefaultWidget();
+                    break;
+
+                case 'accessoryRectangular': // 锁屏大
+                    W = newConfig.accessoryRectangular ? await M.provideRectangularWidget() : M.provideDefaultWidget();
+                    break;
+
+                case 'accessoryInline': // 锁屏顶部长条
+                    W = newConfig.accessoryInline ? await M.provideInlineWidget() : M.provideDefaultWidget();
+                    break;
+
+                default:
+                    W = newConfig.small ? await M.provideSmallWidget() : M.provideDefaultWidget();
+                    break;
+            }
+            if (W != undefined) {
+                await M.runWidget(W, false, true);
+            }
+        }
+    } else {
+        const W = await M.render()
+        if (W != undefined) {
+            await M.runWidget(W, needSetBg)
+        }
+    }
+
+}
+
+//================================================================================================
 /**
 * 自定义字体渲染
 */
@@ -1741,27 +2324,28 @@ class CustomFont {
         this.webview = webview || new WebView()
         this.fontFamily = config.fontFamily || 'customFont'
         this.fontUrl = 'url(' + config.fontUrl + ')'
-        this.timeout = config.timeout || 60000
+        this.timeout = config.timeout || 20000
     }
 
     async load() { // 加载字体
         return await this.webview.evaluateJavaScript(`
-            const customFont = new FontFace("${this.fontFamily}", "${this.fontUrl}");
-            const canvas = document.createElement("canvas");
-            const ctx = canvas.getContext("2d");
-            let baseHeight,extendHeight;
-            console.log('loading font.');
-            customFont.load().then((font) => {
+        const customFont = new FontFace("${this.fontFamily}", "${this.fontUrl}");
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        let baseHeight,extendHeight;
+        log('🚀开始加载自定义字体.');
+        customFont.load().then((font) => {
             document.fonts.add(font);
-            console.log('load font successfully.');
             completion(true);
-            });
-            setTimeout(()=>{
-            console.log('load font failed：timeout.');
+            log('✅自定义字体加载成功.');
+            log('----------------------------------------')
+        });
+        setTimeout(()=>{
+            log('🚫自定义字体加载超时');
+            log('----------------------------------------')
             completion(false);
-            },${this.timeout});
-            null`
-        )
+        },${this.timeout});
+        null`, true)
     }
 
     async drawText(text, config) {
@@ -1772,10 +2356,9 @@ class CustomFont {
         const lineLimit = config.lineLimit || 99
         const rowSpacing = config.rowSpacing || 0
         const textColor = config.textColor || 'white'
-        
         const textArray = await this.cutText(text, fontSize, textWidth)
         const scale = config.scale || 1
-        
+
         let script = ''
         for (let i in textArray) {
             let content = textArray[i].str
@@ -1800,20 +2383,19 @@ class CustomFont {
         const realWidth = textArray.length > 1 ? textWidth : textArray[0].len
         const lineCount = lineLimit < textArray.length ? lineLimit : textArray.length
         const returnValue = await this.webview.evaluateJavaScript(`
-            canvas.width=${realWidth}*${scale};
-            ctx.font = "${fontSize}px ${this.fontFamily}";
-            ctx.textBaseline= "hanging";
-            baseHeight= ${(fontSize + rowSpacing) * (lineCount - 1)};
-            extendHeight= ctx.measureText('qypgj').actualBoundingBoxDescent;
-            canvas.height= (baseHeight + extendHeight)*${scale};
-            ctx.scale(${scale}, ${scale});
-
-            ctx.font = "${fontSize}px ${this.fontFamily}";
-            ctx.fillStyle = "${textColor}";
-            ctx.textBaseline= "hanging";
-            ${script}
-            canvas.toDataURL()`
-        )
+        canvas.width=${realWidth}*${scale};
+        ctx.font = "${fontSize}px ${this.fontFamily}";
+        ctx.textBaseline= "hanging";
+        baseHeight= ${(fontSize + rowSpacing) * (lineCount - 1)};
+        extendHeight= ctx.measureText('qypgj').actualBoundingBoxDescent;
+        canvas.height= (baseHeight + extendHeight)*${scale};
+        ctx.scale(${scale}, ${scale});
+    
+        ctx.font = "${fontSize}px ${this.fontFamily}";
+        ctx.fillStyle = "${textColor}";
+        ctx.textBaseline= "hanging";
+        ${script}
+        canvas.toDataURL()`, false)
 
         const imageDataString = returnValue.slice(22)
         const imageData = Data.fromBase64String(imageDataString)
@@ -1822,50 +2404,39 @@ class CustomFont {
 
     async cutText(text, fontSize, textWidth) { // 处理文本
         return await this.webview.evaluateJavaScript(`
-            function cutText(textWidth, text) {
-                ctx.font = "${fontSize}px ${this.fontFamily}";
-                ctx.textBaseline = "hanging";
-            
-                let textArray = [];
-                let len = 0, str = '';
-                for (let i = 0; i < text.length; i++) {
-                    const char = text[i]
-                    const width = ctx.measureText(char).width;
-                    if (len < textWidth) {
-                        str = str + char;
-                        len = len + width;
-                    }
-                    if (len == textWidth) {
-                        textArray.push({ str: str, len: len, });
-                        str = ''; len = 0;
-                    }
-                    if (len > textWidth) {
-                        textArray.push({
-                            str: str.substring(0, str.length - 1),
-                            len: len - width,
-                        });
-                        str = char; len = width;
-                    }
-                    if (i == text.length - 1 && str) {
-                        textArray.push({ str: str, len: len, });
-                    }
+        function cutText(textWidth, text){
+            ctx.font = "${fontSize}px ${this.fontFamily}";
+            ctx.textBaseline= "hanging";
+    
+            let textArray=[];
+            let len=0,str='';
+            for(let i=0;i<text.length;i++){
+                const char=text[i]
+                const width=ctx.measureText(char).width;
+                if(len < textWidth){
+                    str=str+char;
+                    len=len+width;
                 }
-                return textArray
+                if(len == textWidth){
+                    textArray.push({str:str,len:len,});
+                    str='';len=0;
+                }
+                if(len > textWidth){
+                    textArray.push({
+                    str:str.substring(0,str.length-1),
+                    len:len-width,});
+                    str=char;len=width;
+                }
+                if(i==text.length-1 && str){
+                    textArray.push({str:str,len:len,});
+                }
             }
-            cutText(${ textWidth }, "${text}")
+            return textArray
+        }
+        cutText(${textWidth},"${text}")
         `)
     }
 }
-
-//================================
-const Running = async (Widget, scriptName, needSetBg = true) => {
-    const M = new Widget(scriptName)
-    const W = await M.render()
-    if (W != undefined) {
-        await M.runWidget(W, needSetBg)
-    }
-}
-//================================
 
 //================================
 module.exports = {
