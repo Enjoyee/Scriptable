@@ -424,6 +424,7 @@ class Widget extends BaseWidget {
       totalBalanceVoiceAmount = response.voiceBalance;
     }
     // 流量&语音
+    let isUnlimitedFlow = false;
     response?.items?.forEach((data) => {
       if (data.offerType !== 19) {
         data.items?.forEach((item) => {
@@ -444,17 +445,14 @@ class Widget extends BaseWidget {
               }
               totalFlowAmount += parseFloat(ratableAmount);
               totalBalanceFlowAmount += parseFloat(balanceAmount);
-              totalUsedFlowAmount += parseFloat(usedAmount);
             }
+            totalUsedFlowAmount += parseFloat(item.usageAmount);
             if (showUsedFlow) {
               this.flow.title = '⛽️ 流量已用：';
             }
             if (data.offerType == 21 && item.ratableAmount == '0') {
               // 无限流量用户
-              const usageAmountObj = this.formatFlow(item.usageAmount);
-              this.flow.title = '⛽️ 流量已用：';
-              this.flow.balance = usageAmountObj.amount;
-              this.flow.unit = usageAmountObj.unit;
+              isUnlimitedFlow = true;
             }
           } else if (!response.voiceBalance && item.unitTypeId == 1) {
             totalVoiceAmount += parseInt(item.ratableAmount);
@@ -477,6 +475,12 @@ class Widget extends BaseWidget {
     this.flow.percent = ((totalBalanceFlowAmount / (totalFlowAmount || 1)) * 100).toFixed(2);
     this.flow.balance = finalBalanceFlowObj.amount;
     this.flow.unit = finalBalanceFlowObj.unit;
+    if (isUnlimitedFlow) {
+      const usageAmountObj = this.formatFlow(totalUsedFlowAmount);
+      this.flow.title = '⛽️ 流量已用：';
+      this.flow.balance = usageAmountObj.amount;
+      this.flow.unit = usageAmountObj.unit;
+    }
     // 设置语音
     this.voice.percent = ((totalBalanceVoiceAmount / (totalVoiceAmount || 1)) * 100).toFixed(2);
     this.voice.balance = totalBalanceVoiceAmount;
