@@ -1,0 +1,390 @@
+var floatyWindow = floaty.window(
+  <frame gravity="center" bg="#FFFFFF" alpha="0.8">
+    <text id="text" textColor="red" textStyle="bold" borderWidth="5" borderColor="blue" textSize="14sp">悬浮文字</text>
+  </frame>
+);
+floatyWindow.setPosition(0, 100);
+floatyWindow.exitOnClose();
+function floatyText(text) {
+  ui.run(function () {
+    floatyWindow.text.setText(text);
+  });
+}
+
+const splitStr = "；";
+let searchKeywords = "论文查重";
+let commentKeywords = "需要；我；费用；招生；求"
+let messageContents = "你好"
+const viewedVideos = [];
+const viewedUsers = [];
+
+floatyText(`打开抖音`);
+launchApp("抖音");
+for (let index = 0; index < 10; index++) {
+  if (currentActivity() != "com.ss.android.ugc.aweme.main.MainActivity") {
+    sleep(1e3);
+  }
+}
+floatyText(`抖音首页`);
+sleep(1e3);
+
+let recommendNodes = text("推荐").find(10e3);
+if (recommendNodes && recommendNodes.length > 0) {
+  floatyText("点击推荐tab");
+  nodeClick(recommendNodes[0]);
+  sleep(1000);
+}
+
+// 搜索按钮
+let searchNodes = id("1f5").className("android.widget.Button").find(10e3);
+if (searchNodes && searchNodes.length > 0) {
+  floatyText("点击搜索按钮");
+  nodeClick(searchNodes[0]);
+  sleep(2e3);
+  floatyText("输入关键字");
+  setText(searchKeywords);
+  sleep(1e3);
+  floatyText("点击搜索");
+  nodeClick(text("搜索").findOne());
+  sleep(random(3e3, 6e3));
+  // 筛选出视频tab
+  let tabNodes = id("text1").className("android.widget.Button").find(5e3);
+  tabNodes.forEach(node => {
+    if (node.getText() == '视频') {
+      nodeClick(node)
+      floatySleepText(random(5, 8), "切换到视频tab");
+      checkVideoTab();
+    }
+  });
+}
+
+// 视频列表查看
+function checkVideoTab() {
+  while (true) {
+    let videos = id("cyq").className("android.widget.LinearLayout").find(10e3);
+    videos.forEach(videoNode => {
+      if (videoNode.visibleToUser()) {
+        let desc = '';
+        let userName = '';
+        let date = '';
+        // 简介
+        let descNodes = id("desc").className("android.widget.TextView").find(10e3);
+        descNodes.forEach(node => {
+          let resultNode = findNodeInBounds(videoNode, node);
+          if (resultNode && desc.length == 0) {
+            desc = resultNode.getText().toString();
+          }
+        });
+        // 用户名
+        let userNameNodes = id("+q").className("android.widget.TextView").find(10e3);
+        userNameNodes.forEach(node => {
+          let resultNode = findNodeInBounds(videoNode, node);
+          if (resultNode && userName.length == 0) {
+            userName = resultNode.getText().toString();
+          }
+        });
+        // 日期
+        let dateNodes = id("2m+").className("android.widget.TextView").find(10e3);
+        dateNodes.forEach(node => {
+          let resultNode = findNodeInBounds(videoNode, node);
+          if (resultNode && date.length == 0) {
+            date = resultNode.getText().toString();
+          }
+        });
+        /////
+        console.log(`观看：${userName}的视频`);
+        if (!viewedVideos.includes(userName + desc)) {
+          viewedVideos.push(userName + desc);
+          let parent = videoNode.parent();
+          if (parent != null) {
+            nodeClick(videoNode);
+          }
+          floatySleepText(random(5, 10), `观看【${userName}】的视频`);
+          // 点击评论按钮
+          clickCommentBtn();
+        }
+      }
+    });
+    // 视频滑动
+    videoListScroll();
+  }
+}
+
+// 评论按钮
+function clickCommentBtn() {
+  floatyText('点击评论按钮');
+  let commendNodes = id("d6x").className("android.widget.ImageView").find(10e3);
+  if (commendNodes[0].desc() == '评论评论，按钮') {
+    floatySleepText(random(2, 3), `该视频没有评论`);
+  } else {
+    nodeClick(commendNodes[0].parent());
+    floatySleepText(random(2, 3), `点击打开评论列表`);
+    // 查看评论
+    checkComment();
+  }
+}
+
+// 开始查看评论
+function checkComment() {
+  let result = true;
+  while (result) {
+    // 展开回复
+    let expandCommendNodes = textMatches(/.*展开\d+条回复/).find();
+    if (expandCommendNodes && expandCommendNodes.length > 0) {
+      nodeClick(expandCommendNodes[0]);
+      floatySleepText(random(3, 5), `点击展开回复`);
+      expandCommendNodes = textMatches(/.*展开\d+条回复/).find();
+      while (expandCommendNodes && expandCommendNodes.length > 0) {
+        nodeClick(expandCommendNodes[0]);
+        floatySleepText(random(3, 5), `点击展开回复`);
+        expandCommendNodes = textMatches(/.*展开\d+条回复/).find();
+      }
+    }
+
+    // 评论区用户评论
+    let mainCommentNodes = id("eub").className("android.widget.FrameLayout").find(10e3);
+    mainCommentNodes.forEach(commentNode => {
+      let { avatarNode, userName, content, date } = getCommentInfoText(commentNode);
+      matchComment(avatarNode, userName, content, date);
+    });
+    let replyCommentNodes = id("k47").className("android.widget.FrameLayout").find(10e3);
+    replyCommentNodes.forEach(commentNode => {
+      let { avatarNode, userName, content, date } = getCommentInfoText(commentNode);
+      matchComment(avatarNode, userName, content, date);
+    });
+    //
+    commentScroll();
+    result = text('暂时没有更多了').find(1e3)[0] == null;
+  }
+  floatySleepText(random(1, 3), `评论已经查看完成，返回上一级`);
+  pressBack(2);
+}
+
+
+/**
+ * 获取评论内容
+ * @param {*} commentNode 
+ * @returns 
+ */
+function getCommentInfoText(commentNode) {
+  let userName = '';
+  let content = '';
+  let date = '';
+  let avatarNode;
+  // ====================================
+  let avatarNodes = descEndsWith("的头像").find(10e3);
+  let contentNodes = id("content").className("android.widget.TextView").find(10e3);
+  let userNameNodes = id("title").className("android.widget.TextView").find(10e3);
+  let replyUserNameNodes = id("0_v").className("android.widget.TextView").find(10e3);
+  let dateNodes = id("d=9").className("android.widget.TextView").find(10e3);
+  // ====================================
+
+  avatarNodes.forEach(node => {
+    let resultNode = findNodeInBounds(commentNode, node);
+    if (resultNode && avatarNode == null) {
+      avatarNode = resultNode;
+    }
+  })
+  userNameNodes.forEach(node => {
+    let resultNode = findNodeInBounds(commentNode, node);
+    if (resultNode && userName.length == 0) {
+      userName = resultNode.getText().toString();
+    }
+  })
+  if (userName.length == 0) {
+    replyUserNameNodes.forEach(node => {
+      let resultNode = findNodeInBounds(commentNode, node);
+      if (resultNode && userName.length == 0) {
+        userName = resultNode.getText().toString();
+      }
+    })
+  }
+  contentNodes.forEach(node => {
+    let resultNode = findNodeInBounds(commentNode, node);
+    if (resultNode && content.length == 0) {
+      content = resultNode.getText().toString();
+    }
+  })
+  dateNodes.forEach(node => {
+    let resultNode = findNodeInBounds(commentNode, node);
+    if (resultNode && date.length == 0) {
+      date = resultNode.getText().toString();
+    }
+  })
+  // ====================================
+  console.log(`获取到的用户名：${userName}，评论内容：${content}，日期：${date}`);
+  console.log(' ');
+  return { avatarNode, userName, content, date };
+}
+
+/**
+ * 匹配符合规则评论
+ * @param {*} userName 
+ * @param {*} content 
+ * @param {*} date 
+ */
+function matchComment(avatarNode, userName, content, date) {
+  if (userName != '' && content != '') {
+    if (viewedUsers.includes(userName)) {
+      floatySleepText(1, `【${userName}】用户已经查看，跳过`);
+    } else {
+      viewedUsers.push(userName);
+      floatyText(`对【${userName}】用户进行关键字匹配`);
+      let matchResult = false;
+      let matchKeywords = '';
+      commentKeywords.split(splitStr).forEach(keyword => {
+        if (!matchResult) {
+          if (content.search(keyword) != -1) {
+            matchResult = true;
+            matchKeywords = keyword;
+          }
+        }
+      });
+      // ====================================
+      if (matchResult) {
+        floatySleepText(random(3, 5), `找到匹配设定的关键字【${matchKeywords}】\n\n评论内容【${content}】`);
+        nodeClick(avatarNode);
+        floatyText(`点击进去用户主页`);
+        userHomePageOperate();
+      } else {
+        floatySleepText(1, `用户【${userName}】评论不匹配规则，跳过`);
+      }
+    }
+    sleep(1e3);
+  }
+}
+
+// 用户主页，关注，私信
+function userHomePageOperate() {
+  let sleepTime = random(1, 6);
+  floatySleepText(sleepTime, `点击进入用户主页`);
+  let privateMessageBtns = text("私信").className("android.widget.TextView").find(3e3);
+  if (privateMessageBtns && privateMessageBtns.length == 0) {
+    // 用户昵称
+    let userNo = id("sh2").findOne().getText().toString();
+    viewedUsers.push(userNo);
+    //
+    // floatyText(`点击关注用户`);
+    // nodeClick(id("jb+").findOne());
+    // sleep(random(2, 5) * 1000);
+    // privateMessageBtns = text("私信").className("android.widget.TextView").find(3e3);
+    // if (privateMessageBtns && privateMessageBtns.length > 0) {
+    //   floatyText(`点击私信`);
+    //   nodeClick(privateMessageBtns[0]);
+    //   sleep(random(2, 5) * 1000);
+    //   let messageContentArr = messageContents.split(splitStr);
+    //   floatyText(`输入私信内容`);
+    //   setText(messageContentArr[random(0, messageContentArr.length - 1)]);
+    //   pressBack(1);
+    // }
+  } else {
+    floatyText(`已关注，跳过`);
+  }
+  pressBack(1);
+}
+
+/**
+ * 在父节点范围内查找子节点
+ * @param {父节点} parentNode 
+ * @param {查找的节点} node 
+ */
+function findNodeInBounds(parentNode, node) {
+  let parentBounds = parentNode.bounds();
+  let parentBoundsLeft = parentBounds.left;
+  let parentBoundsTop = parentBounds.top;
+  let parentBoundsRight = parentBounds.right;
+  let parentBoundsBottom = parentBounds.bottom;
+  //
+  let nodeBounds = node.bounds();
+  let nodeBoundsLeft = nodeBounds.left;
+  let nodeBoundsTop = nodeBounds.top;
+  let nodeBoundsRight = nodeBounds.right;
+  let nodeBoundsBottom = nodeBounds.bottom;
+
+  let resultNode;
+  if (nodeBoundsLeft >= parentBoundsLeft && nodeBoundsTop >= parentBoundsTop && nodeBoundsRight <= parentBoundsRight && nodeBoundsBottom <= parentBoundsBottom) {
+    resultNode = node;
+  }
+  return resultNode;
+}
+
+/**
+ * 悬浮窗休眠显示文字
+ */
+function floatySleepText(time, text) {
+  for (let i = 0; i < time; i++) {
+    floatyText(`${text}，等待${time - i}秒.`)
+    sleep(1000);
+  }
+}
+
+/**
+ * 视频列表翻页
+ */
+function videoListScroll() {
+  swipe(
+    device.width * 0.5 + random(10, 50),
+    device.height * 0.9 + random(10, 50),
+    device.width * 0.5 + random(10, 50),
+    device.height * 0.3 + random(10, 50),
+    random(400, 600)
+  )
+  sleep(random(1e3, 3e3));
+}
+
+/**
+ * 评论翻页
+ */
+function commentScroll() {
+  swipe(
+    device.width * 0.5 + random(10, 50),
+    device.height * 0.6 + random(10, 50),
+    device.width * 0.5 + random(10, 50),
+    device.height * 0.3 + random(10, 50),
+    random(400, 600)
+  )
+  sleep(random(1e3, 3e3));
+}
+
+/**
+ * 节点点击
+ * @param {页面节点} node 
+ */
+function nodeClick(node) {
+  if (node) {
+    let result = node.click();
+    if (!result) {
+      clickCenter(node);
+    }
+  } else {
+    console.error('节点点击失败');
+  }
+}
+
+/**
+ * 点击节点中心
+ * @param {节点} node 
+ */
+function clickCenter(node) {
+  if (node) {
+    let bounds = node.bounds();
+    let boundsWidth = bounds.width();
+    let boundsHeight = bounds.height();
+    click(bounds.centerX() + random(-boundsWidth / 3, boundsWidth / 3), bounds.centerY() + random(-boundsHeight / 3, boundsHeight / 3));
+  } else {
+    console.error('点击节点中心失败')
+  }
+}
+
+/**
+ * 点击系统返回操作
+ * @param {返回次数} count 
+ */
+function pressBack(count) {
+  for (let index = 0; index < count; index++) {
+    sleep(random(600, 1000));
+    back();
+  }
+}
+
+
