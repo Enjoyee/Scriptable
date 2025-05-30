@@ -1,32 +1,79 @@
 # Scriptable
-IOS Scriptable App 脚本分享
 
-## 新系列
+公众号：杂货万事屋，公众号回复对应关键字获取下载脚本，或者直接源码copy自己新增文件。
 
-### 1. 多样式彩云天气
-- 可选透明背景 & 自定义样式背景
-- 天气图标提供了好几套可以自主选择
-- 天气背景提供了好几套可以自主选择，天气背景会根据对应的天气进行变换
-- 其他配置自己进入脚本前面查看即可，都有注释，自行修改运行查看效果即可
-- 彩云key进行缓存，再对下的下次同步不需要重新填入key(2021-03-10)
+---
 
-### 2. 小日历
-- 日程文字颜色同步系统日程颜色
-- 新增圆角指示条配置(schedulesIndicatorRadius)，默认是矩形
-- 新增圆角指示尺寸配置(schedulesIndicatorSize)
-- 实时时间
-- 只做了小型组件支持
-- 未来一周日程前三条展示
-- 支持透明背景
-- 农历展示
+![公众号](https://raw.githubusercontent.com/Enjoyee/Scriptable/v2/img/other/wechat_pay.png)
 
-### 3. 图片轮播
-- 网络图片链接轮播
-- 脚本里内置了line的一些表情的轮播
-- 鬼灭、哆啦A梦、可妮布朗熊、进击的巨人
+---
 
-### 4. 彩云折线
-- 显示温度折线
-- 两种模式，日小时温度模式，每天温度模式
-- 长按小组件编辑，在Parameter栏输入1就是每天的温度模式，2就是日小时温度模式
-- 照旧背景模式
+### `S13，万年历`：
+
+![](https://raw.githubusercontent.com/Enjoyee/Scriptable/v2/preview/s13.jpeg)
+
+### `S12，彩云折线`：
+
+![](https://raw.githubusercontent.com/Enjoyee/Scriptable/v2/preview/s12.jpeg)
+
+### `S11，联通`：
+
+![](https://raw.githubusercontent.com/Enjoyee/Scriptable/v2/preview/s11.jpeg)
+
+### `S10，电信`：
+
+![](https://raw.githubusercontent.com/Enjoyee/Scriptable/v2/preview/s10.jpeg)
+
+### `S9，京东`：
+
+![](https://raw.githubusercontent.com/Enjoyee/Scriptable/v2/preview/s9.jpeg)
+
+### `S8，电影日历`：
+
+![](https://raw.githubusercontent.com/Enjoyee/Scriptable/v2/preview/s8.jpeg)
+
+### `S7，倒计日`：
+
+![](https://raw.githubusercontent.com/Enjoyee/Scriptable/v2/preview/s7.jpeg)
+
+### `S6，今日事项`：
+
+![](https://raw.githubusercontent.com/Enjoyee/Scriptable/v2/preview/s6.jpeg)
+
+### `S5，世界杯`：
+
+![](https://raw.githubusercontent.com/Enjoyee/Scriptable/v2/preview/s5.jpeg)
+
+### `S4，TopHub热榜`：
+
+![](https://raw.githubusercontent.com/Enjoyee/Scriptable/v2/preview/s4.jpeg)
+
+### `S3，随机写真`：
+
+![](https://raw.githubusercontent.com/Enjoyee/Scriptable/v2/preview/s3.jpeg)
+
+### `S2，谷歌青蛙天气`：
+
+![](https://raw.githubusercontent.com/Enjoyee/Scriptable/v2/preview/s2.jpeg)
+
+### `S1，桌面启动`：
+
+![](https://raw.githubusercontent.com/Enjoyee/Scriptable/v2/preview/s1.jpeg)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
